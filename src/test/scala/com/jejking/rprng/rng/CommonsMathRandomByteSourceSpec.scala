@@ -1,10 +1,9 @@
 package com.jejking.rprng.rng
 
-import org.apache.commons.math3.random.AbstractRandomGenerator
 import org.scalatest.{Matchers, FlatSpec}
 
 /**
- * Created by jking on 23/08/15.
+ * Simple tests of [[CommonsMathRandomByteSource]].
  */
 class CommonsMathRandomByteSourceSpec extends FlatSpec with Matchers {
 

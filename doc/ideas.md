@@ -12,9 +12,9 @@ So, we need to take some measures against this.
 
 1. create a reasonable number of actors each wrapping a PRNG that is properly seeded (java.secure.Random)
 2. route randomly across these. This may require extending the random router that comes with Akka.
-3. reseed or recreate the actors at random intervals
+3. recreate the actors at random intervals
 
--> allow reseed of underlying source???
+-> allow reseed of underlying source??? Or just discard and recreate new instance. Keeps instances simple.
 -> we just need to be able to obtain some bytes...
 
 Stream

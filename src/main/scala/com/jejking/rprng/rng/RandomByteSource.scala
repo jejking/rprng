@@ -13,9 +13,19 @@ trait RandomByteSource {
    * @return corresponding array of bytes
    */
   def randomBytes(count: Int): Array[Byte]
+
+  /**
+   * Returns the class of the underlying RNG or other generator.
+   * @return class
+   */
+  def generatorClass(): Class[_]
 }
 
-class CommonsMathRandomByteSource(randomGenerator: RandomGenerator) extends RandomByteSource {
+/**
+ * Implementation of [[RandomByteSource]] based around the Apache Commons Math Library.
+ * @param randomGenerator an instance that supplies the underlying randomness.
+ */
+class CommonsMathRandomByteSource(val randomGenerator: RandomGenerator) extends RandomByteSource {
 
   override def randomBytes(count: Int): Array[Byte] = {
     require(count > 0, "Requested byte array size must be strictly positive")
@@ -24,9 +34,23 @@ class CommonsMathRandomByteSource(randomGenerator: RandomGenerator) extends Rand
     theArray
   }
 
+  override def generatorClass(): Class[_] = {
+    randomGenerator.getClass
+  }
+
 }
 
+case class RandomByteRequest(count: Int)
+
+/**
+ * Companion object with constructor helper.
+ */
 object CommonsMathRandomByteSource {
 
+  /**
+   * Constructs new [[CommonsMathRandomByteSource]] using supplied generator.
+   * @param randomGenerator
+   * @return freshly instantiated generator
+   */
   def apply(randomGenerator: RandomGenerator): CommonsMathRandomByteSource = new CommonsMathRandomByteSource(randomGenerator)
 }

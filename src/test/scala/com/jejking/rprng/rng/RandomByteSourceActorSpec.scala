@@ -10,7 +10,7 @@ import org.scalatest.{BeforeAndAfterAll, FlatSpecLike, FlatSpec, Matchers}
  * Created by jking on 23/08/15.
  */
 class RandomByteSourceActorSpec extends TestKit(ActorSystem("test")) with DefaultTimeout with ImplicitSender
-  with FlatSpecLike with Matchers with BeforeAndAfterAll with ByteStringEquality {
+  with FlatSpecLike with Matchers with BeforeAndAfterAll  {
 
   import RandomByteSourceActor._
 

@@ -13,6 +13,7 @@ libraryDependencies ++= {
   val akkaStreamV = "1.0"
   val scalaTestV  = "2.2.5"
   val commonsMathV = "3.5"
+  val scalaMockV = "3.2.2"
   Seq(
     "org.apache.commons" % "commons-math3"                        % commonsMathV,
     "com.typesafe.akka" %% "akka-actor"                           % akkaV,
@@ -22,6 +23,8 @@ libraryDependencies ++= {
     "com.typesafe.akka" %% "akka-http-spray-json-experimental"    % akkaStreamV,
     "com.typesafe.akka" %% "akka-http-testkit-experimental"       % akkaStreamV % "test",
     "org.scalatest"     %% "scalatest"                            % scalaTestV  % "test",
-    "com.typesafe.akka" %% "akka-testkit"                         % akkaV       % "test"
+    "com.typesafe.akka" %% "akka-testkit"                         % akkaV       % "test",
+    "org.scalamock"     %% "scalamock-core"                       % scalaMockV     % "test",
+    "org.scalamock"     %% "scalamock-scalatest-support"          % scalaMockV     % "test"
   )
 }
