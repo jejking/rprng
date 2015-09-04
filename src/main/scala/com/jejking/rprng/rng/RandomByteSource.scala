@@ -2,55 +2,41 @@ package com.jejking.rprng.rng
 
 import org.apache.commons.math3.random.RandomGenerator
 
-/**
- * Defines functionality to obtain a fixed number of random bytes.
- */
-trait RandomByteSource {
+class RandomByteSource(val randomGenerator: RandomGenerator) {
 
-  /**
-   * Obtains the requested number of bytes.
-   * @param count number of bytes. Must be 1 or greater.
-   * @return corresponding array of bytes
-   */
-  def randomBytes(count: Int): Array[Byte]
-
-  /**
-   * Returns the class of the underlying RNG or other generator.
-   * @return class
-   */
-  def generatorClass(): Class[_]
-}
-
-/**
- * Implementation of [[RandomByteSource]] based around the Apache Commons Math Library.
- * @param randomGenerator an instance that supplies the underlying randomness.
- */
-class CommonsMathRandomByteSource(val randomGenerator: RandomGenerator) extends RandomByteSource {
-
-  override def randomBytes(count: Int): Array[Byte] = {
-    require(count > 0, "Requested byte array size must be strictly positive")
-    val theArray = new Array[Byte](count)
-    randomGenerator.nextBytes(new Array[Byte](count))
+  def randomBytes(request: RandomByteRequest): Array[Byte] = {
+    val theArray = new Array[Byte](request.count)
+    randomGenerator.nextBytes(new Array[Byte](request.count))
     theArray
   }
 
-  override def generatorClass(): Class[_] = {
+  def generatorClass(): Class[_] = {
     randomGenerator.getClass
+  }
+
+  def reseed(seed: Long): Unit = {
+    randomGenerator.setSeed(seed)
   }
 
 }
 
-case class RandomByteRequest(count: Int)
+/**
+ * Request for a given number of bytes.
+ * @param count number off bytes to request, must be strictly positive.
+ */
+case class RandomByteRequest(count: Int) {
+  require(count >= 1, "Requested byte array size must be strictly positive")
+}
 
 /**
  * Companion object with constructor helper.
  */
-object CommonsMathRandomByteSource {
+object RandomByteSource {
 
   /**
-   * Constructs new [[CommonsMathRandomByteSource]] using supplied generator.
-   * @param randomGenerator
-   * @return freshly instantiated generator
+   * Constructs new [[RandomByteSource]] using supplied generator.
+   * @param randomGenerator the underlying generator to use
+   * @return freshly instantiated random byte source
    */
-  def apply(randomGenerator: RandomGenerator): CommonsMathRandomByteSource = new CommonsMathRandomByteSource(randomGenerator)
+  def apply(randomGenerator: RandomGenerator): RandomByteSource = new RandomByteSource(randomGenerator)
 }
