@@ -7,7 +7,7 @@ import java.security.SecureRandom
  */
 class FixedSeedGeneratingSecureRandom extends SecureRandom {
 
-  private val fixedByteSource = new RandomByteSource(FixedApacheRandomGenerator())
+  private val fixedByteSource = new RandomGeneratorByteSource(FixedApacheRandomGenerator())
 
   override def generateSeed(numBytes: Int) =  {
     fixedByteSource.randomBytes(RandomByteRequest(numBytes))

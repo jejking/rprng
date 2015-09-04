@@ -1,6 +1,6 @@
 package com.jejking.rprng.rng
 
-import akka.actor.ActorSystem
+import akka.actor.{Scheduler, ActorSystem}
 import akka.testkit.{ImplicitSender, DefaultTimeout, TestKit, TestActorRef}
 import akka.pattern.ask
 import akka.util.ByteString
@@ -20,8 +20,9 @@ class RandomByteSourceActorSpec extends TestKit(ActorSystem("test")) with Defaul
 
   "the random byte source actor" should "send a message with 4 fixed bytes when assembled with fixed source in response to a request" in {
     // create actor ref with byte source that wraps the fixed source
-    val fixedByteSource = RandomByteSource(FixedApacheRandomGenerator())
-    val actorRef = TestActorRef(new RandomByteSourceActor(fixedByteSource))
+    val fixedByteSource = RandomGeneratorByteSource(FixedApacheRandomGenerator())
+    val fixedSecureSeeder = new SecureRandomSeeder(new FixedSeedGeneratingSecureRandom())
+    val actorRef = TestActorRef(new RandomByteSourceActor(fixedByteSource, fixedSecureSeeder))
 
     // send request for four "random" bytes
     val future = actorRef ? RandomByteRequest(4)
@@ -36,11 +37,25 @@ class RandomByteSourceActorSpec extends TestKit(ActorSystem("test")) with Defaul
   }
 
   it should "initialise itself from a proper seed source" in {
-    fail("not done")
+    val mockByteSource = mock[RandomByteSource]
+    val mockSecureSeeder = mock[SecureSeeder]
+    (mockSecureSeeder.generateSeed _).expects()
+    (mockByteSource.reseed _).expects(*)
+    val actorRef = TestActorRef(new RandomByteSourceActor(mockByteSource, mockSecureSeeder))
+    val future = actorRef ? RandomByteRequest(4)
   }
 
   it should "schedule a message to itself to reseed" in {
-    fail("not done")
+    val mockByteSource = mock[RandomByteSource]
+    val mockSecureSeeder = mock[SecureSeeder]
+    val mockScheduleHelper = mock[ScheduleHelper]
+    val scheduleHelperFactory: ActorSystem => ScheduleHelper = _ => mockScheduleHelper
+
+    val actorRef = TestActorRef(new RandomByteSourceActor(mockByteSource, mockSecureSeeder, scheduleHelperFactory))
+
+    // we expect that the scheduler is called to send a reseed message between min and max duration from now...
+
+    fail("need to do rest")
   }
 
   it should "obtain new seed in a way that does not block message processing" in {
@@ -53,8 +68,9 @@ class RandomByteSourceActorSpec extends TestKit(ActorSystem("test")) with Defaul
 
   it should "politely ignore other message types" in {
     // create actor ref with byte source that wraps the fixed source
-    val fixedByteSource = RandomByteSource(FixedApacheRandomGenerator())
-    val actorRef = TestActorRef(new RandomByteSourceActor(fixedByteSource))
+    val fixedByteSource = RandomGeneratorByteSource(FixedApacheRandomGenerator())
+    val fixedSecureSeeder = new SecureRandomSeeder(new FixedSeedGeneratingSecureRandom())
+    val actorRef = TestActorRef(new RandomByteSourceActor(fixedByteSource, fixedSecureSeeder))
 
     // send request for four "random" bytes
     val future = actorRef ? "Hello"
