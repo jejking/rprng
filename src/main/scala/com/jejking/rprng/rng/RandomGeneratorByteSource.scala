@@ -1,5 +1,7 @@
 package com.jejking.rprng.rng
 
+import java.nio.ByteBuffer
+
 import org.apache.commons.math3.random.RandomGenerator
 
 /**
@@ -11,6 +13,31 @@ trait RandomByteSource {
   def randomBytes(request: RandomByteRequest): Array[Byte]
 
   def reseed(seed: Long): Unit
+
+  def nextLong(): Long = {
+    val bytes = randomBytes(RandomByteRequest(8))
+    val wrapper = ByteBuffer.wrap(bytes)
+    wrapper.getLong
+  }
+
+  def nextDouble(): Double = {
+    val bytes = randomBytes(RandomByteRequest(8))
+    val wrapper = ByteBuffer.wrap(bytes)
+    wrapper.getDouble
+  }
+
+  def nextInt(): Int = {
+    val bytes = randomBytes(RandomByteRequest(4))
+    val wrapper = ByteBuffer.wrap(bytes)
+    wrapper.getInt
+  }
+
+  def nextInt(bound: Int): Int = {
+    require(bound >= 1, "Bound must be strictly positive")
+    // basically scala-ified version of the code from AbstractRandomGenerator.
+    val result: Int = (nextDouble * bound).toInt
+    return if (result < bound) result else bound - 1
+  }
 }
 
 class RandomGeneratorByteSource(val randomGenerator: RandomGenerator) extends RandomByteSource {
