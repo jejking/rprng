@@ -4,32 +4,23 @@ Rough Design Ideas
 PRNG Core
 ---------
 
-Basically we wrap a well-known PRNG from apache commons math in an actor.
+Our fundamental assumption is a trait `RandomByteSource` that allows us to generate an array of random bytes. That functionality is abstract. Other methods, more or less derived from existing code, allow these bytes to be turned into other primitives.
 
-That's OK, but if we can observe the output often enough we may be able to deduce the seed and thus predict the output.
+The one implementation that we have is based on Apache Commons Math and injects instances of `RandomGenerator`.
 
-So, we need to take some measures against this.
+We also allow the instances to be reseeded with (hopefully) high quality random seed.
 
-1. create a reasonable number of actors each wrapping a PRNG that is properly seeded (java.secure.Random)
-2. route randomly across these. This may require extending the random router that comes with Akka.
-3. recreate the actors at random intervals
+In order to allow these to be accessed and used in a threadsafe manner, we wrap them in an Actor. This actor is also responsible for taking some initial counter measures against deriving the seed from observing the output. It is supplied with an instance of a trait `SecureRandomSeeder` which should supplies a high quality long (8 bytes) of random seed from Java `SecureRandom`'s `generateSeed` method which should gather entropy. This seeder is used to initialise the wrapped `RandomByteSource`. At a random interval within a configurable time window, the seeder is again called upon to generate seed and the result is sent back. This seed generation in the running system is scheduled by the akka scheduler but then executed in a future so as not to block the actor.'
 
--> allow reseed of underlying source??? Or just discard and recreate new instance. Keeps instances simple.
--> we just need to be able to obtain some bytes...
+A number of instances of these self-reseeding actors are placed behind a standard Akka random router in order to add another layer of obfuscation to the underlying PRNGs and their state.
 
 Stream
 ------
 
-We can expose this construction as a reactive stream of bytes, encapsulating the non-type safe akka stuff.
+Now, let's see if we can encapsulate this as a stream of ByteStrings or a stream of Ints that are derived from sending
+messages to the router and streaming back the responses from the underlying PRNG actors.
 
-On top of the bytes, we can then assemble various other things:
-* Java / Scala primitives
-
-It should be possible to use the underlying library code to munge these to fall within a given range.
-
-On top of the stream we can then construct collections of a given type and size:
-* lists
-* sets
+The idea would be that we have a `Source[ByteString, Unit]` that we can plug into.
 
 
 Web API
