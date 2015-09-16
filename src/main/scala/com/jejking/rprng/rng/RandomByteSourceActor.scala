@@ -96,7 +96,7 @@ object RandomByteSourceActor {
   sealed trait Error
   case object UnknownInputType extends Error
 
-  def props(byteSource: RandomGeneratorByteSource, secureSeeder: SecureRandomSeeder): Props = Props(new RandomByteSourceActor(byteSource, secureSeeder))
+  def props(byteSource: RandomByteSource, secureSeeder: SecureSeeder): Props = Props(new RandomByteSourceActor(byteSource, secureSeeder))
 
   def computeScheduledTimeToReseed(config: TimeRangeToReseed, byteSource: RandomByteSource): FiniteDuration = {
     // random duration at least min, at most max

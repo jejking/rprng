@@ -4,9 +4,10 @@ import akka.actor.Props
 import akka.pattern.ask
 import akka.stream.actor.ActorPublisher
 import akka.stream.actor.ActorPublisherMessage.{Cancel, Request}
-import akka.util.ByteString
+import akka.util.{Timeout, ByteString}
 
 import scala.util.{Failure, Success}
+import scala.concurrent.duration._
 
 /**
  * Wraps a path to [[RandomByteSourceActor]] (or a router over a bunch of them) to
@@ -14,7 +15,10 @@ import scala.util.{Failure, Success}
  */
 class RandomByteStringActorPublisher(val byteStringSize: Int, val randomByteServicePath: String) extends ActorPublisher[ByteString]  {
 
+  import scala.concurrent.ExecutionContext.Implicits.global
+
   val wrappedActorPath = context.actorSelection(randomByteServicePath)
+  implicit val timeout = Timeout(5 seconds)
 
 
   override def receive: Receive = {
@@ -23,10 +27,16 @@ class RandomByteStringActorPublisher(val byteStringSize: Int, val randomByteServ
     case _ =>
   }
 
+  def checkedOnNext(byteString: ByteString): Unit = {
+    if (isActive && totalDemand > 0) {
+      onNext(byteString)
+    }
+  }
+
   def sendByteStrings() {
-    while(isActive && totalDemand > 0) {
+    while(isActive) {
       (wrappedActorPath ? RandomByteRequest(byteStringSize)).mapTo[ByteString].onComplete {
-        case Success(bs) => onNext(bs)
+        case Success(bs) => checkedOnNext(bs)
         case Failure(e) => onError(e)
       }
     }
