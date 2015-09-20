@@ -33,11 +33,17 @@ class RandomByteStringActorPublisher(val byteStringSize: Int, val randomByteServ
     }
   }
 
+  def checkedOnError(t: Throwable): Unit = {
+    if (!isErrorEmitted) {
+      onError(t)
+    }
+  }
+
   def sendByteStrings() {
     while(isActive) {
       (wrappedActorPath ? RandomByteRequest(byteStringSize)).mapTo[ByteString].onComplete {
         case Success(bs) => checkedOnNext(bs)
-        case Failure(e) => onError(e)
+        case Failure(t) => checkedOnError(t)
       }
     }
   }
