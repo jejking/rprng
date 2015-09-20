@@ -6,6 +6,7 @@ import akka.stream.actor.ActorPublisher
 import akka.stream.actor.ActorPublisherMessage.{Cancel, Request}
 import akka.util.{Timeout, ByteString}
 
+import scala.concurrent.Future
 import scala.util.{Failure, Success}
 import scala.concurrent.duration._
 
@@ -22,6 +23,8 @@ class RandomByteStringActorPublisher(val byteStringSize: Int, val randomByteServ
 
 
   override def receive: Receive = {
+    case bs:ByteString => checkedOnNext(bs)
+    case akka.actor.Status.Failure(e) => checkedOnError(e)
     case Request(cnt) => sendByteStrings()
     case Cancel => context.stop(self)
     case _ =>
@@ -40,10 +43,10 @@ class RandomByteStringActorPublisher(val byteStringSize: Int, val randomByteServ
   }
 
   def sendByteStrings() {
-    while(isActive) {
-      (wrappedActorPath ? RandomByteRequest(byteStringSize)).mapTo[ByteString].onComplete {
-        case Success(bs) => checkedOnNext(bs)
-        case Failure(t) => checkedOnError(t)
+    val capturedDemand = totalDemand.toInt
+    Future {
+      for (i <- 1 to capturedDemand) {
+        wrappedActorPath ! RandomByteRequest(byteStringSize)
       }
     }
   }
@@ -53,6 +56,8 @@ class RandomByteStringActorPublisher(val byteStringSize: Int, val randomByteServ
 object RandomByteStringActorPublisher {
 
   val standardActorPath = "/user/randomByteService"
+
+
 
   def props(byteStringSize: Int = 8, randomByteServicePath: String = standardActorPath): Props = Props(new RandomByteStringActorPublisher(byteStringSize, randomByteServicePath))
   

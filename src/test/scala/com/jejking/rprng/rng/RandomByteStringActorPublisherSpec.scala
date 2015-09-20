@@ -24,13 +24,23 @@ class RandomByteStringActorPublisherSpec extends FlatSpec with Matchers with Bef
 
   def initActorSystem(): ActorSystem = {
 
-    val randomByteSource = stub[RandomByteSource]
-    (randomByteSource.randomBytes _).when(*).returns(Array(0.toByte, 0.toByte, 0.toByte, 0.toByte, 0.toByte, 0.toByte, 0.toByte, 0.toByte))
-    val secureSeeder = stub[SecureSeeder]
-    (secureSeeder.generateSeed _).when().returns(0L)
+    class ZeroRandomByteSource extends RandomByteSource {
+      override def randomBytes(request: RandomByteRequest): Array[Byte] = Array(0.toByte, 0.toByte, 0.toByte, 0.toByte, 0.toByte, 0.toByte, 0.toByte, 0.toByte)
+
+      override def reseed(seed: Long): Unit = {}
+    }
+
+    class InsecureSeeder extends SecureSeeder {
+      /**
+       * Generates a long. Implementations may block.
+       * @return
+       */
+      override def generateSeed(): Long = 0L
+    }
+
 
     val actorSystem = ActorSystem("publisherSpec")
-    actorSystem.actorOf(RandomByteSourceActor.props(randomByteSource, secureSeeder), "secureSeeder")
+    actorSystem.actorOf(RandomByteSourceActor.props(new ZeroRandomByteSource, new InsecureSeeder), "secureSeeder")
     actorSystem.actorOf(Props[FailureActor], "failure")
     actorSystem
   }
