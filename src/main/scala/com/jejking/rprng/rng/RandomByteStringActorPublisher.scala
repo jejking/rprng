@@ -57,8 +57,6 @@ object RandomByteStringActorPublisher {
 
   val standardActorPath = "/user/randomByteService"
 
-
-
   def props(byteStringSize: Int = 8, randomByteServicePath: String = standardActorPath): Props = Props(new RandomByteStringActorPublisher(byteStringSize, randomByteServicePath))
   
 }

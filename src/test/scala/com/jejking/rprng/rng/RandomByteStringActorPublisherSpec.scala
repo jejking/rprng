@@ -74,3 +74,9 @@ class RandomByteStringActorPublisherSpec extends FlatSpec with Matchers with Bef
     this.system.shutdown()
   }
 }
+
+class FailureActor extends Actor {
+  override def receive: Actor.Receive = {
+    case _ => sender() ! akka.actor.Status.Failure(new RuntimeException("I fail"))
+  }
+}
