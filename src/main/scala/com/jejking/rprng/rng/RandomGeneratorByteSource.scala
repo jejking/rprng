@@ -32,24 +32,23 @@ trait RandomByteSource {
     wrapper.getInt
   }
 
-  def nextInt(bound: Int): Int = {
-    require(bound >= 1, "Bound must be strictly positive")
-    // basically scala-ified version of the code from AbstractRandomGenerator.
-    val result: Int = (nextDouble * bound).toInt
-    return if (result < bound) result else bound - 1
-  }
+  def nextInt(bound: Int): Int
 }
 
 class RandomGeneratorByteSource(val randomGenerator: RandomGenerator) extends RandomByteSource {
 
   override def randomBytes(request: RandomByteRequest): Array[Byte] = {
     val theArray = new Array[Byte](request.count)
-    randomGenerator.nextBytes(new Array[Byte](request.count))
+    randomGenerator.nextBytes(theArray)
     theArray
   }
 
   override def reseed(seed: Long): Unit = {
     randomGenerator.setSeed(seed)
+  }
+
+  override def nextInt(bound: Int): Int = {
+    randomGenerator.nextInt(bound)
   }
 
 }

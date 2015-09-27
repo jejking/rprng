@@ -9,7 +9,7 @@ import org.scalatest.{Matchers, FlatSpec}
  */
 class RandomByteSourceSpec extends FlatSpec with Matchers with MockFactory {
 
-  val byteSource = new RandomGeneratorByteSource(FixedApacheRandomGenerator())
+  val byteSource =   new RandomGeneratorByteSource(FixedApacheRandomGenerator())
 
   "a commons math byte source" should "generate an array of 4 fixed bytes with the fixed generator" in {
 

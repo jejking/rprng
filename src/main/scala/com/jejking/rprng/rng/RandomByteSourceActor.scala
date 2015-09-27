@@ -103,6 +103,7 @@ object RandomByteSourceActor {
     val actualDuration = config.maxLifeTime - config.minLifeTime
     val numberOfMillis = actualDuration.toMillis.asInstanceOf[Int]
     val randomInterval = byteSource.nextInt(numberOfMillis)
+    println("number of millis: " + numberOfMillis, "random interval: " + randomInterval)
     config.minLifeTime + (randomInterval milliseconds)
   }
 

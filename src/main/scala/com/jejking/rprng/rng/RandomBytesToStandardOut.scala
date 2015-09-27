@@ -8,7 +8,7 @@ import akka.stream.ActorMaterializer
 import akka.stream.actor.ActorPublisher
 import akka.stream.scaladsl.Source
 import akka.util.ByteString
-import org.apache.commons.math3.random.Well44497b
+import org.apache.commons.math3.random.{Well44497a, Well44497b}
 import org.reactivestreams.Publisher
 
 /**
@@ -29,7 +29,7 @@ object RandomBytesToStandardOut {
     for (i <- 1 to 8) {
       val secureRandom = new SecureRandom()
       val secureSeeder = new SecureRandomSeeder(secureRandom)
-      val randomGenerator = RandomGeneratorFactory.createNewGeneratorInstance[Well44497b]
+      val randomGenerator = RandomGeneratorFactory.createNewGeneratorInstance[Well44497a]
       val randomGeneratorByteSource = RandomGeneratorByteSource(randomGenerator)
       actorSystem.actorOf(RandomByteSourceActor.props(randomGeneratorByteSource, secureSeeder), "randomByteSource" + i)
     }
@@ -38,7 +38,7 @@ object RandomBytesToStandardOut {
 
     val routerActorRef = actorSystem.actorOf(RandomGroup(paths).props(), "randomRouter")
 
-    val publisherActor = actorSystem.actorOf(RandomByteStringActorPublisher.props(8, "/user/randomRouter"))
+    val publisherActor = actorSystem.actorOf(RandomByteStringActorPublisher.props(512, "/user/randomRouter"))
     val streamActorPublisher: Publisher[ByteString] = ActorPublisher[ByteString](publisherActor)
     val source: Source[ByteString, Unit] = Source(streamActorPublisher)
     // System.out.write(bs.toArray)

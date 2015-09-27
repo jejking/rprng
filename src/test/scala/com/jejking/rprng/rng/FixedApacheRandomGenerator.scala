@@ -11,6 +11,12 @@ class FixedApacheRandomGenerator(retValue: Double = 0d) extends AbstractRandomGe
     this(0d)
   }
 
+  override def nextBytes(array: Array[Byte]) = {
+    for (i <- 0 to array.length - 1) {
+      array(i) = 0
+    }
+  }
+
   override def setSeed(seed: Long): Unit = {}
 
   override def nextDouble(): Double = retValue

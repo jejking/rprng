@@ -28,6 +28,8 @@ class RandomByteStringActorPublisherSpec extends FlatSpec with Matchers with Bef
       override def randomBytes(request: RandomByteRequest): Array[Byte] = Array(0.toByte, 0.toByte, 0.toByte, 0.toByte, 0.toByte, 0.toByte, 0.toByte, 0.toByte)
 
       override def reseed(seed: Long): Unit = {}
+
+      override def nextInt(bound:Int): Int = 0
     }
 
     class InsecureSeeder extends SecureSeeder {
