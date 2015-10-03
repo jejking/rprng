@@ -3,7 +3,7 @@ package com.jejking.rprng.rng
 import java.security.SecureRandom
 
 /**
- * Dummy class that generates well known seed.
+ * Test class that generates zeroes.
  */
 class FixedSeedGeneratingSecureRandom extends SecureRandom {
 

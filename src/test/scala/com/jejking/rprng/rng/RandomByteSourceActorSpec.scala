@@ -1,10 +1,10 @@
 package com.jejking.rprng.rng
 
-import akka.actor.{Scheduler, ActorSystem}
-import akka.testkit.{ImplicitSender, DefaultTimeout, TestKit, TestActorRef}
+import akka.actor.ActorSystem
 import akka.pattern.ask
+import akka.testkit.{DefaultTimeout, ImplicitSender, TestActorRef, TestKit}
 import akka.util.ByteString
-import org.apache.commons.math3.random.{MersenneTwister, RandomGenerator}
+import org.apache.commons.math3.random.MersenneTwister
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.concurrent.Eventually
 import org.scalatest.{BeforeAndAfterAll, FlatSpecLike, Matchers}
@@ -18,25 +18,31 @@ import scala.concurrent.duration._
 class RandomByteSourceActorSpec extends TestKit(ActorSystem("test")) with DefaultTimeout with ImplicitSender
   with FlatSpecLike with Matchers with BeforeAndAfterAll with MockFactory with Eventually  {
 
-  import RandomByteSourceActor._
   import RandomByteSourceActor.Protocol._
-  import scala.concurrent.ExecutionContext.Implicits.global
+  import RandomByteSourceActor._
 
-  "the random byte source actor" should "send a message with 4 fixed bytes when assembled with fixed source in response to a request" in {
-    // create actor ref with byte source that wraps the fixed source
-    val fixedByteSource = RandomGeneratorByteSource(FixedApacheRandomGenerator())
-    val fixedSecureSeeder = new SecureRandomSeeder(new FixedSeedGeneratingSecureRandom())
-    val actorRef = TestActorRef(new RandomByteSourceActor(fixedByteSource, fixedSecureSeeder))
+  "the random byte source actor" should "send respond with bytes from the wrapped byte source in response to a request" in {
+
+    val request = RandomByteRequest(4)
+    val notVeryRandomBytes = Array[Byte](1, 2, 3, 4)
+
+    val mockByteSource = mock[RandomByteSource]
+    (mockByteSource.randomBytes _).expects(where {
+      (request: RandomByteRequest) => request.count == 4
+    }).returning(notVeryRandomBytes)
+    (mockByteSource.reseed _).expects(*)
+    (mockByteSource.nextInt _).expects(*)
+
+
+    val fixedSecureSeeder = stub[SecureSeeder]
+    val actorRef = TestActorRef(new RandomByteSourceActor(mockByteSource, fixedSecureSeeder))
 
     // send request for four "random" bytes
-    val future = actorRef ? RandomByteRequest(4)
-
-    // expect a response back that contains 4 zeros. Expect an immutable ByteString back, not a mutable array
-    val expected = ByteString(0, 0, 0, 0)
+    val future = actorRef ? request
 
     val actual = future.value.get.get
 
-    actual shouldBe expected
+    actual shouldBe notVeryRandomBytes
     actual shouldBe a [ByteString]
   }
 
@@ -50,7 +56,9 @@ class RandomByteSourceActorSpec extends TestKit(ActorSystem("test")) with Defaul
   }
 
   it should "schedule a message to itself to reseed" in {
-    val mockByteSource = stub[RandomByteSource]
+    val mockByteSource = mock[RandomByteSource]
+    (mockByteSource.nextInt _).expects(*).returning(0)
+    (mockByteSource.reseed _).expects(0L)
     
 
     val mockSecureSeeder = mock[SecureSeeder]
@@ -59,7 +67,7 @@ class RandomByteSourceActorSpec extends TestKit(ActorSystem("test")) with Defaul
     val mockScheduleHelper = mock[ScheduleHelper]
     // we expect that the scheduler is called to send a reseed message between min and max duration from now...
     (mockScheduleHelper.scheduleOnce(_ : FiniteDuration)(_ : () => Unit)(_ : ExecutionContext)) expects (where {
-      (finiteDuration: FiniteDuration, f: () => Unit, executor: ExecutionContext) => finiteDuration === defaultMinLifeTime
+      (finiteDuration: FiniteDuration, *, executor: ExecutionContext) => finiteDuration === defaultMinLifeTime
     })
 
 
@@ -99,8 +107,8 @@ class RandomByteSourceActorSpec extends TestKit(ActorSystem("test")) with Defaul
 
   it should "politely ignore other message types" in {
     // create actor ref with byte source that wraps the fixed source
-    val fixedByteSource = RandomGeneratorByteSource(FixedApacheRandomGenerator())
-    val fixedSecureSeeder = new SecureRandomSeeder(new FixedSeedGeneratingSecureRandom())
+    val fixedByteSource = stub[RandomByteSource]
+    val fixedSecureSeeder = stub[SecureSeeder]
     val actorRef = TestActorRef(new RandomByteSourceActor(fixedByteSource, fixedSecureSeeder))
 
     // send request for four "random" bytes
@@ -134,7 +142,8 @@ class RandomByteSourceActorSpec extends TestKit(ActorSystem("test")) with Defaul
   }
 
   "the companion object" should "compute an appropriate schedule" in {
-    val byteSource = new RandomGeneratorByteSource(FixedApacheRandomGenerator(0d))
+    val byteSource = mock[RandomByteSource]
+    (byteSource.nextInt _).expects(60000).returning(0)
     val minLifeTime: FiniteDuration = 1 minute
     val maxLifeTime: FiniteDuration = 2 minutes
 
@@ -145,25 +154,6 @@ class RandomByteSourceActorSpec extends TestKit(ActorSystem("test")) with Defaul
 
     for (i <- 1 to 100) {
       val computedScheduledTimeOfDeath = computeScheduledTimeToReseed(lifeSpanRange, new RandomGeneratorByteSource(mersenneTwister))
-      assert(computedScheduledTimeOfDeath >= minLifeTime)
-      assert(computedScheduledTimeOfDeath <= maxLifeTime)
-    }
-  }
-
-
-  it should "compute a reseed time given a random byte source and a time range to use" in {
-    val randomGenerator = FixedApacheRandomGenerator()
-    val byteSource = RandomGeneratorByteSource(randomGenerator)
-    val minLifeTime: FiniteDuration = 1 minute
-    val maxLifeTime: FiniteDuration = 2 minutes
-    val config = TimeRangeToReseed(minLifeTime, maxLifeTime)
-    computeScheduledTimeToReseed(config, byteSource) shouldBe (1 minute)
-
-    val mersenneTwister = new MersenneTwister()
-    val mtByteSource = RandomGeneratorByteSource(mersenneTwister)
-
-    for (i <- 1 to 100) {
-      val computedScheduledTimeOfDeath = computeScheduledTimeToReseed(config, mtByteSource)
       assert(computedScheduledTimeOfDeath >= minLifeTime)
       assert(computedScheduledTimeOfDeath <= maxLifeTime)
     }
