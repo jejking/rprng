@@ -32,29 +32,21 @@ class RandomByteSourceSpec extends FlatSpec with Matchers with MockFactory {
     byteSourceWithMockGenerator.reseed(123L)
   }
 
-}
-
-class RandomByteRequestSpec extends FlatSpec with Matchers {
-
-  "the case class" should "accept a value of 1" in {
-    val req = RandomByteRequest(1)
-    req.count should be (1)
-  }
 
   it should "reject a value of 0" in {
     intercept[IllegalArgumentException] {
-      RandomByteRequest(0)
+      byteSource.randomBytes(RandomByteRequest(0))
     }
   }
 
   it should "reject a value of -1" in {
     intercept[IllegalArgumentException] {
-      RandomByteRequest(-1)
+      byteSource.randomBytes(RandomByteRequest(-1))
     }
   }
 
-
 }
+
 
 
 

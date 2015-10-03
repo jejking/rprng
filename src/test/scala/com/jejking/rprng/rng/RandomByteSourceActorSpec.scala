@@ -19,6 +19,7 @@ class RandomByteSourceActorSpec extends TestKit(ActorSystem("test")) with Defaul
   with FlatSpecLike with Matchers with BeforeAndAfterAll with MockFactory with Eventually  {
 
   import RandomByteSourceActor._
+  import RandomByteSourceActor.Protocol._
   import scala.concurrent.ExecutionContext.Implicits.global
 
   "the random byte source actor" should "send a message with 4 fixed bytes when assembled with fixed source in response to a request" in {
@@ -50,7 +51,7 @@ class RandomByteSourceActorSpec extends TestKit(ActorSystem("test")) with Defaul
 
   it should "schedule a message to itself to reseed" in {
     val mockByteSource = stub[RandomByteSource]
-    (mockByteSource.nextDouble _).when().returns(0)
+    
 
     val mockSecureSeeder = mock[SecureSeeder]
     (mockSecureSeeder.generateSeed _).expects()
@@ -72,7 +73,7 @@ class RandomByteSourceActorSpec extends TestKit(ActorSystem("test")) with Defaul
     val timeRange = TimeRangeToReseed(1 milliseconds, 2 milliseconds)
 
     val mockByteSource = stub[RandomByteSource]
-    (mockByteSource.nextDouble _).when().returns(0)
+    (mockByteSource.nextInt _).when(*).returns(0)
 
     val mockSecureSeeder = mock[SecureSeeder]
     (mockSecureSeeder.generateSeed _).expects().atLeastTwice()

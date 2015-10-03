@@ -3,14 +3,11 @@ package com.jejking.rprng.rng
 import java.util.concurrent.TimeUnit
 
 import akka.actor._
-import akka.actor.Actor.Receive
 import akka.util.ByteString
-import com.jejking.rprng.rng.RandomByteSourceActor.{TimeRangeToReseed, UnknownInputType}
-import org.apache.commons.math3.random.RandomGenerator
+import com.jejking.rprng.rng.RandomByteSourceActor.TimeRangeToReseed
 
-import scala.concurrent.{Future, ExecutionContext}
-import scala.concurrent.duration.FiniteDuration
-import scala.concurrent.duration._
+import scala.concurrent.duration.{FiniteDuration, _}
+import scala.concurrent.{ExecutionContext, Future}
 
 /**
  * Actor wrapping a [[RandomGeneratorByteSource]] to allow thread-safe access to it and to manage its lifecycle,
@@ -21,9 +18,11 @@ import scala.concurrent.duration._
  */
 class RandomByteSourceActor(private val byteSource: RandomByteSource, private val secureSeeder: SecureSeeder,
                             private val scheduleHelperCreator: (ActorSystem) => ScheduleHelper = a => new AkkaScheduleHelper(a.scheduler),
-                            private val timeRangeToReseed: TimeRangeToReseed = TimeRangeToReseed()) extends Actor {
+                            private val timeRangeToReseed: TimeRangeToReseed = TimeRangeToReseed()) extends Actor with ActorLogging {
 
+  import RandomByteSourceActor.Protocol._
   import RandomByteSourceActor._
+
   import scala.concurrent.ExecutionContext.Implicits.global
 
   val scheduleHelper  =  scheduleHelperCreator(context.system)
@@ -32,36 +31,62 @@ class RandomByteSourceActor(private val byteSource: RandomByteSource, private va
     val seed = secureSeeder.generateSeed()
     this.byteSource.reseed(seed)
     scheduleReseed()
+    log.info("completed pre-start of " + context.self.path)
   }
 
   override def receive: Receive = {
-    case r: RandomByteRequest => sender() ! ByteString(byteSource.randomBytes(r))
+
+    // main use case, fetch random bytes
+    case r: RandomByteRequest => {
+      sender() ! ByteString(byteSource.randomBytes(r))
+      if (log.isDebugEnabled) {
+        log.debug("processed request for " + r.count + "bytes")
+      }
+    }
+    // trigger reseed, note this is done in a future to avoid blocking the actor
     case Reseed => fetchSeedAndNotify()
+
+    // apply fresh seed, non blocking action
     case newSeed: NewSeed => applyNewSeedAndScheduleReseed(newSeed)
-    case _ => sender() ! UnknownInputType
+
+    // ooops
+    case _ => {
+      log.warning("received unknown message type")
+      sender() ! UnknownInputType
+    }
   }
 
   def applyNewSeedAndScheduleReseed(newSeed: NewSeed): Unit = {
     this.byteSource.reseed(newSeed.seed)
+    log.info("applied new seed in actor " + context.self.path)
+
+    // and off we go for the next round at some point in the future
     scheduleReseed()
   }
 
   def fetchSeedAndNotify(): Unit = {
+    log.info("about to trigger future to collect fresh seed for actor " + context.self.path)
+    // generate seed is likely to block as the seeder gathers entropy
+    // therefore we do this in a future and send a message onto the actor's mailbox
+    // for async application once we have a result
     Future {
       val seed = secureSeeder.generateSeed()
+      log.info("obtained fresh seed in actor " + context.self.path)
       self ! NewSeed(seed)
     }
   }
 
   def scheduleReseed(): Unit = {
+    // non-blocking computation
     val timeToReseed = computeScheduledTimeToReseed(timeRangeToReseed, byteSource)
     scheduleHelper.scheduleOnce(timeToReseed) {
       self ! Reseed
+      log.info("sent reseed message to actor " + context.self.path)
     }
+    log.info("scheduled reseed in actor " + context.self.path)
   }
 }
 
-// needed to allow straightforward mocking...
 /**
  * Isolates the functionality we need from the Akka Scheduler.
  */
@@ -70,8 +95,8 @@ trait ScheduleHelper {
 }
 
 /**
- * Standard implementation that takes the akka scheduler.
- * @param scheduler
+ * Standard implementation that simply delegates to the akka scheduler.
+ * @param scheduler reference to an akka scheduler to delegate to
  */
 class AkkaScheduleHelper(scheduler: Scheduler) extends ScheduleHelper {
 
@@ -80,29 +105,69 @@ class AkkaScheduleHelper(scheduler: Scheduler) extends ScheduleHelper {
   }
 }
 
-
+/**
+ * Defines constants and helper function.
+ */
 object RandomByteSourceActor {
+
+  object Protocol {
+
+    /**
+     * Wraps long that encapsulates eight bytes of seed to apply to the underlying PRNG.
+     * @param seed a long
+     */
+    case class NewSeed(seed: Long) extends AnyVal
+
+    /**
+     * Instruction to the actor to ask for more seed to apply
+     */
+    case object Reseed
+
+    // errors
+    sealed trait Error
+    case object UnknownInputType extends Error
+  }
+
+
+  /**
+   * Default time to reseed is between one and eight hours, a completely arbitrary time span.
+   */
 
   val defaultMinLifeTime = FiniteDuration(1, TimeUnit.HOURS)
   val defaultMaxLifeTime = FiniteDuration(8, TimeUnit.HOURS)
 
+  /**
+   * Defines a period of time within which the underlying PRNG should be reseeded.
+   * @param minLifeTime minimum period of time to reseed
+   * @param maxLifeTime maximum period of time to reseed
+   * @throws IllegalArgumentException if min is less than max, as might be expected
+   */
   case class TimeRangeToReseed(minLifeTime: FiniteDuration = defaultMinLifeTime, maxLifeTime: FiniteDuration = defaultMaxLifeTime) {
     require(minLifeTime < maxLifeTime, "minLifeTime must be less than maxLifeTime")
   }
 
-  case class NewSeed(seed: Long) extends AnyVal
 
-  case object Reseed
-  sealed trait Error
-  case object UnknownInputType extends Error
 
-  def props(byteSource: RandomByteSource, secureSeeder: SecureSeeder): Props = Props(new RandomByteSourceActor(byteSource, secureSeeder))
+  /**
+   * Assembles Akka Props for the actor to avoid closing over actor state.
+   * @param randomByteSource a random byte source that will be wrapped by the actor.
+   * @param secureSeeder a secure seeder to use to fetch initial seeding of the random byte source and for subsequent reseeding
+   * @return akka props
+   */
+  def props(randomByteSource: RandomByteSource, secureSeeder: SecureSeeder): Props = Props(new RandomByteSourceActor(randomByteSource, secureSeeder))
 
-  def computeScheduledTimeToReseed(config: TimeRangeToReseed, byteSource: RandomByteSource): FiniteDuration = {
-    // random duration at least min, at most max
+  /**
+   * Utility function to find a random duration between the min and max of the configured time range which will
+   * be used to schedule a reseeding of the underlying PRNG.
+   * @param config determines the limits between which the point to reseed will lie
+   * @param randomBytesource used to find a random point between the limits
+   * @return a duration (de factor relative to "now") that effectively represents the point in time at which
+   *         the reseeding should be scheduled to start
+   */
+  def computeScheduledTimeToReseed(config: TimeRangeToReseed, randomBytesource: RandomByteSource): FiniteDuration = {
     val actualDuration = config.maxLifeTime - config.minLifeTime
     val numberOfMillis = actualDuration.toMillis.asInstanceOf[Int]
-    val randomInterval = byteSource.nextInt(numberOfMillis)
+    val randomInterval = randomBytesource.nextInt(numberOfMillis)
     config.minLifeTime + (randomInterval milliseconds)
   }
 
