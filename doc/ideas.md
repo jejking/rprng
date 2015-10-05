@@ -28,10 +28,11 @@ Web API
 
 On top of that we can expose a web api that exposes the pseudo-randomness as a service.
 
-* /stream - a stream of raw bytes from the underlying stream, chunked
-* /chunk - a fixed size raw byte, standard size 1kB, other sizes as query param ?size=2048. Configurable limits
-* /?collectionType/?primitiveType - list or set of byte, char, int, float, long, double.
+* /byte/stream - a stream of raw bytes from the underlying stream, chunked
+* /byte/block - a fixed size block of raw bytes, standard size 1kB, other sizes as query param ?size=2048. Configurable limits
+* /?primitiveType/?collectionType - list or set of byte, char, int, float, long, double.
   * parameters ?min ?max ?size ?count (number of such collections to produce in the output)
+  * JSON encoded
 
 
 
