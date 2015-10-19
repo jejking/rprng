@@ -1,0 +1,48 @@
+package com.jejking.rprng.api
+
+import java.security.SecureRandom
+
+import akka.actor.{ActorRef, ActorSystem}
+import akka.routing.RandomGroup
+import akka.stream.ActorMaterializer
+
+import akka.http.scaladsl.Http
+import com.jejking.rprng.rng.{RandomByteSourceActor, RandomGeneratorByteSource, RandomGeneratorFactory, SecureRandomSeeder}
+import org.apache.commons.math3.random.Well44497a
+
+/**
+ * Starts web service.
+ */
+object Main {
+
+  val randomRouterPath = "/user/randomRouter"
+
+  def main(args: Array[String]): Unit = {
+
+    implicit val actorSystem = ActorSystem("rprng")
+    implicit val materializer = ActorMaterializer()
+
+    val randomRouter = createActors(actorSystem)
+    val streamsHelper = new AkkaStreamsHelper()
+    val route = new Routes(streamsHelper).route
+
+    val bindingFuture = Http().bindAndHandle(route, "localhost", 8080)
+
+    // TODO - log shutdown
+  }
+
+  private def createActors(actorSystem: ActorSystem): ActorRef = {
+    for (i <- 1 to 8) {
+      val secureRandom = new SecureRandom()
+      val secureSeeder = new SecureRandomSeeder(secureRandom)
+      val randomGenerator = RandomGeneratorFactory.createNewGeneratorInstance[Well44497a]
+      val randomGeneratorByteSource = RandomGeneratorByteSource(randomGenerator)
+      actorSystem.actorOf(RandomByteSourceActor.props(randomGeneratorByteSource, secureSeeder), "randomByteSource" + i)
+    }
+
+    val paths = for (i <- 1 to 8) yield "/user/randomByteSource" + i
+
+    actorSystem.actorOf(RandomGroup(paths).props(), "randomRouter")
+  }
+
+}
