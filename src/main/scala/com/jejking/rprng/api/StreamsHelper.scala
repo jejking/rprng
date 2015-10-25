@@ -1,7 +1,8 @@
 package com.jejking.rprng.api
 
 import akka.actor.{ActorPath, ActorRef, ActorSystem}
-import akka.http.scaladsl.model.HttpResponse
+import akka.http.scaladsl.model.HttpEntity.{Chunked, ChunkStreamPart, Chunk}
+import akka.http.scaladsl.model._
 import akka.stream.ActorMaterializer
 import akka.stream.actor.ActorPublisher
 import akka.stream.scaladsl.{Keep, Sink, Source, RunnableGraph}
@@ -24,6 +25,8 @@ trait StreamsHelper {
    */
   def responseForByteBlock(blockSize: Int): Future[HttpResponse]
 
+  def responseForByteStream(chunkSize: Int): HttpResponse
+
 }
 
 class AkkaStreamsHelper(path: String = "/user/randomRouter")(implicit actorSystem: ActorSystem, actorMaterializer: ActorMaterializer) extends StreamsHelper {
@@ -40,5 +43,11 @@ class AkkaStreamsHelper(path: String = "/user/randomRouter")(implicit actorSyste
       .map(bs => HttpResponse(entity = bs))
       .toMat(Sink.head)(Keep.right)
       .run()
+  }
+
+  override def responseForByteStream(chunkSize: Int): HttpResponse = {
+    val chunkSource: Source[ChunkStreamPart, Unit] = createByteStringSource(chunkSize).map(bs => Chunk(bs))
+    val entity: ResponseEntity = Chunked(ContentTypes.`application/octet-stream`, chunkSource)
+    HttpResponse(StatusCodes.OK).withEntity(entity)
   }
 }

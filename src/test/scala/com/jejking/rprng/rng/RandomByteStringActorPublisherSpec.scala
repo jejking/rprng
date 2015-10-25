@@ -1,6 +1,5 @@
 package com.jejking.rprng.rng
 
-import akka.actor.Actor.Receive
 import akka.actor._
 import akka.stream.actor.ActorPublisher
 import akka.stream.{ActorMaterializer}
@@ -8,6 +7,7 @@ import akka.stream.scaladsl.Source
 import akka.stream.testkit.scaladsl.TestSink
 import akka.testkit.TestProbe
 import akka.util.ByteString
+import com.jejking.rprng.rng.TestUtils.{FailureActor, InsecureSeeder, ZeroRandomByteSource}
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.{BeforeAndAfterAll, FlatSpec, Matchers}
 
@@ -19,27 +19,7 @@ class RandomByteStringActorPublisherSpec extends FlatSpec with Matchers with Bef
   implicit val system = initActorSystem()
   implicit val materializer = ActorMaterializer()
 
-
-
-
   def initActorSystem(): ActorSystem = {
-
-    class ZeroRandomByteSource extends RandomByteSource {
-      override def randomBytes(request: RandomByteRequest): Array[Byte] = Array(0.toByte, 0.toByte, 0.toByte, 0.toByte, 0.toByte, 0.toByte, 0.toByte, 0.toByte)
-
-      override def reseed(seed: Long): Unit = {}
-
-      override def nextInt(bound:Int): Int = 0
-    }
-
-    class InsecureSeeder extends SecureSeeder {
-      /**
-       * Generates a long. Implementations may block.
-       * @return
-       */
-      override def generateSeed(): Long = 0L
-    }
-
 
     val actorSystem = ActorSystem("publisherSpec")
     actorSystem.actorOf(RandomByteSourceActor.props(new ZeroRandomByteSource, new InsecureSeeder), "secureSeeder")
@@ -77,8 +57,3 @@ class RandomByteStringActorPublisherSpec extends FlatSpec with Matchers with Bef
   }
 }
 
-class FailureActor extends Actor {
-  override def receive: Actor.Receive = {
-    case _ => sender() ! akka.actor.Status.Failure(new RuntimeException("I fail"))
-  }
-}
