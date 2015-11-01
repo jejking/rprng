@@ -30,7 +30,7 @@ On top of that we can expose a web api that exposes the pseudo-randomness as a s
 
 * /byte/stream - a stream of raw bytes from the underlying stream, chunked
 * /byte/block - a fixed size block of raw bytes, standard size 1kB, other sizes as path param /2048. Configurable limits
-* /?primitiveType/?collectionType - list or set of byte, char, int, float, long, double.
+* /?primitiveType/?collectionType - list of set of long or double
   * parameters ?min ?max ?size ?count (number of such collections to produce in the output)
   * JSON encoded
 

@@ -1,15 +1,17 @@
 package com.jejking.rprng.api
 
+import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
 import akka.http.scaladsl.model.{StatusCodes, HttpResponse}
 import akka.http.scaladsl.server.Directives._
-import akka.http.scaladsl.server.{ValidationRejection, RejectionHandler}
+import akka.http.scaladsl.server.{Route, ValidationRejection, RejectionHandler}
 import akka.stream.ActorMaterializer
 
+import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
 
 /**
  * Routing for web requests for randomness.
  */
-class Routes(streamsHelper: StreamsHelper) {
+class Routes(streamsHelper: StreamsHelper) extends SprayJsonSupport {
 
   implicit val theRejectionHandler = RejectionHandler.newBuilder()
                                       .handle {
@@ -18,8 +20,10 @@ class Routes(streamsHelper: StreamsHelper) {
                                         }
                                       }.result()
 
+  implicit val randomIntCollectionFormat = RandomIntegerCollectionResponseProtocol.format
 
-  val byteRoute = get {
+
+  val byteRoute: Route = get {
     pathPrefix("byte") {
       pathPrefix("block") {
         pathEndOrSingleSlash {
@@ -45,6 +49,29 @@ class Routes(streamsHelper: StreamsHelper) {
     }
   }
 
-  val route = byteRoute
+  val intRoute: Route = get {
+    pathPrefix("int") {
+      parameters('size.as[Int] ? 100, 'count.as[Int]? 1, 'min.as[Int] ? Int.MinValue, 'max.as[Int] ? Int.MaxValue) {
+        (size: Int, count: Int, min: Int, max: Int) => {
+          pathPrefix("list") {
+            complete {
+              val req = RandomIntegerCollectionRequest(RandomSet, size, count, min, max)
+              streamsHelper.responseForIntegerCollection(req)
+            }
+          } ~
+          pathPrefix("set") {
+            complete {
+              val req = RandomIntegerCollectionRequest(RandomList, size, count, min, max)
+              streamsHelper.responseForIntegerCollection(req)
+            }
+          }
+
+        }
+      }
+    }
+  }
+
+  val route = byteRoute ~ intRoute
+
 
 }

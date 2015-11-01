@@ -27,6 +27,8 @@ trait StreamsHelper {
 
   def responseForByteStream(chunkSize: Int): HttpResponse
 
+  def responseForIntegerCollection(req: RandomIntegerCollectionRequest): Future[RandomIntegerCollectionResponse]
+
 }
 
 class AkkaStreamsHelper(path: String = "/user/randomRouter")(implicit actorSystem: ActorSystem, actorMaterializer: ActorMaterializer) extends StreamsHelper {
@@ -50,4 +52,6 @@ class AkkaStreamsHelper(path: String = "/user/randomRouter")(implicit actorSyste
     val entity: ResponseEntity = Chunked(ContentTypes.`application/octet-stream`, chunkSource)
     HttpResponse(StatusCodes.OK).withEntity(entity)
   }
+
+  override def responseForIntegerCollection(req: RandomIntegerCollectionRequest) = ???
 }
