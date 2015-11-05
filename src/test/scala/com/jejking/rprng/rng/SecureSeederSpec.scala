@@ -1,6 +1,6 @@
 package com.jejking.rprng.rng
 
-import org.scalatest.{Matchers, FlatSpec}
+import org.scalatest.{FlatSpec, Matchers}
 
 /**
  * Tests for [[SecureRandomSeeder]].

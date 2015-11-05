@@ -2,7 +2,7 @@ package com.jejking.rprng.rng
 
 import org.apache.commons.math3.random.RandomGenerator
 
-import scala.reflect.{ClassTag, classTag}
+import scala.reflect.ClassTag
 
 /**
  * Provides functionality to instantiate various PRNG types.

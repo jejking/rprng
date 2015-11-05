@@ -1,16 +1,15 @@
 package com.jejking.rprng.api
 
 import akka.http.scaladsl.model.HttpEntity.{Chunk, Chunked}
-import akka.http.scaladsl.model.{ContentTypes, StatusCodes, HttpResponse}
+import akka.http.scaladsl.model.{ContentTypes, HttpResponse, StatusCodes}
 import akka.http.scaladsl.server.ValidationRejection
 import akka.http.scaladsl.testkit.ScalatestRouteTest
 import akka.stream.scaladsl.Source
-
 import akka.util.ByteString
 import com.jejking.rprng.rng.TestUtils
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.{Matchers, FlatSpec}
+import org.scalatest.{FlatSpec, Matchers}
 
 import scala.concurrent.Future
 
@@ -109,5 +108,27 @@ class RoutesSpec extends FlatSpec with Matchers with ScalaFutures with Scalatest
       }
     }
   }
+
+  "/int/list" should "deliver 1 list of 100 ints between " + Int.MinValue + " and " + Int.MaxValue in {
+    fail("not done")
+  }
+
+  "/int/list?size=10" should "deliver 1 list of 10 ints between " + Int.MinValue + " and " + Int.MaxValue in {
+    fail("not done")
+  }
+
+  "/int/list?size=10&count=2" should "deliver 2 lists of 10 ints between " + Int.MinValue + " and " + Int.MaxValue in {
+    fail("not done")
+  }
+
+  "/int/list?min=0&max=1000" should "deliver 1 list of 100 ints betweeen 0 and 100" in {
+    fail("not done")
+  }
+
+  "/int/list?size=10&min=100&max=10" should "be rejected with a 400" in {
+    fail("not done")
+  }
+
+
 
 }

@@ -1,8 +1,8 @@
 package com.jejking.rprng.rng
 
 import akka.actor._
+import akka.stream.ActorMaterializer
 import akka.stream.actor.ActorPublisher
-import akka.stream.{ActorMaterializer}
 import akka.stream.scaladsl.Source
 import akka.stream.testkit.scaladsl.TestSink
 import akka.testkit.TestProbe

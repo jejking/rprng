@@ -2,7 +2,7 @@ package com.jejking.rprng.rng
 
 import org.apache.commons.math3.random.RandomGenerator
 import org.scalamock.scalatest.MockFactory
-import org.scalatest.{Matchers, FlatSpec}
+import org.scalatest.{FlatSpec, Matchers}
 
 /**
  * Simple tests of [[RandomGeneratorByteSource]].

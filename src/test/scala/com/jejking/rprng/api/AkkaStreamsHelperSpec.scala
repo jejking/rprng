@@ -1,17 +1,13 @@
 package com.jejking.rprng.api
 
-import akka.actor.{Props, ActorSystem}
-import akka.http.javadsl.server.values.Headers
-import akka.http.scaladsl.model
-import akka.http.scaladsl.model.{ContentTypes, ContentType, StatusCodes, HttpResponse}
+import akka.actor.{ActorSystem, Props}
+import akka.http.scaladsl.model.{ContentTypes, StatusCodes}
 import akka.stream.ActorMaterializer
 import akka.util.ByteString
-import com.jejking.rprng.rng.{TestUtils, RandomByteSourceActor}
 import com.jejking.rprng.rng.TestUtils.{FailureActor, InsecureSeeder, ZeroRandomByteSource}
-import org.scalatest.concurrent.{ScalaFutures, Futures}
-import org.scalatest.{BeforeAndAfterAll, Matchers, FlatSpec}
-
-import scala.Some
+import com.jejking.rprng.rng.{RandomByteSourceActor, TestUtils}
+import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.{BeforeAndAfterAll, FlatSpec, Matchers}
 
 /**
  * Tests for [[AkkaStreamsHelper]].

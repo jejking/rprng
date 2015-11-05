@@ -3,10 +3,9 @@ package com.jejking.rprng.api
 import java.security.SecureRandom
 
 import akka.actor.{ActorRef, ActorSystem}
+import akka.http.scaladsl.Http
 import akka.routing.RandomGroup
 import akka.stream.ActorMaterializer
-
-import akka.http.scaladsl.Http
 import com.jejking.rprng.rng.{RandomByteSourceActor, RandomGeneratorByteSource, RandomGeneratorFactory, SecureRandomSeeder}
 import org.apache.commons.math3.random.Well44497a
 

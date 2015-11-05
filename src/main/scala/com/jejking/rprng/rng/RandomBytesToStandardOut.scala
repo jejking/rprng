@@ -8,7 +8,7 @@ import akka.stream.ActorMaterializer
 import akka.stream.actor.ActorPublisher
 import akka.stream.scaladsl.Source
 import akka.util.ByteString
-import org.apache.commons.math3.random.{Well44497a, Well44497b}
+import org.apache.commons.math3.random.Well44497a
 import org.reactivestreams.Publisher
 
 /**

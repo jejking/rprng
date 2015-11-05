@@ -1,11 +1,11 @@
 package com.jejking.rprng.api
 
-import akka.actor.{ActorPath, ActorRef, ActorSystem}
-import akka.http.scaladsl.model.HttpEntity.{Chunked, ChunkStreamPart, Chunk}
+import akka.actor.ActorSystem
+import akka.http.scaladsl.model.HttpEntity.{Chunk, ChunkStreamPart, Chunked}
 import akka.http.scaladsl.model._
 import akka.stream.ActorMaterializer
 import akka.stream.actor.ActorPublisher
-import akka.stream.scaladsl.{Keep, Sink, Source, RunnableGraph}
+import akka.stream.scaladsl.{Keep, Sink, Source}
 import akka.util.ByteString
 import com.jejking.rprng.rng.RandomByteStringActorPublisher
 

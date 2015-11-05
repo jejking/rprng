@@ -1,13 +1,11 @@
 package com.jejking.rprng.rng
 
 import akka.actor.{ActorLogging, Props}
-import akka.pattern.ask
 import akka.stream.actor.ActorPublisher
 import akka.stream.actor.ActorPublisherMessage.{Cancel, Request}
-import akka.util.{Timeout, ByteString}
+import akka.util.{ByteString, Timeout}
 
 import scala.concurrent.Future
-import scala.util.{Failure, Success}
 import scala.concurrent.duration._
 
 /**

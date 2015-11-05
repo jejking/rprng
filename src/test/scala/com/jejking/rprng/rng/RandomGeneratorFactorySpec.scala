@@ -1,7 +1,7 @@
 package com.jejking.rprng.rng
 
 import org.apache.commons.math3.random.MersenneTwister
-import org.scalatest.{Matchers, FlatSpec}
+import org.scalatest.{FlatSpec, Matchers}
 
 /**
  * Tests factory.
