@@ -60,7 +60,6 @@ class AkkaStreamsHelperSpec extends FlatSpec with Matchers with ScalaFutures wit
   }
 
 
-
   override def afterAll(): Unit = {
     this.system.shutdown()
   }
