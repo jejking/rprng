@@ -12,7 +12,7 @@ import org.apache.commons.math3.random.Well44497a
 import org.reactivestreams.Publisher
 
 /**
- * Creates a bunch of [[RandomByteSourceActor]] instances, puts them behind
+ * Creates a bunch of [[RandomSourceActor]] instances, puts them behind
  * an Akka Random Router, hooks up a reactive stream to the router and writes
  * the stream as raw bytes to stdout until the program is killed.
  *
@@ -30,8 +30,8 @@ object RandomBytesToStandardOut {
       val secureRandom = new SecureRandom()
       val secureSeeder = new SecureRandomSeeder(secureRandom)
       val randomGenerator = RandomGeneratorFactory.createNewGeneratorInstance[Well44497a]
-      val randomGeneratorByteSource = RandomGeneratorByteSource(randomGenerator)
-      actorSystem.actorOf(RandomByteSourceActor.props(randomGeneratorByteSource, secureSeeder), "randomByteSource" + i)
+      val randomGeneratorByteSource = RandomGeneratorSource(randomGenerator)
+      actorSystem.actorOf(RandomSourceActor.props(randomGeneratorByteSource, secureSeeder), "randomByteSource" + i)
     }
 
     val paths = for (i <- 1 to 8) yield "/user/randomByteSource" + i

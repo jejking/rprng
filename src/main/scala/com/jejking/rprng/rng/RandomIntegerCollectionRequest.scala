@@ -1,9 +1,8 @@
-package com.jejking.rprng.api
+package com.jejking.rprng.rng
 
 sealed trait RandomCollectionType
 case object RandomList extends RandomCollectionType
 case object RandomSet extends RandomCollectionType
-
 
 /**
  * Request for collection(s) of integers.
@@ -25,6 +24,3 @@ case class RandomIntegerCollectionRequest(collectionType: RandomCollectionType, 
     require(maxBound - minBound > size, "Max bound - min bound must be greater than requested set size")
   }
 }
-
-
-

@@ -5,7 +5,7 @@ import org.scalamock.scalatest.MockFactory
 import org.scalatest.{FlatSpec, Matchers}
 
 /**
- * Simple tests of [[RandomGeneratorByteSource]].
+ * Simple tests of [[RandomGeneratorSource]].
  */
 class RandomGeneratorByteSourceSpec extends FlatSpec with Matchers with MockFactory {
 
@@ -18,7 +18,7 @@ class RandomGeneratorByteSourceSpec extends FlatSpec with Matchers with MockFact
       (ba: Array[Byte]) => ba.length == 4
     }).onCall((ba: Array[Byte]) => notVeryRandomBytes.copyToArray(ba))
 
-    val byteSource = RandomGeneratorByteSource(randomGenerator)
+    val byteSource = RandomGeneratorSource(randomGenerator)
 
     val actual = byteSource.randomBytes(RandomByteRequest(4))
     actual should be (notVeryRandomBytes)
@@ -29,14 +29,14 @@ class RandomGeneratorByteSourceSpec extends FlatSpec with Matchers with MockFact
     val mockedGenerator = mock[RandomGenerator]
     (mockedGenerator.setSeed(_: Long)).expects(123L)
 
-    val byteSourceWithMockGenerator = new RandomGeneratorByteSource(mockedGenerator)
+    val byteSourceWithMockGenerator = new RandomGeneratorSource(mockedGenerator)
     byteSourceWithMockGenerator.reseed(123L)
   }
 
 
   it should "reject a value of 0" in {
 
-    val byteSource = RandomGeneratorByteSource(mock[RandomGenerator])
+    val byteSource = RandomGeneratorSource(mock[RandomGenerator])
     intercept[IllegalArgumentException] {
       byteSource.randomBytes(RandomByteRequest(0))
     }
@@ -44,7 +44,7 @@ class RandomGeneratorByteSourceSpec extends FlatSpec with Matchers with MockFact
 
   it should "reject a value of -1" in {
 
-    val byteSource = RandomGeneratorByteSource(mock[RandomGenerator])
+    val byteSource = RandomGeneratorSource(mock[RandomGenerator])
     intercept[IllegalArgumentException] {
       byteSource.randomBytes(RandomByteRequest(-1))
     }

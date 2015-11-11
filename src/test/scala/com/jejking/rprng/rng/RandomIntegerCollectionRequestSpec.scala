@@ -1,20 +1,11 @@
-package com.jejking.rprng.api
+package com.jejking.rprng.rng
 
-import org.scalatest.{Matchers, FlatSpec}
+import org.scalatest.{FlatSpec, Matchers}
 
 /**
  * Tests for [[RandomIntegerCollectionRequest]].
  */
 class RandomIntegerCollectionRequestSpec extends FlatSpec with Matchers {
-
-  /**
-   * require(size > 0, "Size must be strictly positive")
-  require(count > 0, "Count must be strictly positive")
-  require(minBound < maxBound, "Min bound must be less than max bound")
-  if (collectionType == RandomSet) {
-    require(maxBound - minBound > size, "Max bound - min bound must be greater than requested set size")
-  }
-   */
 
   "a request" should "be constructed OK given valid input" in {
     RandomIntegerCollectionRequest(RandomList)

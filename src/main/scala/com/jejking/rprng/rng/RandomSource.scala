@@ -8,7 +8,7 @@ import org.apache.commons.math3.random.RandomGenerator
  * Defines functionality to generate random bytes and to set
  * random seed for the underlying implementation.
  */
-trait RandomByteSource {
+trait RandomSource {
 
   /**
    * Creates random bytes into a newly created array of the size specified in the request.
@@ -45,7 +45,7 @@ trait RandomByteSource {
  * Implementation based on Apache Commons Math.
  * @param randomGenerator the Apache Commons Math generator to use.
  */
-class RandomGeneratorByteSource(val randomGenerator: RandomGenerator) extends RandomByteSource {
+class RandomGeneratorSource(val randomGenerator: RandomGenerator) extends RandomSource {
 
   override def randomBytes(request: RandomByteRequest): Array[Byte] = {
     require(request.count >= 1, "Requested byte array size must be strictly positive")
@@ -71,14 +71,30 @@ class RandomGeneratorByteSource(val randomGenerator: RandomGenerator) extends Ra
 case class RandomByteRequest(count: Int) extends AnyVal
 
 /**
+ * Request for any integer.
+ */
+case object RandomAnyIntRequest
+
+/**
+ * Request for an integer between min and max bound.
+ * @param minBound inclusive minimum bound. Must be smaller than the maxBound
+ * @param maxBound inclusive maximum bound. Must be greater than minBound.
+ * @throws IllegalArgumentException if preconditions not met
+ */
+case class RandomIntRequest(minBound: Int, maxBound: Int) {
+  require(minBound < maxBound, "minBound must be less than maxBound")
+}
+
+
+/**
  * Companion object with constructor helper.
  */
-object RandomGeneratorByteSource {
+object RandomGeneratorSource {
 
   /**
-   * Constructs new [[RandomGeneratorByteSource]] using supplied generator.
+   * Constructs new [[RandomGeneratorSource]] using supplied generator.
    * @param randomGenerator the underlying generator to use
    * @return freshly instantiated random byte source
    */
-  def apply(randomGenerator: RandomGenerator): RandomGeneratorByteSource = new RandomGeneratorByteSource(randomGenerator)
+  def apply(randomGenerator: RandomGenerator): RandomGeneratorSource = new RandomGeneratorSource(randomGenerator)
 }

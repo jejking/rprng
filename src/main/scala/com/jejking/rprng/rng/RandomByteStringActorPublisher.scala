@@ -9,7 +9,7 @@ import scala.concurrent.Future
 import scala.concurrent.duration._
 
 /**
- * Wraps a path to [[RandomByteSourceActor]] (or a router over a bunch of them) to
+ * Wraps a path to [[RandomSourceActor]] (or a router over a bunch of them) to
  * act as a stream publisher of `ByteString`s which are obtained asynchronously from the actor / router. When wrapping
  * a router the publisher thus effectively mixes up the underlying sources of pseudo-randomness.
  *

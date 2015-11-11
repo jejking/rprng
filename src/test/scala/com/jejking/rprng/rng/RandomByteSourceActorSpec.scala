@@ -13,20 +13,20 @@ import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
 
 /**
- * Test of functionality around [[RandomByteSourceActor]].
+ * Test of functionality around [[RandomSourceActor]].
  */
 class RandomByteSourceActorSpec extends TestKit(ActorSystem("test")) with DefaultTimeout with ImplicitSender
   with FlatSpecLike with Matchers with BeforeAndAfterAll with MockFactory with Eventually  {
 
-  import RandomByteSourceActor.Protocol._
-  import RandomByteSourceActor._
+  import RandomSourceActor.Protocol._
+  import RandomSourceActor._
 
   "the random byte source actor" should "send respond with bytes from the wrapped byte source in response to a request" in {
 
     val request = RandomByteRequest(4)
     val notVeryRandomBytes = Array[Byte](1, 2, 3, 4)
 
-    val mockByteSource = mock[RandomByteSource]
+    val mockByteSource = mock[RandomSource]
     (mockByteSource.randomBytes _).expects(where {
       (request: RandomByteRequest) => request.count == 4
     }).returning(notVeryRandomBytes)
@@ -35,7 +35,7 @@ class RandomByteSourceActorSpec extends TestKit(ActorSystem("test")) with Defaul
 
 
     val fixedSecureSeeder = stub[SecureSeeder]
-    val actorRef = TestActorRef(new RandomByteSourceActor(mockByteSource, fixedSecureSeeder))
+    val actorRef = TestActorRef(new RandomSourceActor(mockByteSource, fixedSecureSeeder))
 
     // send request for four "random" bytes
     val future = actorRef ? request
@@ -47,16 +47,16 @@ class RandomByteSourceActorSpec extends TestKit(ActorSystem("test")) with Defaul
   }
 
   it should "initialise itself from a proper seed source" in {
-    val mockByteSource = mock[RandomByteSource]
+    val mockByteSource = mock[RandomSource]
     val mockSecureSeeder = mock[SecureSeeder]
     (mockSecureSeeder.generateSeed _).expects()
     (mockByteSource.reseed _).expects(*)
-    val actorRef = TestActorRef(new RandomByteSourceActor(mockByteSource, mockSecureSeeder))
+    val actorRef = TestActorRef(new RandomSourceActor(mockByteSource, mockSecureSeeder))
     val future = actorRef ? RandomByteRequest(4)
   }
 
   it should "schedule a message to itself to reseed" in {
-    val mockByteSource = mock[RandomByteSource]
+    val mockByteSource = mock[RandomSource]
     (mockByteSource.nextInt _).expects(*).returning(0)
     (mockByteSource.reseed _).expects(0L)
     
@@ -73,19 +73,19 @@ class RandomByteSourceActorSpec extends TestKit(ActorSystem("test")) with Defaul
 
     val scheduleHelperFactory: ActorSystem => ScheduleHelper = _ => mockScheduleHelper
 
-    val actorRef = TestActorRef(new RandomByteSourceActor(mockByteSource, mockSecureSeeder, scheduleHelperFactory))
+    val actorRef = TestActorRef(new RandomSourceActor(mockByteSource, mockSecureSeeder, scheduleHelperFactory))
   }
 
   it should "obtain new seed - in a way that does not block message processing" in {
 
     val timeRange = TimeRangeToReseed(1 milliseconds, 2 milliseconds)
 
-    val mockByteSource = stub[RandomByteSource]
+    val mockByteSource = stub[RandomSource]
     (mockByteSource.nextInt _).when(*).returns(0)
 
     val mockSecureSeeder = mock[SecureSeeder]
     (mockSecureSeeder.generateSeed _).expects().atLeastTwice()
-    val actorRef = TestActorRef(new RandomByteSourceActor(mockByteSource, mockSecureSeeder, timeRangeToReseed = timeRange))
+    val actorRef = TestActorRef(new RandomSourceActor(mockByteSource, mockSecureSeeder, timeRangeToReseed = timeRange))
 
     Thread.sleep(100) // wait for the async stuff to happen before evaluating the expectations
 
@@ -94,22 +94,22 @@ class RandomByteSourceActorSpec extends TestKit(ActorSystem("test")) with Defaul
   it should "apply new seed in a thread-safe way" in {
     val timeRange = TimeRangeToReseed(1 milliseconds, 2 milliseconds)
 
-    val mockByteSource = mock[RandomByteSource]
+    val mockByteSource = mock[RandomSource]
     (mockByteSource.nextInt (_: Int)).expects(*)
     (mockByteSource.reseed _).expects(*).atLeastTwice()
 
     val mockSecureSeeder = mock[SecureSeeder]
     (mockSecureSeeder.generateSeed _).expects().atLeastTwice()
-    val actorRef = TestActorRef(new RandomByteSourceActor(mockByteSource, mockSecureSeeder, timeRangeToReseed = timeRange))
+    val actorRef = TestActorRef(new RandomSourceActor(mockByteSource, mockSecureSeeder, timeRangeToReseed = timeRange))
 
     Thread.sleep(100) // wait for the async stuff to happen before evaluating the expectations
   }
 
   it should "politely ignore other message types" in {
     // create actor ref with byte source that wraps the fixed source
-    val fixedByteSource = stub[RandomByteSource]
+    val fixedByteSource = stub[RandomSource]
     val fixedSecureSeeder = stub[SecureSeeder]
-    val actorRef = TestActorRef(new RandomByteSourceActor(fixedByteSource, fixedSecureSeeder))
+    val actorRef = TestActorRef(new RandomSourceActor(fixedByteSource, fixedSecureSeeder))
 
     // send request for four "random" bytes
     val future = actorRef ? "Hello"
@@ -142,7 +142,7 @@ class RandomByteSourceActorSpec extends TestKit(ActorSystem("test")) with Defaul
   }
 
   "the companion object" should "compute an appropriate schedule" in {
-    val byteSource = mock[RandomByteSource]
+    val byteSource = mock[RandomSource]
     (byteSource.nextInt _).expects(60000).returning(0)
     val minLifeTime: FiniteDuration = 1 minute
     val maxLifeTime: FiniteDuration = 2 minutes
@@ -153,7 +153,7 @@ class RandomByteSourceActorSpec extends TestKit(ActorSystem("test")) with Defaul
     val mersenneTwister = new MersenneTwister()
 
     for (i <- 1 to 100) {
-      val computedScheduledTimeOfDeath = computeScheduledTimeToReseed(lifeSpanRange, new RandomGeneratorByteSource(mersenneTwister))
+      val computedScheduledTimeOfDeath = computeScheduledTimeToReseed(lifeSpanRange, new RandomGeneratorSource(mersenneTwister))
       assert(computedScheduledTimeOfDeath >= minLifeTime)
       assert(computedScheduledTimeOfDeath <= maxLifeTime)
     }

@@ -6,7 +6,7 @@ import akka.actor.{ActorRef, ActorSystem}
 import akka.http.scaladsl.Http
 import akka.routing.RandomGroup
 import akka.stream.ActorMaterializer
-import com.jejking.rprng.rng.{RandomByteSourceActor, RandomGeneratorByteSource, RandomGeneratorFactory, SecureRandomSeeder}
+import com.jejking.rprng.rng.{RandomSourceActor$, RandomGeneratorSource, RandomGeneratorFactory, SecureRandomSeeder}
 import org.apache.commons.math3.random.Well44497a
 
 /**
@@ -35,8 +35,8 @@ object Main {
       val secureRandom = new SecureRandom()
       val secureSeeder = new SecureRandomSeeder(secureRandom)
       val randomGenerator = RandomGeneratorFactory.createNewGeneratorInstance[Well44497a]
-      val randomGeneratorByteSource = RandomGeneratorByteSource(randomGenerator)
-      actorSystem.actorOf(RandomByteSourceActor.props(randomGeneratorByteSource, secureSeeder), "randomByteSource" + i)
+      val randomGeneratorByteSource = RandomGeneratorSource(randomGenerator)
+      actorSystem.actorOf(RandomSourceActor.props(randomGeneratorByteSource, secureSeeder), "randomByteSource" + i)
     }
 
     val paths = for (i <- 1 to 8) yield "/user/randomByteSource" + i

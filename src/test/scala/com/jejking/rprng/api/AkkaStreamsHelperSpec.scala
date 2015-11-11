@@ -4,8 +4,8 @@ import akka.actor.{ActorSystem, Props}
 import akka.http.scaladsl.model.{ContentTypes, StatusCodes}
 import akka.stream.ActorMaterializer
 import akka.util.ByteString
-import com.jejking.rprng.rng.TestUtils.{FailureActor, InsecureSeeder, ZeroRandomByteSource}
-import com.jejking.rprng.rng.{RandomByteSourceActor, TestUtils}
+import com.jejking.rprng.rng.TestUtils.{FailureActor, InsecureSeeder, ZeroRandomSource}
+import com.jejking.rprng.rng.{RandomSourceActor$, TestUtils}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{BeforeAndAfterAll, FlatSpec, Matchers}
 
@@ -22,7 +22,7 @@ class AkkaStreamsHelperSpec extends FlatSpec with Matchers with ScalaFutures wit
   def initActorSystem(): ActorSystem = {
 
     val actorSystem = ActorSystem("akkaStreamsHelperSpec")
-    actorSystem.actorOf(RandomByteSourceActor.props(new ZeroRandomByteSource, new InsecureSeeder), "randomRouter")
+    actorSystem.actorOf(RandomSourceActor.props(new ZeroRandomSource, new InsecureSeeder), "randomRouter")
     actorSystem.actorOf(Props[FailureActor], "failure")
     actorSystem
   }
