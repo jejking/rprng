@@ -81,7 +81,7 @@ case object RandomAnyIntRequest
  * @param maxBound inclusive maximum bound. Must be greater than minBound.
  * @throws IllegalArgumentException if preconditions not met
  */
-case class RandomIntRequest(minBound: Int, maxBound: Int) {
+case class RandomIntRequest(minBound: Int = 0, maxBound: Int) {
   require(minBound < maxBound, "minBound must be less than maxBound")
 }
 
