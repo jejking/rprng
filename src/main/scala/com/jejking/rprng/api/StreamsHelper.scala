@@ -7,7 +7,7 @@ import akka.stream.ActorMaterializer
 import akka.stream.actor.ActorPublisher
 import akka.stream.scaladsl.{Keep, Sink, Source}
 import akka.util.ByteString
-import com.jejking.rprng.rng.{RandomIntegerCollectionRequest, RandomByteStringActorPublisher}
+import com.jejking.rprng.rng.{RandomIntegerCollectionResponse, RandomIntegerCollectionRequest, RandomByteStringActorPublisher}
 
 import scala.concurrent.Future
 
