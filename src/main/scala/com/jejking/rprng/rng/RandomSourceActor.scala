@@ -43,6 +43,14 @@ class RandomSourceActor(private val randomSource: RandomSource, private val secu
         log.debug("processed request for " + r.count + "bytes")
       }
     }
+
+    case RandomAnyIntRequest => {
+      sender() ! randomSource.nextInt()
+      if (log.isDebugEnabled) {
+        log.debug("processed request for random int with no specified bounds")
+      }
+    }
+
     // trigger reseed, note this is done in a future to avoid blocking the actor
     case Reseed => fetchSeedAndNotify()
 

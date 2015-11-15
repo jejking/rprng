@@ -41,6 +41,16 @@ trait RandomSource {
   def nextInt(bound: Int): Int
 
   /**
+   * Creates a random integer between the lower bound (inclusive) and the upper bound (inclusive).
+   * @param req request specifying bounds
+   * @return a random integer
+   */
+  def nextInt(req: RandomIntRequest): Int = {
+    nextInt((req.maxBound - req.minBound) + 1) + req.minBound
+  }
+
+
+  /**
    * Requests four bytes of randomness and uses these to construct an int.
    * @return a random int
    */

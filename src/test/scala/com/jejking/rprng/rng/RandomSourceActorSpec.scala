@@ -6,7 +6,7 @@ import akka.testkit.{DefaultTimeout, ImplicitSender, TestActorRef, TestKit}
 import akka.util.ByteString
 import org.apache.commons.math3.random.MersenneTwister
 import org.scalamock.scalatest.MockFactory
-import org.scalatest.concurrent.Eventually
+import org.scalatest.concurrent.{ScalaFutures, Eventually}
 import org.scalatest.{BeforeAndAfterAll, FlatSpecLike, Matchers}
 
 import scala.concurrent.ExecutionContext
@@ -15,8 +15,8 @@ import scala.concurrent.duration._
 /**
  * Test of functionality around [[RandomSourceActor]].
  */
-class RandomByteSourceActorSpec extends TestKit(ActorSystem("test")) with DefaultTimeout with ImplicitSender
-  with FlatSpecLike with Matchers with BeforeAndAfterAll with MockFactory with Eventually  {
+class RandomSourceActorSpec extends TestKit(ActorSystem("test")) with DefaultTimeout with ImplicitSender
+  with FlatSpecLike with Matchers with BeforeAndAfterAll with MockFactory with Eventually with ScalaFutures  {
 
   import RandomSourceActor.Protocol._
   import RandomSourceActor._
@@ -45,6 +45,25 @@ class RandomByteSourceActorSpec extends TestKit(ActorSystem("test")) with Defaul
 
     actual shouldBe notVeryRandomBytes
     actual shouldBe a [ByteString]
+  }
+
+  it should "request and return a random integer on receiving RandomAnyIntRequest" in {
+
+    val mockRandomSource = mock[RandomSource]
+    (mockRandomSource.nextInt _).expects().returning(1234)
+    (mockRandomSource.reseed _).expects(*)
+    (mockRandomSource.nextInt (_: Int)).expects(*)
+
+    val fixedSecureSeeder = stub[SecureSeeder]
+    val actorRef = TestActorRef(new RandomSourceActor(mockRandomSource, fixedSecureSeeder))
+
+    // send request for any random int
+    val response = (actorRef ? RandomAnyIntRequest).mapTo[Int]
+
+    whenReady(response) { i =>
+      i should be (1234)
+    }
+
   }
 
   it should "initialise itself from a proper seed source" in {
@@ -105,6 +124,8 @@ class RandomByteSourceActorSpec extends TestKit(ActorSystem("test")) with Defaul
 
     Thread.sleep(100) // wait for the async stuff to happen before evaluating the expectations
   }
+
+
 
   it should "politely ignore other message types" in {
     // create actor ref with byte source that wraps the fixed source

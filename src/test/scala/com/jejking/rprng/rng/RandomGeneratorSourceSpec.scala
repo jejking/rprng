@@ -1,6 +1,7 @@
 package com.jejking.rprng.rng
 
-import org.apache.commons.math3.random.RandomGenerator
+import org.apache.commons.math3.random.{MersenneTwister, RandomGenerator}
+import org.apache.commons.math3.stat.Frequency
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.{FlatSpec, Matchers}
 
@@ -80,7 +81,7 @@ class RandomGeneratorSourceSpec extends FlatSpec with Matchers with MockFactory 
   }
 
   it should "create a random int between zero and a positive int bound" in {
-    // essentially just test that we call the backing mock, logic delegated to Apache Commons Math at the moment
+    // essentially just test that we call the backing mock, lic delegated to Apache Commons Math at the moment
     val randomGenerator = mock[RandomGenerator]
     (randomGenerator.nextInt (_:Int)).expects(10).returning(7)
 
@@ -88,6 +89,38 @@ class RandomGeneratorSourceSpec extends FlatSpec with Matchers with MockFactory 
     val notVeryRandomInt = source.nextInt(10)
 
     notVeryRandomInt should be (7)
+  }
+
+  it should "respect the bounds between zero and the specified positive int bound" in {
+    val randomGenerator = new MersenneTwister
+    val source = RandomGeneratorSource(randomGenerator)
+    val frequency = new Frequency()
+    for (i <- 1 to 10000) {
+      val randomInt = source.nextInt(10)
+      assert(randomInt >= 0)
+      assert(randomInt < 10)
+      frequency.addValue(randomInt)
+    }
+    // rough check for proper distribution
+    for (i <- 0 to 9) {
+      frequency.getPct(i) should be (0.1 +- 0.01)
+    }
+  }
+
+  it should "respect the bounds between min and max when requesting a customer range" in {
+    val randomGenerator = new MersenneTwister
+    val source = RandomGeneratorSource(randomGenerator)
+    val frequency = new Frequency()
+    for (i <- 1 to 10000) {
+      val randomInt = source.nextInt(RandomIntRequest(11, 20))
+      assert(randomInt >= 11)
+      assert(randomInt <= 20)
+      frequency.addValue(randomInt)
+    }
+    // rough check for proper distribution
+    for (i <- 11 to 20) {
+      frequency.getPct(i) should be (0.1 +- 0.01)
+    }
   }
 }
 
