@@ -51,6 +51,15 @@ class RandomSourceActor(private val randomSource: RandomSource, private val secu
       }
     }
 
+    case r: RandomIntRequest => {
+      sender() ! randomSource.nextInt(r)
+      if (log.isDebugEnabled) {
+        val min = r.minBound
+        val max = r.maxBound
+        log.debug(s"processed request for random int between $min and $max")
+      }
+    }
+
     // trigger reseed, note this is done in a future to avoid blocking the actor
     case Reseed => fetchSeedAndNotify()
 

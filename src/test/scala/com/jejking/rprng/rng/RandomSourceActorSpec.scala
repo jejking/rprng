@@ -66,6 +66,25 @@ class RandomSourceActorSpec extends TestKit(ActorSystem("test")) with DefaultTim
 
   }
 
+  it should "request and return an appropriate random integer on receiving a RandomIntRequeest" in {
+
+    val mockRandomSource = mock[RandomSource]
+    (mockRandomSource.nextInt (_:RandomIntRequest)).expects(RandomIntRequest(10, 20)).returning(19)
+    (mockRandomSource.reseed _).expects(*)
+    (mockRandomSource.nextInt (_: Int)).expects(*)
+
+    val fixedSecureSeeder = stub[SecureSeeder]
+    val actorRef = TestActorRef(new RandomSourceActor(mockRandomSource, fixedSecureSeeder))
+
+    // send request for any random int
+    val response = (actorRef ? RandomIntRequest(10, 20)).mapTo[Int]
+
+    whenReady(response) { i =>
+      i should be (19)
+    }
+
+  }
+
   it should "initialise itself from a proper seed source" in {
     val mockByteSource = mock[RandomSource]
     val mockSecureSeeder = mock[SecureSeeder]
