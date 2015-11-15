@@ -34,11 +34,21 @@ trait RandomSource {
   }
 
   /**
-   * Creates a random integer between zero and the supplied upper bound.
+   * Creates a random integer between zero (inclusive) and the supplied upper bound (exclusive).
    * @param bound the upper bound.
    * @return a random integer
    */
   def nextInt(bound: Int): Int
+
+  /**
+   * Requests four bytes of randomness and uses these to construct an int.
+   * @return a random int
+   */
+  def nextInt(): Int = {
+    val bytes = randomBytes(RandomByteRequest(4))
+    val wrapper = ByteBuffer.wrap(bytes)
+    wrapper.getInt
+  }
 }
 
 /**
@@ -59,6 +69,7 @@ class RandomGeneratorSource(val randomGenerator: RandomGenerator) extends Random
   }
 
   override def nextInt(bound: Int): Int = {
+    require(bound > 0, "Bound must be strictly positive")
     randomGenerator.nextInt(bound)
   }
 

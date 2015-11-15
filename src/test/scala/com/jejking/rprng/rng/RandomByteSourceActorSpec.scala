@@ -31,7 +31,8 @@ class RandomByteSourceActorSpec extends TestKit(ActorSystem("test")) with Defaul
       (request: RandomByteRequest) => request.count == 4
     }).returning(notVeryRandomBytes)
     (mockByteSource.reseed _).expects(*)
-    (mockByteSource.nextInt _).expects(*)
+
+    (mockByteSource.nextInt (_: Int)).expects(*)
 
 
     val fixedSecureSeeder = stub[SecureSeeder]
@@ -57,7 +58,7 @@ class RandomByteSourceActorSpec extends TestKit(ActorSystem("test")) with Defaul
 
   it should "schedule a message to itself to reseed" in {
     val mockByteSource = mock[RandomSource]
-    (mockByteSource.nextInt _).expects(*).returning(0)
+    (mockByteSource.nextInt (_:Int)).expects(*).returning(0)
     (mockByteSource.reseed _).expects(0L)
     
 
@@ -81,7 +82,7 @@ class RandomByteSourceActorSpec extends TestKit(ActorSystem("test")) with Defaul
     val timeRange = TimeRangeToReseed(1 milliseconds, 2 milliseconds)
 
     val mockByteSource = stub[RandomSource]
-    (mockByteSource.nextInt _).when(*).returns(0)
+    (mockByteSource.nextInt _).when().returns(0)
 
     val mockSecureSeeder = mock[SecureSeeder]
     (mockSecureSeeder.generateSeed _).expects().atLeastTwice()
@@ -143,7 +144,7 @@ class RandomByteSourceActorSpec extends TestKit(ActorSystem("test")) with Defaul
 
   "the companion object" should "compute an appropriate schedule" in {
     val byteSource = mock[RandomSource]
-    (byteSource.nextInt _).expects(60000).returning(0)
+    (byteSource.nextInt (_: Int)).expects(60000).returning(0)
     val minLifeTime: FiniteDuration = 1 minute
     val maxLifeTime: FiniteDuration = 2 minutes
 

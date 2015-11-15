@@ -5,7 +5,7 @@ import akka.http.scaladsl.model.{ContentTypes, StatusCodes}
 import akka.stream.ActorMaterializer
 import akka.util.ByteString
 import com.jejking.rprng.rng.TestUtils.{FailureActor, InsecureSeeder, ZeroRandomSource}
-import com.jejking.rprng.rng.{RandomSourceActor$, TestUtils}
+import com.jejking.rprng.rng.{RandomSourceActor, RandomSourceActor$, TestUtils}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{BeforeAndAfterAll, FlatSpec, Matchers}
 

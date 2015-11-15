@@ -4,7 +4,7 @@ import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
 import akka.http.scaladsl.model.{HttpResponse, StatusCodes}
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.{RejectionHandler, Route, ValidationRejection}
-import com.jejking.rprng.rng.RandomIntegerCollectionRequest
+import com.jejking.rprng.rng.{RandomSet, RandomList, RandomIntegerCollectionRequest}
 
 /**
  * Routing for web requests for randomness.

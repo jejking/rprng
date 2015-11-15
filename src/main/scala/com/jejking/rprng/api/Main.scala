@@ -6,7 +6,7 @@ import akka.actor.{ActorRef, ActorSystem}
 import akka.http.scaladsl.Http
 import akka.routing.RandomGroup
 import akka.stream.ActorMaterializer
-import com.jejking.rprng.rng.{RandomSourceActor$, RandomGeneratorSource, RandomGeneratorFactory, SecureRandomSeeder}
+import com.jejking.rprng.rng.{RandomSourceActor, RandomGeneratorSource, RandomGeneratorFactory, SecureRandomSeeder}
 import org.apache.commons.math3.random.Well44497a
 
 /**
