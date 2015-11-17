@@ -6,7 +6,6 @@ import akka.stream.actor.ActorPublisher
 import akka.stream.scaladsl.Source
 import akka.stream.testkit.scaladsl.TestSink
 import akka.testkit.TestProbe
-import akka.util.ByteString
 import com.jejking.rprng.rng.TestUtils.{FailureActor, InsecureSeeder, ZeroRandomSource}
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.{BeforeAndAfterAll, FlatSpec, Matchers}
@@ -14,7 +13,7 @@ import org.scalatest.{BeforeAndAfterAll, FlatSpec, Matchers}
 /**
  * Tests for [[RandomIntActorPublisher]].
  */
-class RandomByteStringActorPublisherSpec extends FlatSpec with Matchers with BeforeAndAfterAll with MockFactory {
+class RandomIntActorPublisherSpec extends FlatSpec with Matchers with BeforeAndAfterAll with MockFactory {
 
   implicit val system = initActorSystem()
   implicit val materializer = ActorMaterializer()
@@ -28,25 +27,25 @@ class RandomByteStringActorPublisherSpec extends FlatSpec with Matchers with Bef
   }
 
 
-  "the random byte string actor publisher" should "provide a stream of byte strings from wrapped actor path" in {
+  "the random int actor publisher" should "provide a stream of ints from wrapped actor path" in {
 
-    val source = Source.actorPublisher[ByteString](RandomByteStringActorPublisher.props(8, "/user/secureSeeder"))
-    source.runWith(TestSink.probe[ByteString]).request(1).expectNext(ByteString(Array(0.toByte, 0.toByte, 0.toByte, 0.toByte, 0.toByte, 0.toByte, 0.toByte, 0.toByte)))
+    val source = Source.actorPublisher[Int](RandomIntActorPublisher.props(RandomIntRequest(0, 10), "/user/secureSeeder"))
+    source.runWith(TestSink.probe[Int]).request(1).expectNext(0)
 
   }
 
-  it should "notify the subscriber if attempt to get a byte string from the wrapped actor path fails" in {
-    val source = Source.actorPublisher[ByteString](RandomByteStringActorPublisher.props(8, "/user/failure"))
-    source.runWith(TestSink.probe[ByteString]).request(1).expectError()
+  it should "notify the subscriber if attempt to get an int from the wrapped actor path fails" in {
+    val source = Source.actorPublisher[Int](RandomIntActorPublisher.props(RandomIntRequest(0, 10), "/user/failure"))
+    source.runWith(TestSink.probe[Int]).request(1).expectError()
   }
 
   it should "stop itself when it receives a cancel message from the subscriber" in {
-    val newActorRef = system.actorOf(RandomByteStringActorPublisher.props(8, "/user/secureSeeder"))
+    val newActorRef = system.actorOf(RandomIntActorPublisher.props(RandomIntRequest(0, 10), "/user/secureSeeder"))
     val probe = TestProbe()
     probe watch newActorRef
-    val publisher = ActorPublisher[ByteString](newActorRef)
+    val publisher = ActorPublisher[Int](newActorRef)
     val source = Source(publisher)
-    source.runWith(TestSink.probe[ByteString]).cancel()
+    source.runWith(TestSink.probe[Int]).cancel()
 
     probe.expectTerminated(newActorRef)
   }

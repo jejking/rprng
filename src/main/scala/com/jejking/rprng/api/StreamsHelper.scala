@@ -7,7 +7,7 @@ import akka.stream.ActorMaterializer
 import akka.stream.actor.ActorPublisher
 import akka.stream.scaladsl.{Keep, Sink, Source}
 import akka.util.ByteString
-import com.jejking.rprng.rng.{RandomIntegerCollectionResponse, RandomIntegerCollectionRequest, RandomByteStringActorPublisher}
+import com.jejking.rprng.rng.{RandomByteStringActorPublisher, RandomIntegerCollectionResponse, RandomIntegerCollectionRequest, RandomIntActorPublisher$}
 
 import scala.concurrent.Future
 
@@ -57,72 +57,6 @@ class AkkaStreamsHelper(path: String = "/user/randomRouter")(implicit actorSyste
 }
 
 object AkkaStreamsHelper {
-
-  // from java.util.Random
-
-  /**
-   * protected  Int next(bits : Int) {
-  var oldseed : Long = 0L
-  var nextseed : Long = 0L
-  val seed : AtomicLong = this.seed
-do {
-oldseed = seed.get
-nextseed = (oldseed * multiplier + addend) & mask
-}while (!seed.compareAndSet(oldseed, nextseed))
-return (nextseed >>> (48 - bits)).toInt
-}
-   *
-   * /**
-   * The form of nextInt used by IntStream Spliterators.
-   * For the unbounded case: uses nextInt().
-   * For the bounded case with representable range: uses nextInt(int bound)
-   * For the bounded case with unrepresentable range: uses nextInt()
-   *
-   * @param origin the least value, unless greater than bound
-   * @param bound the upper bound (exclusive), must not equal origin
-   * @return a pseudorandom value
-   */
-private[util]   def internalNextInt(origin : Int, bound : Int) : Int = {
-if (origin < bound) {
-  val n : Int = bound - origin
-if (n > 0) {
-return nextInt(n) + origin
-}
-else {
-  var r : Int = 0
-do {
-r = nextInt
-}while (r < origin || r >= bound)
-return r
-}
-}
-else {
-return nextInt
-}
-}
-   *
-   *
-   * Int nextInt(bound : Int) {
-if (bound <= 0) throw new IllegalArgumentException(BadBound)
-  var r : Int = next(31)
-  val m : Int = bound - 1
-if ((bound & m) == 0) r = ((bound * r.toLong) >> 31).toInt
-else {
-
-{
-  var u : Int = r
-while (u - (({r = u % bound; r})) + m < 0) {
-
-u = next(31)
-}
-}
-}
-return r
-}
-   *
-   *
-   */
-
 
   // some method to map from four bytes to an integer
 
