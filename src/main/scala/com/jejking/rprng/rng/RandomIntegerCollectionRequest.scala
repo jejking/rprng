@@ -23,4 +23,10 @@ case class RandomIntegerCollectionRequest(collectionType: RandomCollectionType, 
   if (collectionType == RandomSet) {
     require(maxBound - minBound > size, "Max bound - min bound must be greater than requested set size")
   }
+
+  /**
+   * Extracts [[minBound]] and [[maxBound]] as a [[RandomIntRequest]]
+   * @return corresponding object
+   */
+  def randomIntRequest(): RandomIntRequest = RandomIntRequest(this.minBound, this.maxBound)
 }

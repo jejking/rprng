@@ -7,7 +7,7 @@ import akka.stream.ActorMaterializer
 import akka.stream.actor.ActorPublisher
 import akka.stream.scaladsl.{Keep, Sink, Source}
 import akka.util.ByteString
-import com.jejking.rprng.rng.{RandomByteStringActorPublisher, RandomIntegerCollectionResponse, RandomIntegerCollectionRequest, RandomIntActorPublisher$}
+import com.jejking.rprng.rng._
 
 import scala.concurrent.Future
 
@@ -53,16 +53,38 @@ class AkkaStreamsHelper(path: String = "/user/randomRouter")(implicit actorSyste
     HttpResponse(StatusCodes.OK).withEntity(entity)
   }
 
-  override def responseForIntegerCollection(req: RandomIntegerCollectionRequest) = ???
+  override def responseForIntegerCollection(req: RandomIntegerCollectionRequest): Future[RandomIntegerCollectionResponse] = {
+    val builder = List.newBuilder[Iterable[Int]]
+    builder.sizeHint(req.count)
+
+    def createIntSource(): Source[Int, Unit] = {
+      val publisherActor = actorSystem.actorOf(RandomIntActorPublisher.props(req.randomIntRequest(), path))
+      val publisher = ActorPublisher[Int](publisherActor)
+      Source(publisher)
+    }
+
+    def listsFromStream(): Future[RandomIntegerCollectionResponse] = {
+      createIntSource()
+        .take(req.count * req.size)
+        .grouped(req.size)
+        .map(s => s.toList)
+        .grouped(req.count)
+        .map(s => s.toList)
+        .map(lli => RandomIntegerCollectionResponse(lli))
+        .toMat(Sink.head)(Keep.right)
+        .run()
+    }
+
+    req.collectionType match {
+      case RandomList => listsFromStream
+      case RandomSet  => throw new UnsupportedOperationException("not done yet")
+    }
+
+  }
 }
 
 object AkkaStreamsHelper {
 
-  // some method to map from four bytes to an integer
 
-  // some method to constrain the range of an integer
 
-  // some method to construct a set of a given size from a stream of integers
-
-  // some method to convert a stream of byte strings of (known) size 4 to a stream of integers
 }
