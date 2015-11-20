@@ -5,7 +5,7 @@ import akka.http.scaladsl.model.{ContentTypes, StatusCodes}
 import akka.stream.ActorMaterializer
 import akka.util.ByteString
 import com.jejking.rprng.rng.TestUtils.{FailureActor, InsecureSeeder, ZeroRandomSource}
-import com.jejking.rprng.rng.{RandomSourceActor, RandomSourceActor$, TestUtils}
+import com.jejking.rprng.rng._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{BeforeAndAfterAll, FlatSpec, Matchers}
 
@@ -59,6 +59,25 @@ class AkkaStreamsHelperSpec extends FlatSpec with Matchers with ScalaFutures wit
                       .runForeach(bs => bs shouldBe TestUtils.oneKb)
   }
 
+  it should "deliver a list of ints of size 1 of a list of size 1 when requested" in {
+    val req = RandomIntegerCollectionRequest(RandomList, 1, 1, 0, 10)
+
+    whenReady(akkaStreamsHelper.responseForIntegerCollection(req)) { resp =>
+      resp.content.size shouldBe 1
+      resp.content.foreach(it => it.size shouldBe 1)
+      resp.content.foreach(it => it.foreach(i => i shouldBe 0))
+    }
+  }
+
+  it should "deliver a list of ints of size 100 of a list of size 10 when requested" in {
+    val req = RandomIntegerCollectionRequest(RandomList, 1000, 100, 0, 10)
+
+    whenReady(akkaStreamsHelper.responseForIntegerCollection(req)) { resp =>
+      resp.content.size shouldBe 100
+      resp.content.foreach(it => it.size shouldBe 10)
+      resp.content.foreach(it => it.foreach(i => i shouldBe 0))
+    }
+  }
 
   override def afterAll(): Unit = {
     this.system.shutdown()
