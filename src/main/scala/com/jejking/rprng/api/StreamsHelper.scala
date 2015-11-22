@@ -73,6 +73,14 @@ class AkkaStreamsHelper(path: String = "/user/randomRouter")(implicit actorSyste
         .run()
     }
 
+    def setsFromStream(): Future[RandomIntegerCollectionResponse] = ???
+
+    /*
+    Think about creating some form of custom PushPullStage that allows us
+    to map the source to a traversable to a set of size N *using WithToSizedSet.
+    Input would be ints, an the appropriately sized set.
+     */
+
     req.collectionType match {
       case RandomList => listsFromStream
       case RandomSet  => throw new UnsupportedOperationException("not done yet")
