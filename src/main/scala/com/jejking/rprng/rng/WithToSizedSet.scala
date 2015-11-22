@@ -1,5 +1,7 @@
 package com.jejking.rprng.rng
 
+import scala.annotation.tailrec
+
 /**
  * Enhances a traversable with method to map it to a set of a target size..
  */
@@ -17,7 +19,7 @@ class WithToSizedSet[T](traversable: Traversable[T]) {
   def toSet(targetSize: Int): Set[T] = {
     require(targetSize >= 0)
 
-    def addToSet(accum: Set[T], traversing: Traversable[T]): Set[T] = {
+    @tailrec def addToSet(accum: Set[T], traversing: Traversable[T]): Set[T] = {
       if (accum.size == targetSize) {
         accum
       } else if (traversing.headOption.isEmpty) {
