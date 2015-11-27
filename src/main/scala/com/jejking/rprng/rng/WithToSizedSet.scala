@@ -16,7 +16,7 @@ class WithToSizedSet[T](traversable: Traversable[T]) {
    * @param targetSize zero or greater. It generally only makes sense to use an integer > 1.
    * @return a set which may be empty.
    */
-  def toSet(targetSize: Int): Set[T] = {
+  def toSizedSet(targetSize: Int): Set[T] = {
     require(targetSize >= 0)
 
     @tailrec def addToSet(accum: Set[T], traversing: Traversable[T]): Set[T] = {

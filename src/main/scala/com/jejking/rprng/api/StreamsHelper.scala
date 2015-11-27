@@ -6,6 +6,7 @@ import akka.http.scaladsl.model._
 import akka.stream.ActorMaterializer
 import akka.stream.actor.ActorPublisher
 import akka.stream.scaladsl.{Keep, Sink, Source}
+import akka.stream.stage.{LifecycleContext, SyncDirective, Context, PushPullStage}
 import akka.util.ByteString
 import com.jejking.rprng.rng._
 
@@ -86,6 +87,32 @@ class AkkaStreamsHelper(path: String = "/user/randomRouter")(implicit actorSyste
       case RandomSet  => throw new UnsupportedOperationException("not done yet")
     }
 
+  }
+}
+
+class ToSizedSet(req: RandomIntegerCollectionRequest) extends PushPullStage[Int, Set[Int]] {
+
+  private var setBeingBuilt = Set.empty[Int]
+
+  override def onPush(elem: Int, ctx: Context[Set[Int]]): SyncDirective = {
+
+    this.setBeingBuilt = this.setBeingBuilt + elem
+
+    // we're done and can push downstream
+    if (this.setBeingBuilt.size == req.size) {
+      val copy = this.setBeingBuilt
+      // reset
+      this.setBeingBuilt == Set.empty[Int]
+      ctx.push(copy)
+    } else {
+      ctx.pull() // get some more as we're not finished yet
+    }
+
+  }
+
+  override def onPull(ctx: Context[Set[Int]]): SyncDirective = {
+
+    ctx.pull() // start the process of collecting ints needed for our set
   }
 }
 
