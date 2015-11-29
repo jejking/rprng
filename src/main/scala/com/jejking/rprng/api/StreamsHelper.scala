@@ -74,7 +74,15 @@ class AkkaStreamsHelper(path: String = "/user/randomRouter")(implicit actorSyste
         .run()
     }
 
-    def setsFromStream(): Future[RandomIntegerCollectionResponse] = ???
+    def setsFromStream(): Future[RandomIntegerCollectionResponse] = {
+      createIntSource()
+        .transform(() => ToSizedSet(req.size))
+        .take(req.count)
+        .grouped(req.count)
+        .map(seqOfSets => RandomIntegerCollectionResponse(seqOfSets))
+        .toMat(Sink.head)(Keep.right)
+        .run()
+    }
 
     /*
     Think about creating some form of custom PushPullStage that allows us
@@ -84,7 +92,7 @@ class AkkaStreamsHelper(path: String = "/user/randomRouter")(implicit actorSyste
 
     req.collectionType match {
       case RandomList => listsFromStream
-      case RandomSet  => throw new UnsupportedOperationException("not done yet")
+      case RandomSet  => setsFromStream
     }
 
   }
