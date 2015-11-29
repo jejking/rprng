@@ -7,6 +7,7 @@ import akka.util.ByteString
 import com.jejking.rprng.rng.TestUtils.{FailureActor, InsecureSeeder, ZeroRandomSource}
 import com.jejking.rprng.rng._
 import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.time.{Seconds, Millis, Span}
 import org.scalatest.{BeforeAndAfterAll, FlatSpec, Matchers}
 
 /**
@@ -70,11 +71,11 @@ class AkkaStreamsHelperSpec extends FlatSpec with Matchers with ScalaFutures wit
   }
 
   it should "deliver a list of ints of size 100 of a list of size 10 when requested" in {
-    val req = RandomIntegerCollectionRequest(RandomList, 1000, 100, 0, 10)
+    val req = RandomIntegerCollectionRequest(RandomList, 100, 10, 0, 10)
 
-    whenReady(akkaStreamsHelper.responseForIntegerCollection(req)) { resp =>
-      resp.content.size shouldBe 100
-      resp.content.foreach(it => it.size shouldBe 10)
+    whenReady(akkaStreamsHelper.responseForIntegerCollection(req), timeout(Span(1, Seconds))) { resp =>
+      resp.content.size shouldBe 10
+      resp.content.foreach(it => it.size shouldBe 100)
       resp.content.foreach(it => it.foreach(i => i shouldBe 0))
     }
   }

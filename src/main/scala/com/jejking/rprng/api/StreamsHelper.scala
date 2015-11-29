@@ -6,7 +6,7 @@ import akka.http.scaladsl.model._
 import akka.stream.ActorMaterializer
 import akka.stream.actor.ActorPublisher
 import akka.stream.scaladsl.{Keep, Sink, Source}
-import akka.stream.stage.{LifecycleContext, SyncDirective, Context, PushPullStage}
+import akka.stream.stage._
 import akka.util.ByteString
 import com.jejking.rprng.rng._
 
@@ -90,7 +90,7 @@ class AkkaStreamsHelper(path: String = "/user/randomRouter")(implicit actorSyste
   }
 }
 
-class ToSizedSet(req: RandomIntegerCollectionRequest) extends PushPullStage[Int, Set[Int]] {
+class ToSizedSet(requestedSetSize: Int) extends PushPullStage[Int, Set[Int]] {
 
   private var setBeingBuilt = Set.empty[Int]
 
@@ -99,10 +99,10 @@ class ToSizedSet(req: RandomIntegerCollectionRequest) extends PushPullStage[Int,
     this.setBeingBuilt = this.setBeingBuilt + elem
 
     // we're done and can push downstream
-    if (this.setBeingBuilt.size == req.size) {
+    if (this.setBeingBuilt.size == requestedSetSize) {
       val copy = this.setBeingBuilt
       // reset
-      this.setBeingBuilt == Set.empty[Int]
+      this.setBeingBuilt = Set.empty[Int]
       ctx.push(copy)
     } else {
       ctx.pull() // get some more as we're not finished yet
@@ -111,9 +111,18 @@ class ToSizedSet(req: RandomIntegerCollectionRequest) extends PushPullStage[Int,
   }
 
   override def onPull(ctx: Context[Set[Int]]): SyncDirective = {
-
     ctx.pull() // start the process of collecting ints needed for our set
   }
+
+  override def onUpstreamFinish(ctx: Context[Set[Int]]): TerminationDirective = {
+    ctx.absorbTermination()
+  }
+
+}
+
+object ToSizedSet {
+
+  def apply(requestedSetSize: Int) = new ToSizedSet(requestedSetSize)
 }
 
 object AkkaStreamsHelper {
