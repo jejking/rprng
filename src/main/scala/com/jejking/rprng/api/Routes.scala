@@ -53,13 +53,13 @@ class Routes(streamsHelper: StreamsHelper) extends SprayJsonSupport {
         (size: Int, count: Int, min: Int, max: Int) => {
           pathPrefix("list") {
             complete {
-              val req = RandomIntegerCollectionRequest(RandomSet, size, count, min, max)
+              val req = RandomIntegerCollectionRequest(RandomList, size, count, min, max)
               streamsHelper.responseForIntegerCollection(req)
             }
           } ~
           pathPrefix("set") {
             complete {
-              val req = RandomIntegerCollectionRequest(RandomList, size, count, min, max)
+              val req = RandomIntegerCollectionRequest(RandomSet, size, count, min, max)
               streamsHelper.responseForIntegerCollection(req)
             }
           }
