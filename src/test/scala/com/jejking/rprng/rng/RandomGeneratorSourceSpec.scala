@@ -145,6 +145,13 @@ class RandomGeneratorSourceSpec extends FlatSpec with Matchers with MockFactory 
     }
   }
 
+  it should "generate a random int when min and max are " + Int.MinValue + " and " + Int.MaxValue in {
+    val randomGenerator = new MersenneTwister
+    val source = RandomGeneratorSource(randomGenerator)
+
+    source.nextInt(RandomIntRequest(Int.MinValue, Int.MaxValue))
+  }
+
 }
 
 

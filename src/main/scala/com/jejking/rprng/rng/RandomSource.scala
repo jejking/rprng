@@ -46,7 +46,11 @@ trait RandomSource {
    * @return a random integer
    */
   def nextInt(req: RandomIntRequest): Int = {
-    nextInt((req.maxBound - req.minBound) + 1) + req.minBound
+    if (req.minBound == Int.MinValue && req.maxBound == Int.MaxValue) {
+      nextInt()
+    } else {
+      nextInt((req.maxBound - req.minBound) + 1) + req.minBound
+    }
   }
 
 
@@ -79,7 +83,7 @@ class RandomGeneratorSource(val randomGenerator: RandomGenerator) extends Random
   }
 
   override def nextInt(bound: Int): Int = {
-    require(bound > 0, "Bound must be strictly positive")
+    require(bound > 0, s"Bound must be strictly positive, but was $bound")
     randomGenerator.nextInt(bound)
   }
 

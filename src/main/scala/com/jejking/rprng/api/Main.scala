@@ -6,8 +6,8 @@ import akka.actor.{ActorRef, ActorSystem}
 import akka.http.scaladsl.Http
 import akka.routing.RandomGroup
 import akka.stream.ActorMaterializer
-import com.jejking.rprng.rng.{RandomSourceActor, RandomGeneratorSource, RandomGeneratorFactory, SecureRandomSeeder}
-import org.apache.commons.math3.random.Well44497a
+import com.jejking.rprng.rng.{RandomGeneratorFactory, RandomGeneratorSource, RandomSourceActor, SecureRandomSeeder}
+import org.apache.commons.math3.random.ISAACRandom
 
 /**
  * Starts web service.
@@ -34,7 +34,7 @@ object Main {
     for (i <- 1 to 8) {
       val secureRandom = new SecureRandom()
       val secureSeeder = new SecureRandomSeeder(secureRandom)
-      val randomGenerator = RandomGeneratorFactory.createNewGeneratorInstance[Well44497a]
+      val randomGenerator = RandomGeneratorFactory.createNewGeneratorInstance[ISAACRandom]
       val randomGeneratorByteSource = RandomGeneratorSource(randomGenerator)
       actorSystem.actorOf(RandomSourceActor.props(randomGeneratorByteSource, secureSeeder), "randomByteSource" + i)
     }

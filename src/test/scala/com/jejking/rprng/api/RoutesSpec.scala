@@ -8,7 +8,7 @@ import akka.http.scaladsl.server.ValidationRejection
 import akka.http.scaladsl.testkit.ScalatestRouteTest
 import akka.stream.scaladsl.Source
 import akka.util.ByteString
-import com.jejking.rprng.rng.{RandomIntegerCollectionResponse, RandomList, RandomIntegerCollectionRequest, TestUtils}
+import com.jejking.rprng.rng._
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FlatSpec, Matchers}
@@ -180,7 +180,7 @@ class RoutesSpec extends FlatSpec with Matchers with ScalaFutures with Scalatest
 
 
 
- "/int/list?size=10&min=100&max=10" should "be rejected" in {
+ "/int/list?size=10&min=100&max=10" should "result in a 400" in {
    val mockStreamsHelper = mock[StreamsHelper]
    (mockStreamsHelper.responseForIntegerCollection _).expects(*).never()
 
@@ -190,6 +190,30 @@ class RoutesSpec extends FlatSpec with Matchers with ScalaFutures with Scalatest
    }
  }
 
+ "/int/set" should "give a single set of 100 ints" in {
+   val mockStreamsHelper = mock[StreamsHelper]
+   (mockStreamsHelper.responseForIntegerCollection _)
+     .expects(RandomIntegerCollectionRequest(RandomSet))
+     .returning(Future.successful(RandomIntegerCollectionResponse(Set(1 to 100))))
+
+   val routes = new Routes(mockStreamsHelper)
+   Get("/int/set") ~> routes.intRoute ~> check {
+     handled shouldBe true
+     val resp: RandomIntegerCollectionResponse = responseAs[RandomIntegerCollectionResponse]
+     resp.content should have size 1
+     resp.content.head.toSet should have size 100
+   }
+ }
+
+ "/int/set?size=100&min=0&max=50" should "result in a 400" in {
+   val mockStreamsHelper = mock[StreamsHelper]
+   (mockStreamsHelper.responseForIntegerCollection _).expects(*).never()
+
+   val routes = new Routes(mockStreamsHelper)
+   Get("/int/set?size=100&min=0&max=50") ~> routes.route ~> check {
+     response.status shouldBe StatusCodes.BadRequest
+   }
+ }
 
 
 }
