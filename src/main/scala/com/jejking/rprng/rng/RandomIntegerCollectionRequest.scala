@@ -19,9 +19,13 @@ case class RandomIntegerCollectionRequest(collectionType: RandomCollectionType, 
                                           minBound: Int = Integer.MIN_VALUE, maxBound: Int = Integer.MAX_VALUE) {
   require(size > 0, "Size must be strictly positive")
   require(count > 0, "Count must be strictly positive")
-  require(minBound < maxBound, "Min bound must be less than max bound")
+  require(minBound < maxBound, s"Min bound ($minBound) must be less than max bound ($maxBound)")
   if (collectionType == RandomSet) {
-    require(maxBound - minBound > size, "Max bound - min bound must be greater than requested set size")
+    // accept defaults without doing the math
+    if (minBound != Integer.MIN_VALUE && maxBound != Integer.MAX_VALUE) {
+      val range: Long = maxBound.toLong - minBound.toLong
+      require(range > size, "Range specified must be greater than requested set size")
+    }
   }
 
   /**

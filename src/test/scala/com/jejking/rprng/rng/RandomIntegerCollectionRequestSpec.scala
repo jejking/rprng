@@ -12,6 +12,31 @@ class RandomIntegerCollectionRequestSpec extends FlatSpec with Matchers {
     RandomIntegerCollectionRequest(RandomList, size = 20, count = 2, minBound = 10, maxBound = 2000)
   }
 
+  it should "accept a request for a set from the full range of integers" in {
+    RandomIntegerCollectionRequest(RandomSet)
+  }
+
+  it should "accept a request for a set from nearly the full range of integers" in {
+    RandomIntegerCollectionRequest(RandomSet, maxBound = Int.MaxValue - 1)
+  }
+
+  it should "accept a request for a set from constrained range of positive integers" in {
+    RandomIntegerCollectionRequest(RandomSet, size = 5, minBound = 10, maxBound = 20)
+  }
+
+  it should "accept a request for a set from bounds between zero and 10" in {
+    RandomIntegerCollectionRequest(RandomSet, size = 5, minBound = 0, maxBound = 10)
+  }
+
+  it should "accept a request for a set from bounds between -10 and zero" in {
+    RandomIntegerCollectionRequest(RandomSet, size = 5, minBound = -10, maxBound = 0)
+  }
+
+  it should "accept a request for a set from bounds between -10 and =10" in {
+    RandomIntegerCollectionRequest(RandomSet, size = 10, minBound = -10, maxBound = 10)
+  }
+
+
   it should "reject request for an empty list" in {
     intercept[IllegalArgumentException] {
       RandomIntegerCollectionRequest(RandomList, size = 0, count = 2)
