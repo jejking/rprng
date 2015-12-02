@@ -169,7 +169,7 @@ class RoutesSpec extends FlatSpec with Matchers with ScalaFutures with Scalatest
       .returning(Future.successful(RandomIntegerCollectionResponse(List(1 to 100))))
 
     val routes = new Routes(mockStreamsHelper)
-    Get("/int/list?min=0&max=100") ~> routes.intRoute ~> check {
+    Get("/int/list?min=0&max=100") ~> routes.route ~> check {
       handled shouldBe true
       val resp: RandomIntegerCollectionResponse = responseAs[RandomIntegerCollectionResponse]
       resp.content should have size 1
@@ -185,8 +185,8 @@ class RoutesSpec extends FlatSpec with Matchers with ScalaFutures with Scalatest
    (mockStreamsHelper.responseForIntegerCollection _).expects(*).never()
 
    val routes = new Routes(mockStreamsHelper)
-   Get("/int/list?min=100&max=10") ~> routes.intRoute ~> check {
-     handled shouldBe false
+   Get("/int/list?min=100&max=10") ~> routes.route ~> check {
+     response.status shouldBe StatusCodes.BadRequest
    }
  }
 

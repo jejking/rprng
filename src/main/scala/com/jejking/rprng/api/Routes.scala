@@ -3,7 +3,7 @@ package com.jejking.rprng.api
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
 import akka.http.scaladsl.model.{HttpResponse, StatusCodes}
 import akka.http.scaladsl.server.Directives._
-import akka.http.scaladsl.server.{RejectionHandler, Route, ValidationRejection}
+import akka.http.scaladsl.server.{ExceptionHandler, RejectionHandler, Route, ValidationRejection}
 import com.jejking.rprng.rng.{RandomSet, RandomList, RandomIntegerCollectionRequest}
 
 /**
@@ -17,6 +17,13 @@ class Routes(streamsHelper: StreamsHelper) extends SprayJsonSupport {
                                           complete(HttpResponse(StatusCodes.BadRequest, entity = reason))
                                         }
                                       }.result()
+
+   val theExceptionHandler: ExceptionHandler =
+    ExceptionHandler {
+      case e: IllegalArgumentException => complete(HttpResponse(StatusCodes.BadRequest, entity = e.getMessage))
+    }
+
+
 
   implicit val randomIntCollectionFormat = RandomIntegerCollectionResponseProtocol.format
 
@@ -69,7 +76,9 @@ class Routes(streamsHelper: StreamsHelper) extends SprayJsonSupport {
     }
   }
 
-  val route = byteRoute ~ intRoute
+  val route = handleExceptions(theExceptionHandler) {
+    byteRoute ~ intRoute
+  }
 
 
 }
