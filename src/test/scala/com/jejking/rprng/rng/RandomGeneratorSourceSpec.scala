@@ -122,6 +122,29 @@ class RandomGeneratorSourceSpec extends FlatSpec with Matchers with MockFactory 
       frequency.getPct(i) should be (0.1 +- 0.01)
     }
   }
+
+  it should "respect the bounds between min and max when using negative to positive range" in {
+    val randomGenerator = new MersenneTwister
+    val source = RandomGeneratorSource(randomGenerator)
+
+    for (i <- 1 to 1000) {
+      val randomInt = source.nextInt(RandomIntRequest(-10, 20))
+      assert(randomInt >= -10)
+      assert(randomInt <= 20)
+    }
+  }
+
+  it should "respect the bounds between min and max when using range of negative integers" in {
+    val randomGenerator = new MersenneTwister
+    val source = RandomGeneratorSource(randomGenerator)
+
+    for (i <- 1 to 1000) {
+      val randomInt = source.nextInt(RandomIntRequest(-20, -10))
+      assert(randomInt >= -20)
+      assert(randomInt <= -10)
+    }
+  }
+
 }
 
 
