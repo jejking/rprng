@@ -1,5 +1,6 @@
 package com.jejking.rprng.api
 
+import akka.event.Logging
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
 import akka.http.scaladsl.model.{HttpResponse, StatusCodes}
 import akka.http.scaladsl.server.Directives._
@@ -77,7 +78,9 @@ class Routes(streamsHelper: StreamsHelper) extends SprayJsonSupport {
   }
 
   val route = handleExceptions(theExceptionHandler) {
-    byteRoute ~ intRoute
+    logRequest("rprng-routes",  Logging.InfoLevel) {
+      byteRoute ~ intRoute
+    }
   }
 
 

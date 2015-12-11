@@ -1,0 +1,20 @@
+<configuration>
+
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${RPRNG_LOG:-rprng}.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>10</maxHistory>
+        </rollingPolicy>
+
+        <encoder>
+            <pattern>%X{akkaTimestamp} %-5level %logger{36}  %X{akkaSource} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="com.jejking" level="INFO"/>
+
+    <root level="INFO">
+        <appender-ref ref="FILE" />
+    </root>
+</configuration>

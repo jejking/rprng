@@ -28,10 +28,12 @@ class RandomSourceActor(private val randomSource: RandomSource, private val secu
   val scheduleHelper  =  scheduleHelperCreator(context.system)
 
   override def preStart(): Unit = {
+    log.info(s"reseed interval is: $timeRangeToReseed")
     val seed = secureSeeder.generateSeed()
     this.randomSource.reseed(seed)
     scheduleReseed()
     log.info("completed pre-start of " + context.self.path)
+
   }
 
   override def receive: Receive = {
@@ -172,6 +174,17 @@ object RandomSourceActor {
    * @return akka props
    */
   def props(randomByteSource: RandomSource, secureSeeder: SecureSeeder): Props = Props(new RandomSourceActor(randomByteSource, secureSeeder))
+
+
+  /**
+   * Assembles Akka Props for the actor.
+   * @param randomByteSource a random byte source that will be wrapped by the actor.
+   * @param secureSeeder a secure seeder to use to fetch initial seeding of the random byte source and for subsequent reseeding
+   * @param timeRangeToReseed specified time range to reseed
+   * @return akka props
+   */
+  def props(randomByteSource: RandomSource, secureSeeder: SecureSeeder, timeRangeToReseed: TimeRangeToReseed): Props =
+    Props(new RandomSourceActor(randomSource = randomByteSource, secureSeeder = secureSeeder, timeRangeToReseed = timeRangeToReseed))
 
   /**
    * Utility function to find a random duration between the min and max of the configured time range which will
