@@ -20,15 +20,16 @@ object Main {
 
   val randomRouterPath = "/user/randomRouter"
 
+  implicit val actorSystem = ActorSystem("rprng")
+  implicit val materializer = ActorMaterializer()
+
   def main(args: Array[String]): Unit = {
+
+    actorSystem.registerOnTermination(() -> println("shutting down actor system"))
 
     val conf = ConfigFactory.load()
     val port = conf.getInt("rprng.port")
     require(port > 0, s"Port must be greater than zero, but is $port")
-
-
-    implicit val actorSystem = ActorSystem("rprng")
-    implicit val materializer = ActorMaterializer()
 
     val randomRouter = createActors(actorSystem, conf)
     val streamsHelper = new AkkaStreamsHelper()
@@ -36,7 +37,10 @@ object Main {
 
     val bindingFuture = Http().bindAndHandle(route, "localhost", port)
 
-    // TODO - log shutdown
+  }
+
+  def shutdown(): Unit = {
+    actorSystem.terminate()
   }
 
   private def getTimeRangeToReseed(conf: Config) = {

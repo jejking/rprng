@@ -53,7 +53,7 @@ class RandomByteStringActorPublisherSpec extends FlatSpec with Matchers with Bef
 
 
   override def afterAll(): Unit = {
-    this.system.shutdown()
+    this.system.terminate()
   }
 }
 

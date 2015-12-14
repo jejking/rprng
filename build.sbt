@@ -18,7 +18,7 @@ libraryDependencies ++= {
     "org.apache.commons" % "commons-math3"                        % commonsMathV,
     "com.typesafe.akka" %% "akka-actor"                           % akkaV,
     "com.typesafe.akka" %% "akka-slf4j"                           % akkaV,
-    "ch.qos.logback"    % "logback-classic"                      % logbackV,
+    "ch.qos.logback"    % "logback-classic"                       % logbackV,
     "com.typesafe.akka" %% "akka-stream-experimental"             % akkaStreamV,
     "com.typesafe.akka" %% "akka-http-core-experimental"          % akkaStreamV,
     "com.typesafe.akka" %% "akka-http-experimental"               % akkaStreamV,
@@ -27,7 +27,7 @@ libraryDependencies ++= {
     "com.typesafe.akka" %% "akka-stream-testkit-experimental"     % akkaStreamV % "test",
     "org.scalatest"     %% "scalatest"                            % scalaTestV  % "test",
     "com.typesafe.akka" %% "akka-testkit"                         % akkaV       % "test",
-    "org.scalamock"     %% "scalamock-core"                       % scalaMockV     % "test",
-    "org.scalamock"     %% "scalamock-scalatest-support"          % scalaMockV     % "test"
+    "org.scalamock"     %% "scalamock-core"                       % scalaMockV  % "test",
+    "org.scalamock"     %% "scalamock-scalatest-support"          % scalaMockV  % "test"
   )
 }

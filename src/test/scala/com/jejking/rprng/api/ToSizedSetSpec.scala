@@ -80,7 +80,7 @@ class ToSizedSetSpec extends FlatSpec with Matchers with Inspectors with ScalaFu
   }
 
   override def afterAll(): Unit = {
-    this.system.shutdown()
+    this.system.terminate()
   }
 
 }

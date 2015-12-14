@@ -52,7 +52,7 @@ class RandomIntActorPublisherSpec extends FlatSpec with Matchers with BeforeAndA
 
 
   override def afterAll(): Unit = {
-    this.system.shutdown()
+    this.system.terminate()
   }
 }
 
