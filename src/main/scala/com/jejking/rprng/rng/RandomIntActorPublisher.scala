@@ -10,7 +10,7 @@ import scala.concurrent.duration._
 
 /**
  * Wraps a path to [[RandomSourceActor]] (or a router over a bunch of them) to
- * act as a stream publisher of `ByteString`s which are obtained asynchronously from the actor / router. When wrapping
+ * act as a stream publisher of `Ints`s which are obtained asynchronously from the actor / router. When wrapping
  * a router the publisher thus effectively mixes up the underlying sources of pseudo-randomness.
  *
  * In a web application such publishers are expected to be created at the API level and to be relatively short-lived.
