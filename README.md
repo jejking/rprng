@@ -39,7 +39,7 @@ The program is built up in a relatively simple fashion, the main idea being to p
 some underlying PRNG. It is assumed that implementations will use a deterministic PRNG.
 * `SecureSeeder`, a trait defining a method to obtain a random long. The idea is that the seeding results from high-quality entropy to make it hard to predict how any subsequent output from a PRNG.
 * `SecureRandomSeeder`, an implementation of `SecureSeeder` that uses Java's `SecureRandom.generateSeed()` method which will (normally) delegate to a good quality source of randomness such as `/dev/random`.
-* `RandomGenerator` from Apache Commons Math. The web application uses the [IsaacRandom)[http://commons.apache.org/proper/commons-math/apidocs/org/apache/commons/math3/random/ISAACRandom.html] PRNG.
+* `RandomGenerator` from Apache Commons Math. The web application uses the [IsaacRandom](http://commons.apache.org/proper/commons-math/apidocs/org/apache/commons/math3/random/ISAACRandom.html) PRNG.
 * `RandomGeneratorSource`, an implementation of `RandomSource` that wraps a `RandomGenerator` 
 * `RandomSourceActor`, an actor that wraps a `RandomGeneratorSource` and ensures a number of things:
     * before starting, obtains and sets seed
