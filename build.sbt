@@ -108,7 +108,7 @@ def setVersionOnly(selectVersion: Versions => String): ReleaseStep =  { st: Stat
 
   reapply(Seq(
     if (useGlobal) version in ThisBuild := selected
-    else version := selected
+    else version := selected 
   ), st)
 }
 
