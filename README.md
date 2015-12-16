@@ -4,7 +4,9 @@
 
 ## Run the server
 
-You can start the web application from `sbt` or an IDE. For now we assume that the server is running on `localhost` on port 8080.
+You can start the web application interactively `sbt` or an IDE. For now we assume that the server is running on `localhost` on port 8080.
+
+`sbt assembly` will produce a fat JAR that can be run directly from the command line using `java`.
 
 ### Getting bytes
 
