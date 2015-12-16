@@ -31,3 +31,5 @@ libraryDependencies ++= {
     "org.scalamock"     %% "scalamock-scalatest-support"          % scalaMockV  % "test"
   )
 }
+
+mainClass in assembly := Some("com.jejking.rprng.api.Main")
