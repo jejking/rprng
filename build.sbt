@@ -2,6 +2,7 @@ import sbt._
 
 import sbtrelease._
 import sbtrelease.ReleaseStateTransformations.{setReleaseVersion=>_,_}
+import com.typesafe.sbt.SbtGit.GitKeys._
 
 name := "rprng"
 organization := "com.jejking"
@@ -18,6 +19,9 @@ git.gitTagToVersionNumber := {
   case VersionRegex(v,s) => Some(s"$v-$s-SNAPSHOT")
   case _ => None
 }
+git.gitDescribedVersion := gitReader.value.withGit(_.describedVersion).flatMap(v =>
+  Option(v).map(_.drop(1)).orElse(formattedShaVersion.value).orElse(Some(git.baseVersion.value))
+)
 showCurrentGitBranch
 
 
