@@ -96,7 +96,7 @@ pomExtra := (
         <name>John King</name>
         <url>http://www.jejking.com</url>
       </developer>
-    </developers>) 
+    </developers>)
 
 def setVersionOnly(selectVersion: Versions => String): ReleaseStep =  { st: State =>
   val vs = st.get(ReleaseKeys.versions).getOrElse(sys.error("No versions are set! Was this release part executed before inquireVersions?"))
@@ -129,9 +129,12 @@ releaseProcess := Seq(
   checkSnapshotDependencies,
   inquireVersions,
   setReleaseVersion,
+  commitReleaseVersion,
   runTest,
   tagRelease,
   publishArtifacts,
   //ReleaseStep(releaseStepTask(publish in Universal)),
+  setNextVersion,
+  commitNextVersion,
   pushChanges
 )
