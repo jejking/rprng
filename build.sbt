@@ -32,6 +32,7 @@ libraryDependencies ++= {
   val commonsMathV = "3.5"
   val scalaMockV = "3.2.2"
   val logbackV = "1.1.3"
+  
   Seq(
     "org.apache.commons" % "commons-math3"                        % commonsMathV,
     "com.typesafe.akka" %% "akka-actor"                           % akkaV,
