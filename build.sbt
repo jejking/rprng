@@ -2,10 +2,20 @@ import sbt._
 
 name := "rprng"
 organization := "com.jejking"
-version := "1.0-SNAPSHOT"
 scalaVersion := "2.11.7"
 
 scalacOptions := Seq("-unchecked", "-deprecation", "-encoding", "utf8")
+
+git.useGitDescribe := true
+git.baseVersion := "1.0.0"
+val VersionRegex = "v([0-9]+.[0-9]+.[0-9]+)-?(.*)?".r
+git.gitTagToVersionNumber := {
+  case VersionRegex(v,"") => Some(v)
+  case VersionRegex(v,"SNAPSHOT") => Some(s"$v-SNAPSHOT")
+  case VersionRegex(v,s) => Some(s"$v-$s-SNAPSHOT")
+  case _ => None
+}
+
 
 libraryDependencies ++= {
   val akkaV       = "2.4.1"
@@ -33,3 +43,45 @@ libraryDependencies ++= {
 }
 
 mainClass in assembly := Some("com.jejking.rprng.api.Main")
+
+lazy val rprng = (project in file(".")).
+  enablePlugins(BuildInfoPlugin, GitVersioning, GitBranchPrompt).
+  settings(
+    buildInfoKeys := Seq[BuildInfoKey](name, version, scalaVersion, sbtVersion),
+    buildInfoObject := "Info",
+    buildInfoPackage := "com.jejking.rprng.info"
+  )
+
+
+publishMavenStyle := true
+publishArtifact in Test := false
+publishTo := {
+  val nexus = "https://oss.sonatype.org/"
+  if (isSnapshot.value)
+    Some("snapshots" at nexus + "content/repositories/snapshots")
+  else
+    Some("releases"  at nexus + "service/local/staging/deploy/maven2")
+}
+pomIncludeRepository := { _ => false }
+
+pomExtra := (
+  <description>A reactive PRNG web service</description>
+  <url>https://github.com/jejking/rprng</url>
+    <licenses>
+      <license>
+        <name>Apache 2.0</name>
+        <url>http://www.apache.org/licenses/LICENSE-2.0</url>
+        <distribution>repo</distribution>
+      </license>
+    </licenses>
+    <scm>
+      <url>git@github.com:jejking/rprng.git</url>
+      <connection>scm:git:git@github.com:jejking/rprng.git</connection>
+    </scm>
+    <developers>
+      <developer>
+        <id>jejking</id>
+        <name>John King</name>
+        <url>http://www.jejking.com</url>
+      </developer>
+    </developers>)
