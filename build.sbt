@@ -1,5 +1,8 @@
 import sbt._
 
+import sbtrelease._
+import sbtrelease.ReleaseStateTransformations.{setReleaseVersion=>_,_}
+
 name := "rprng"
 organization := "com.jejking"
 scalaVersion := "2.11.7"
@@ -15,6 +18,7 @@ git.gitTagToVersionNumber := {
   case VersionRegex(v,s) => Some(s"$v-$s-SNAPSHOT")
   case _ => None
 }
+showCurrentGitBranch
 
 
 libraryDependencies ++= {
@@ -55,6 +59,7 @@ lazy val rprng = (project in file(".")).
 
 publishMavenStyle := true
 publishArtifact in Test := false
+/*
 publishTo := {
   val nexus = "https://oss.sonatype.org/"
   if (isSnapshot.value)
@@ -63,6 +68,8 @@ publishTo := {
     Some("releases"  at nexus + "service/local/staging/deploy/maven2")
 }
 pomIncludeRepository := { _ => false }
+*/
+publishTo := Some(Resolver.file("file",  new File(Path.userHome.absolutePath+"/.m2/repository")))
 
 pomExtra := (
   <description>A reactive PRNG web service</description>
@@ -85,3 +92,41 @@ pomExtra := (
         <url>http://www.jejking.com</url>
       </developer>
     </developers>)
+
+def setVersionOnly(selectVersion: Versions => String): ReleaseStep =  { st: State =>
+  val vs = st.get(ReleaseKeys.versions).getOrElse(sys.error("No versions are set! Was this release part executed before inquireVersions?"))
+  val selected = selectVersion(vs)
+
+  st.log.info("Setting version to '%s'." format selected)
+  val useGlobal =Project.extract(st).get(releaseUseGlobalVersion)
+  val versionStr = (if (useGlobal) globalVersionString else versionString) format selected
+
+  reapply(Seq(
+    if (useGlobal) version in ThisBuild := selected
+    else version := selected
+  ), st)
+}
+
+lazy val setReleaseVersion: ReleaseStep = setVersionOnly(_._1)
+
+releaseVersion <<= (releaseVersionBump)( bumper=>{
+   ver => Version(ver)
+          .map(_.withoutQualifier)
+          .map(_.bump(bumper).string).getOrElse(versionFormatError)
+})
+
+val showNextVersion = settingKey[String]("the future version once releaseNextVersion has been applied to it")
+val showReleaseVersion = settingKey[String]("the future version once releaseNextVersion has been applied to it")
+showReleaseVersion <<= (version, releaseVersion)((v,f)=>f(v))
+showNextVersion <<= (version, releaseNextVersion)((v,f)=>f(v))
+
+releaseProcess := Seq(
+  checkSnapshotDependencies,
+  inquireVersions,
+  setReleaseVersion,
+  runTest,
+  tagRelease,
+  publishArtifacts,
+  //ReleaseStep(releaseStepTask(publish in Universal)),
+  pushChanges
+)
