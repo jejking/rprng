@@ -32,7 +32,7 @@ libraryDependencies ++= {
   val commonsMathV = "3.5"
   val scalaMockV = "3.2.2"
   val logbackV = "1.1.3"
-  
+
   Seq(
     "org.apache.commons" % "commons-math3"                        % commonsMathV,
     "com.typesafe.akka" %% "akka-actor"                           % akkaV,
@@ -96,7 +96,7 @@ pomExtra := (
         <name>John King</name>
         <url>http://www.jejking.com</url>
       </developer>
-    </developers>)
+    </developers>) 
 
 def setVersionOnly(selectVersion: Versions => String): ReleaseStep =  { st: State =>
   val vs = st.get(ReleaseKeys.versions).getOrElse(sys.error("No versions are set! Was this release part executed before inquireVersions?"))
