@@ -40,7 +40,7 @@ object RandomBytesToStandardOut {
 
     val publisherActor = actorSystem.actorOf(RandomByteStringActorPublisher.props(512, "/user/randomRouter"))
     val streamActorPublisher: Publisher[ByteString] = ActorPublisher[ByteString](publisherActor)
-    val source: Source[ByteString, Unit] = Source(streamActorPublisher)
+    val source: Source[ByteString, Unit] = Source.fromPublisher(streamActorPublisher)
     // System.out.write(bs.toArray)
     val runnableGraph = source.takeWhile(_ => true).runForeach(bs => System.out.write(bs.toArray))
     // runnableGraph.run()

@@ -45,7 +45,7 @@ class RandomByteStringActorPublisherSpec extends FlatSpec with Matchers with Bef
     val probe = TestProbe()
     probe watch newActorRef
     val publisher = ActorPublisher[ByteString](newActorRef)
-    val source = Source(publisher)
+    val source = Source.fromPublisher(publisher)
     source.runWith(TestSink.probe[ByteString]).cancel()
 
     probe.expectTerminated(newActorRef)

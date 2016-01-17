@@ -9,7 +9,7 @@ scalacOptions := Seq("-unchecked", "-deprecation", "-encoding", "utf8")
 
 libraryDependencies ++= {
   val akkaV       = "2.4.1"
-  val akkaStreamV = "2.0-M2"
+  val akkaStreamV = "2.0"
   val scalaTestV  = "2.2.5"
   val commonsMathV = "3.5"
   val scalaMockV = "3.2.2"
@@ -46,7 +46,7 @@ lazy val rprng = (project in file(".")).
 
 publishMavenStyle := true
 publishArtifact in Test := false
-/*
+
 publishTo := {
   val nexus = "https://oss.sonatype.org/"
   if (isSnapshot.value)
@@ -55,8 +55,7 @@ publishTo := {
     Some("releases"  at nexus + "service/local/staging/deploy/maven2")
 }
 pomIncludeRepository := { _ => false }
-*/
-publishTo := Some(Resolver.file("file",  new File(Path.userHome.absolutePath+"/.m2/repository")))
+// publishTo := Some(Resolver.file("file",  new File(Path.userHome.absolutePath+"/.m2/repository")))
 
 pomExtra := (
   <description>A reactive PRNG web service</description>
@@ -79,5 +78,3 @@ pomExtra := (
         <url>http://www.jejking.com</url>
       </developer>
     </developers>)
-
-

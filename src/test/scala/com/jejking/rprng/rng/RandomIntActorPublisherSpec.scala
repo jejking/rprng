@@ -44,7 +44,7 @@ class RandomIntActorPublisherSpec extends FlatSpec with Matchers with BeforeAndA
     val probe = TestProbe()
     probe watch newActorRef
     val publisher = ActorPublisher[Int](newActorRef)
-    val source = Source(publisher)
+    val source = Source.fromPublisher(publisher)
     source.runWith(TestSink.probe[Int]).cancel()
 
     probe.expectTerminated(newActorRef)

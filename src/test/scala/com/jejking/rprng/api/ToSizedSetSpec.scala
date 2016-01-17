@@ -58,7 +58,7 @@ class ToSizedSetSpec extends FlatSpec with Matchers with Inspectors with ScalaFu
 
     val toSizedSet = ToSizedSet(5)
 
-    val futureSeq: Future[Seq[Set[Int]]] = Source(() => randomIterator)
+    val futureSeq: Future[Seq[Set[Int]]] = Source.fromIterator(() => randomIterator)
                                     .transform(() => toSizedSet)
                                     .take(100)
                                     .grouped(100)

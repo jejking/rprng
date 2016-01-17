@@ -37,7 +37,7 @@ class AkkaStreamsHelper(path: String = "/user/randomRouter")(implicit actorSyste
   private def createByteStringSource(blockSize: Int): Source[ByteString, Unit] = {
     val publisherActor = actorSystem.actorOf(RandomByteStringActorPublisher.props(blockSize, path))
     val publisher = ActorPublisher[ByteString](publisherActor)
-    Source(publisher)
+    Source.fromPublisher(publisher)
   }
 
   override def responseForByteBlock(blockSize: Int): Future[HttpResponse] = {
@@ -61,7 +61,7 @@ class AkkaStreamsHelper(path: String = "/user/randomRouter")(implicit actorSyste
     def createIntSource(): Source[Int, Unit] = {
       val publisherActor = actorSystem.actorOf(RandomIntActorPublisher.props(req.randomIntRequest(), path))
       val publisher = ActorPublisher[Int](publisherActor)
-      Source(publisher)
+      Source.fromPublisher(publisher)
     }
 
     def listsFromStream(): Future[RandomIntegerCollectionResponse] = {
