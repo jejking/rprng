@@ -1,5 +1,5 @@
 import sbt._
-
+import ReleaseTransformations._
 
 name := "rprng"
 organization := "com.jejking"
@@ -43,7 +43,7 @@ lazy val rprng = (project in file(".")).
     buildInfoPackage := "com.jejking.rprng.info"
   )
 
-releasePublishArtifactsAction := PgpKeys.publishSigned.value
+// releasePublishArtifactsAction := PgpKeys.publishSigned.value
 publishMavenStyle := true
 publishArtifact in Test := false
 
@@ -78,3 +78,18 @@ pomExtra := (
         <url>http://www.jejking.com</url>
       </developer>
     </developers>)
+
+releaseProcess := Seq[ReleaseStep](
+  checkSnapshotDependencies,
+  inquireVersions,
+  runClean,
+  runTest,
+  setReleaseVersion,
+  commitReleaseVersion,
+  tagRelease,
+  ReleaseStep(action = Command.process("publishSigned", _)),
+  setNextVersion,
+  commitNextVersion,
+  ReleaseStep(action = Command.process("sonatypeReleaseAll", _)),
+  pushChanges
+)
