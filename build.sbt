@@ -43,7 +43,7 @@ lazy val rprng = (project in file(".")).
     buildInfoPackage := "com.jejking.rprng.info"
   )
 
-
+releasePublishArtifactsAction := PgpKeys.publishSigned.value
 publishMavenStyle := true
 publishArtifact in Test := false
 
