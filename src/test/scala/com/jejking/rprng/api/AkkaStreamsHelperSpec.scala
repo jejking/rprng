@@ -107,6 +107,8 @@ class AkkaStreamsHelperSpec extends FlatSpec with Matchers with ScalaFutures wit
   }
 
   it should "deliver a lit of size 10 of sets of size 100" in {
+    import org.scalatest.time.SpanSugar._
+    implicit def patienceConfig = PatienceConfig(timeout = 1 second, interval = 100 milliseconds)
 
     val req = RandomIntegerCollectionRequest(RandomSet, 100, 10, 0, 2000)
     whenReady(randomAkkaStreamsHelper.responseForIntegerCollection(req)) {
