@@ -1,5 +1,6 @@
 package com.jejking.rprng.api
 
+import akka.NotUsed
 import akka.actor.ActorSystem
 import akka.http.scaladsl.model.HttpEntity.{Chunk, ChunkStreamPart, Chunked}
 import akka.http.scaladsl.model._
@@ -21,6 +22,7 @@ trait StreamsHelper {
   /**
    * Creates a runnable graph that generates a single block of random bytes which is
    * converted to a future http response.
+ *
    * @param blockSize number of bytes to obtain, must be strictly positive
    * @return graph to run
    */
@@ -34,7 +36,7 @@ trait StreamsHelper {
 
 class AkkaStreamsHelper(path: String = "/user/randomRouter")(implicit actorSystem: ActorSystem, actorMaterializer: ActorMaterializer) extends StreamsHelper {
 
-  private def createByteStringSource(blockSize: Int): Source[ByteString, Unit] = {
+  private def createByteStringSource(blockSize: Int): Source[ByteString, NotUsed] = {
     val publisherActor = actorSystem.actorOf(RandomByteStringActorPublisher.props(blockSize, path))
     val publisher = ActorPublisher[ByteString](publisherActor)
     Source.fromPublisher(publisher)
@@ -49,7 +51,7 @@ class AkkaStreamsHelper(path: String = "/user/randomRouter")(implicit actorSyste
   }
 
   override def responseForByteStream(chunkSize: Int): HttpResponse = {
-    val chunkSource: Source[ChunkStreamPart, Unit] = createByteStringSource(chunkSize).map(bs => Chunk(bs))
+    val chunkSource: Source[ChunkStreamPart, NotUsed] = createByteStringSource(chunkSize).map(bs => Chunk(bs))
     val entity: ResponseEntity = Chunked(ContentTypes.`application/octet-stream`, chunkSource)
     HttpResponse(StatusCodes.OK).withEntity(entity)
   }
@@ -58,7 +60,7 @@ class AkkaStreamsHelper(path: String = "/user/randomRouter")(implicit actorSyste
     val builder = List.newBuilder[Iterable[Int]]
     builder.sizeHint(req.count)
 
-    def createIntSource(): Source[Int, Unit] = {
+    def createIntSource(): Source[Int, NotUsed] = {
       val publisherActor = actorSystem.actorOf(RandomIntActorPublisher.props(req.randomIntRequest(), path))
       val publisher = ActorPublisher[Int](publisherActor)
       Source.fromPublisher(publisher)

@@ -2,6 +2,7 @@ package com.jejking.rprng.rng
 
 import java.security.SecureRandom
 
+import akka.NotUsed
 import akka.actor.ActorSystem
 import akka.routing.RandomGroup
 import akka.stream.ActorMaterializer
@@ -40,7 +41,7 @@ object RandomBytesToStandardOut {
 
     val publisherActor = actorSystem.actorOf(RandomByteStringActorPublisher.props(512, "/user/randomRouter"))
     val streamActorPublisher: Publisher[ByteString] = ActorPublisher[ByteString](publisherActor)
-    val source: Source[ByteString, Unit] = Source.fromPublisher(streamActorPublisher)
+    val source: Source[ByteString, NotUsed] = Source.fromPublisher(streamActorPublisher)
     // System.out.write(bs.toArray)
     val runnableGraph = source.takeWhile(_ => true).runForeach(bs => System.out.write(bs.toArray))
     // runnableGraph.run()

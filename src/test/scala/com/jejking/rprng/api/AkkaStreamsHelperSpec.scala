@@ -54,8 +54,7 @@ class AkkaStreamsHelperSpec extends FlatSpec with Matchers with ScalaFutures wit
       resp.entity.contentType should be (ContentTypes.`application/octet-stream`)
 
       // correct response size, 8 bytes
-      resp.entity.getContentLengthOption().asScala should be (Some (8))
-
+      resp.entity.getContentLengthOption().getAsLong should be (8)
       // correct content, 8 zeroes
       whenReady(resp.entity.dataBytes.runFold(ByteString.empty)((acc, bs) => acc ++ bs)) { bs =>
 

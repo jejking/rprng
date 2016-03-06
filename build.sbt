@@ -8,10 +8,10 @@ scalaVersion := "2.11.7"
 scalacOptions := Seq("-unchecked", "-deprecation", "-encoding", "utf8")
 
 libraryDependencies ++= {
-  val akkaV       = "2.4.1"
-  val akkaStreamV = "2.0"
-  val scalaTestV  = "2.2.5"
-  val commonsMathV = "3.5"
+  val akkaV       = "2.4.2"
+  val akkaStreamV = "2.4.2"
+  val scalaTestV  = "2.2.6"
+  val commonsMathV = "3.6"
   val scalaMockV = "3.2.2"
   val logbackV = "1.1.3"
 
@@ -20,12 +20,11 @@ libraryDependencies ++= {
     "com.typesafe.akka" %% "akka-actor"                           % akkaV,
     "com.typesafe.akka" %% "akka-slf4j"                           % akkaV,
     "ch.qos.logback"    % "logback-classic"                       % logbackV,
-    "com.typesafe.akka" %% "akka-stream-experimental"             % akkaStreamV,
-    "com.typesafe.akka" %% "akka-http-core-experimental"          % akkaStreamV,
-    "com.typesafe.akka" %% "akka-http-experimental"               % akkaStreamV,
-    "com.typesafe.akka" %% "akka-http-spray-json-experimental"    % akkaStreamV,
-    "com.typesafe.akka" %% "akka-http-testkit-experimental"       % akkaStreamV % "test",
-    "com.typesafe.akka" %% "akka-stream-testkit-experimental"     % akkaStreamV % "test",
+    "com.typesafe.akka" %% "akka-stream"                          % akkaV,
+    "com.typesafe.akka" %% "akka-http-experimental"               % akkaV,
+    "com.typesafe.akka" %% "akka-http-spray-json-experimental"    % akkaV,
+    "com.typesafe.akka" %% "akka-http-testkit-experimental"       % "2.4.2-RC3" % "test",
+    "com.typesafe.akka" %% "akka-stream-testkit"                  % akkaV % "test",
     "org.scalatest"     %% "scalatest"                            % scalaTestV  % "test",
     "com.typesafe.akka" %% "akka-testkit"                         % akkaV       % "test",
     "org.scalamock"     %% "scalamock-core"                       % scalaMockV  % "test",
