@@ -12,11 +12,15 @@ import org.apache.commons.math3.random.Well44497a
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.time.{Seconds, Millis, Span}
 import org.scalatest.{BeforeAndAfterAll, FlatSpec, Matchers}
+import org.scalatest.time.SpanSugar._
+
 
 /**
  * Tests for [[AkkaStreamsHelper]].
  */
 class AkkaStreamsHelperSpec extends FlatSpec with Matchers with ScalaFutures with BeforeAndAfterAll {
+
+  implicit override val patienceConfig = PatienceConfig(timeout = 1 second, interval = 100 milliseconds)
 
   implicit val system: ActorSystem = initActorSystem()
   implicit val materializer = ActorMaterializer()
@@ -107,8 +111,6 @@ class AkkaStreamsHelperSpec extends FlatSpec with Matchers with ScalaFutures wit
   }
 
   it should "deliver a lit of size 10 of sets of size 100" in {
-    import org.scalatest.time.SpanSugar._
-    implicit def patienceConfig = PatienceConfig(timeout = 1 second, interval = 100 milliseconds)
 
     val req = RandomIntegerCollectionRequest(RandomSet, 100, 10, 0, 2000)
     whenReady(randomAkkaStreamsHelper.responseForIntegerCollection(req)) {
