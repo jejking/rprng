@@ -21,6 +21,9 @@ class RandomSourceActorSpec extends TestKit(ActorSystem("test")) with DefaultTim
   import RandomSourceActor.Protocol._
   import RandomSourceActor._
 
+  implicit override val patienceConfig = PatienceConfig(timeout = 1 second, interval = 100 milliseconds)
+
+
   "the random byte source actor" should "send respond with bytes from the wrapped byte source in response to a request" in {
 
     val request = RandomByteRequest(4)
