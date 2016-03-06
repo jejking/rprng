@@ -27,7 +27,7 @@ class ToSizedSetSpec extends FlatSpec with Matchers with Inspectors with ScalaFu
   "the stage" should "produce a single set of right size from a sequence of integers when requested" in {
     val toSizedSet = ToSizedSet(5)
     val set: Future[Set[Int]] = Source(1 to 10)
-                                .transform(() => toSizedSet)
+                                .via(toSizedSet)
                                 .take(1)
                                 .toMat(Sink.head)(Keep.right)
                                 .run
@@ -39,7 +39,7 @@ class ToSizedSetSpec extends FlatSpec with Matchers with Inspectors with ScalaFu
   it should "produce multiple sets of right size from a sequence of integers when requested" in {
     val toSizedSet = ToSizedSet(5)
       Source(1 to 20)
-              .transform(() => toSizedSet)
+              .via(toSizedSet)
               .runWith(TestSink.probe[Set[Int]])
               .request(2)
               .expectNext(Set(1,2,3,4,5), Set(6,7,8,9,10))
@@ -59,7 +59,7 @@ class ToSizedSetSpec extends FlatSpec with Matchers with Inspectors with ScalaFu
     val toSizedSet = ToSizedSet(5)
 
     val futureSeq: Future[Seq[Set[Int]]] = Source.fromIterator(() => randomIterator)
-                                    .transform(() => toSizedSet)
+                                    .via(toSizedSet)
                                     .take(100)
                                     .grouped(100)
                                     .toMat(Sink.head)(Keep.right)

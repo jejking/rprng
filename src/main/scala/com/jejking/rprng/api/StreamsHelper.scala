@@ -4,7 +4,7 @@ import akka.NotUsed
 import akka.actor.ActorSystem
 import akka.http.scaladsl.model.HttpEntity.{Chunk, ChunkStreamPart, Chunked}
 import akka.http.scaladsl.model._
-import akka.stream.ActorMaterializer
+import akka.stream._
 import akka.stream.actor.ActorPublisher
 import akka.stream.scaladsl.{Keep, Sink, Source}
 import akka.stream.stage._
@@ -22,8 +22,8 @@ trait StreamsHelper {
   /**
    * Creates a runnable graph that generates a single block of random bytes which is
    * converted to a future http response.
- *
-   * @param blockSize number of bytes to obtain, must be strictly positive
+    *
+    * @param blockSize number of bytes to obtain, must be strictly positive
    * @return graph to run
    */
   def responseForByteBlock(blockSize: Int): Future[HttpResponse]
@@ -78,7 +78,7 @@ class AkkaStreamsHelper(path: String = "/user/randomRouter")(implicit actorSyste
 
     def setsFromStream(): Future[RandomIntegerCollectionResponse] = {
       createIntSource()
-        .transform(() => ToSizedSet(req.size))
+        .via(new ToSizedSet(req.size))
         .take(req.count)
         .grouped(req.count)
         .map(seqOfSets => RandomIntegerCollectionResponse(seqOfSets))
@@ -100,34 +100,41 @@ class AkkaStreamsHelper(path: String = "/user/randomRouter")(implicit actorSyste
   }
 }
 
-class ToSizedSet(requestedSetSize: Int) extends PushPullStage[Int, Set[Int]] {
+class ToSizedSet(requestedSize: Int) extends GraphStage[FlowShape[Int, Set[Int]]] {
 
-  private var setBeingBuilt = Set.empty[Int]
+  val in = Inlet[Int]("ints.in")
+  val out = Outlet[Set[Int]]("int sets.out")
 
-  override def onPush(elem: Int, ctx: Context[Set[Int]]): SyncDirective = {
+  val shape = FlowShape.of(in, out)
 
-    this.setBeingBuilt = this.setBeingBuilt + elem
+  override def createLogic(inheritedAttributes: Attributes): GraphStageLogic =
+    new GraphStageLogic(shape) {
 
-    // we're done and can push downstream
-    if (this.setBeingBuilt.size == requestedSetSize) {
-      val copy = this.setBeingBuilt
-      // reset
-      this.setBeingBuilt = Set.empty[Int]
-      ctx.push(copy)
-    } else {
-      ctx.pull() // get some more as we're not finished yet
+      private var setBeingBuilt = Set.empty[Int]
+
+      setHandler(in, new InHandler {
+        override def onPush(): Unit = {
+          val elem = grab(in)
+
+          setBeingBuilt = setBeingBuilt + elem
+
+          // we're done and can push downstream
+          if (setBeingBuilt.size == requestedSize) {
+            val copy = setBeingBuilt
+            // reset
+            setBeingBuilt = Set.empty[Int]
+            push(out, copy)
+          } else {
+            pull(in)
+          }
+        }
+      })
+      setHandler(out, new OutHandler {
+        override def onPull(): Unit = {
+          pull(in)
+        }
+      })
     }
-
-  }
-
-  override def onPull(ctx: Context[Set[Int]]): SyncDirective = {
-    ctx.pull() // start the process of collecting ints needed for our set
-  }
-
-  override def onUpstreamFinish(ctx: Context[Set[Int]]): TerminationDirective = {
-    ctx.absorbTermination()
-  }
-
 }
 
 object ToSizedSet {
