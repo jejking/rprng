@@ -1,6 +1,8 @@
 import sbt._
 import ReleaseTransformations._
 
+enablePlugins(DockerPlugin)
+
 name := "rprng"
 organization := "com.jejking"
 scalaVersion := "2.11.7"
@@ -91,3 +93,28 @@ releaseProcess := Seq[ReleaseStep](
   ReleaseStep(action = Command.process("sonatypeReleaseAll", _)),
   pushChanges
 )
+
+imageNames in docker := Seq(
+  // Sets the latest tag
+  ImageName(s"${organization.value}/${name.value}:latest"),
+
+  // Sets a name with a tag that contains the project version
+  ImageName(
+    namespace = Some(organization.value),
+    repository = name.value,
+    tag = Some("v" + version.value)
+  )
+)
+
+dockerfile in docker := {
+  // The assembly task generates a fat JAR file
+  val artifact: File = assembly.value
+  val artifactTargetPath = s"/app/${artifact.name}"
+
+  new Dockerfile {
+    from("java:8")
+    add(artifact, artifactTargetPath)
+    entryPoint("java", "-jar", artifactTargetPath)
+    expose(8080)
+  }
+}
