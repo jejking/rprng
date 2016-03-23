@@ -35,7 +35,7 @@ object Main {
     val streamsHelper = new AkkaStreamsHelper()
     val route = new Routes(streamsHelper).route
 
-    val bindingFuture = Http().bindAndHandle(route, "localhost", port)
+    val bindingFuture = Http().bindAndHandle(route, "0.0.0.0", port)
 
   }
 

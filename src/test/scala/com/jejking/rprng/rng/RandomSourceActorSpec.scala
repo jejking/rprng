@@ -129,7 +129,7 @@ class RandomSourceActorSpec extends TestKit(ActorSystem("test")) with DefaultTim
     (mockSecureSeeder.generateSeed _).expects().atLeastTwice()
     val actorRef = TestActorRef(new RandomSourceActor(mockByteSource, mockSecureSeeder, timeRangeToReseed = timeRange))
 
-    Thread.sleep(100) // wait for the async stuff to happen before evaluating the expectations
+    Thread.sleep(250) // wait for the async stuff to happen before evaluating the expectations
 
   }
 
@@ -144,7 +144,7 @@ class RandomSourceActorSpec extends TestKit(ActorSystem("test")) with DefaultTim
     (mockSecureSeeder.generateSeed _).expects().atLeastTwice()
     val actorRef = TestActorRef(new RandomSourceActor(mockByteSource, mockSecureSeeder, timeRangeToReseed = timeRange))
 
-    Thread.sleep(100) // wait for the async stuff to happen before evaluating the expectations
+    Thread.sleep(250) // wait for the async stuff to happen before evaluating the expectations
   }
 
 
