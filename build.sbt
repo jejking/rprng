@@ -95,21 +95,29 @@ releaseProcess := Seq[ReleaseStep](
 )
 
 imageNames in docker := Seq(
-  // Sets the latest tag
-  ImageName(s"${organization.value}/${name.value}:latest"),
 
   // Sets a name with a tag that contains the project version
   ImageName(
-    namespace = Some(organization.value),
+    registry = Some("docker.io"),
+    namespace = Some("jejking"),
     repository = name.value,
     tag = Some("v" + version.value)
+  ),
+  ImageName(
+    registry = Some("docker.io"),
+    namespace = Some("jejking"),
+    repository = name.value,
+    tag = Some("latest")
   )
+
 )
 
 dockerfile in docker := {
   // The assembly task generates a fat JAR file
   val artifact: File = assembly.value
   val artifactTargetPath = s"/app/${artifact.name}"
+
+  // should be able to use alpine linux and install openjdk8-jre on top
 
   new Dockerfile {
     from("java:8")

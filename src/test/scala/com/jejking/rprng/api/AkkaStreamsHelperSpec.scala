@@ -10,7 +10,7 @@ import com.jejking.rprng.rng.TestUtils.{FailureActor, InsecureSeeder, ZeroRandom
 import com.jejking.rprng.rng._
 import org.apache.commons.math3.random.Well44497a
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.time.{Seconds, Millis, Span}
+import org.scalatest.time.{Seconds, Span}
 import org.scalatest.{BeforeAndAfterAll, FlatSpec, Matchers}
 import org.scalatest.time.SpanSugar._
 

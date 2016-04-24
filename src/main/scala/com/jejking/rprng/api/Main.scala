@@ -12,6 +12,7 @@ import com.jejking.rprng.rng.{RandomGeneratorFactory, RandomGeneratorSource, Ran
 import com.typesafe.config.{Config, ConfigFactory}
 import org.apache.commons.math3.random.ISAACRandom
 
+import scala.concurrent.Future
 import scala.concurrent.duration._
 /**
  * Starts web service.
@@ -25,18 +26,24 @@ object Main {
 
   def main(args: Array[String]): Unit = {
 
+    createAndStartServer()
+
+  }
+
+  def createAndStartServer(): Future[Http.ServerBinding] = {
     actorSystem.registerOnTermination(() -> println("shutting down actor system"))
 
     val conf = ConfigFactory.load()
     val port = conf.getInt("rprng.port")
+
     require(port > 0, s"Port must be greater than zero, but is $port")
 
     val randomRouter = createActors(actorSystem, conf)
     val streamsHelper = new AkkaStreamsHelper()
     val route = new Routes(streamsHelper).route
 
-    val bindingFuture = Http().bindAndHandle(route, "0.0.0.0", port)
-
+    println(s"starting on port $port")
+    Http().bindAndHandle(route, "0.0.0.0", port)
   }
 
   def shutdown(): Unit = {
