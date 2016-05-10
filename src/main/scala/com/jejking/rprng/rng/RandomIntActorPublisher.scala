@@ -8,6 +8,8 @@ import akka.util.{ByteString, Timeout}
 import scala.concurrent.Future
 import scala.concurrent.duration._
 
+import scala.language.postfixOps
+
 /**
  * Wraps a path to [[RandomSourceActor]] (or a router over a bunch of them) to
  * act as a stream publisher of `Ints`s which are obtained asynchronously from the actor / router. When wrapping

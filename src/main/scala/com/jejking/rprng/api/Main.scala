@@ -14,6 +14,8 @@ import org.apache.commons.math3.random.ISAACRandom
 
 import scala.concurrent.Future
 import scala.concurrent.duration._
+
+import scala.language.postfixOps
 /**
  * Starts web service.
  */

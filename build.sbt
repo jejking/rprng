@@ -7,7 +7,7 @@ name := "rprng"
 organization := "com.jejking"
 scalaVersion := "2.11.7"
 
-scalacOptions := Seq("-unchecked", "-deprecation", "-encoding", "utf8")
+scalacOptions := Seq("-unchecked", "-deprecation", "-encoding", "utf8", "-feature")
 
 libraryDependencies ++= {
   val akkaV       = "2.4.2"

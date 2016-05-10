@@ -12,6 +12,8 @@ import org.scalatest.{BeforeAndAfterAll, FlatSpecLike, Matchers}
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
 
+import scala.language.postfixOps
+
 /**
  * Test of functionality around [[RandomSourceActor]].
  */
@@ -108,6 +110,8 @@ class RandomSourceActorSpec extends TestKit(ActorSystem("test")) with DefaultTim
 
     val mockScheduleHelper = mock[ScheduleHelper]
     // we expect that the scheduler is called to send a reseed message between min and max duration from now...
+    // the compiler warning emitted here is misleading as it doesn't quite get the particular combination
+    // of mocking and an apparently pure function
     (mockScheduleHelper.scheduleOnce(_ : FiniteDuration)(_ : () => Unit)(_ : ExecutionContext)) expects (where {
       (finiteDuration: FiniteDuration, *, executor: ExecutionContext) => finiteDuration === defaultMinLifeTime
     })

@@ -9,6 +9,8 @@ import com.jejking.rprng.rng.RandomSourceActor.TimeRangeToReseed
 import scala.concurrent.duration.{FiniteDuration, _}
 import scala.concurrent.{ExecutionContext, Future}
 
+import scala.language.postfixOps
+
 /**
  * Actor wrapping a [[RandomSource]] to allow thread-safe access to it and to manage its lifecycle,
  * especially with regard to re-seeding.
