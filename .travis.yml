@@ -1,6 +1,9 @@
 ---
 sudo: required
 
+env:
+- RPRNG_ACTOR_COUNT=1
+
 language: scala
 
 services:
