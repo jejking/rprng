@@ -21,7 +21,7 @@ import scala.concurrent.duration.{Duration, FiniteDuration}
   */
 class MainSpec extends FlatSpec with Matchers with ScalaFutures with BeforeAndAfterAll {
 
-  implicit override val patienceConfig = PatienceConfig(timeout = 5 seconds, interval = 100 milliseconds)
+  implicit override val patienceConfig = PatienceConfig(timeout = 15 seconds, interval = 250 milliseconds)
 
 
   val baseUri = "http://localhost:8080"
