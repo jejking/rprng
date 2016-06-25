@@ -20,7 +20,7 @@ import org.scalatest.time.SpanSugar._
  */
 class AkkaStreamsHelperSpec extends FlatSpec with Matchers with ScalaFutures with BeforeAndAfterAll {
 
-  implicit override val patienceConfig = PatienceConfig(timeout = 1 second, interval = 100 milliseconds)
+  implicit override val patienceConfig = PatienceConfig(timeout = 2 seconds, interval = 100 milliseconds)
 
   implicit val system: ActorSystem = initActorSystem()
   implicit val materializer = ActorMaterializer()
