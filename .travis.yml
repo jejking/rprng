@@ -14,4 +14,4 @@ jdk:
 # after main build is completed , build the docker container
 
 script:
-  - sbt test assembly docker
+  - sbt ++$TRAVIS_SCALA_VERSION test assembly
