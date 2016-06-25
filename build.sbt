@@ -5,7 +5,7 @@ enablePlugins(DockerPlugin)
 
 name := "rprng"
 organization := "com.jejking"
-scalaVersion := "2.11.7"
+scalaVersion := "2.11.8"
 
 scalacOptions := Seq("-unchecked", "-deprecation", "-encoding", "utf8", "-feature")
 
@@ -34,6 +34,7 @@ libraryDependencies ++= {
   )
 }
 
+test in assembly := {}
 mainClass in assembly := Some("com.jejking.rprng.api.Main")
 
 lazy val rprng = (project in file(".")).
