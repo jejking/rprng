@@ -2,7 +2,7 @@
 sudo: required
 
 env:
-- RPRNG_ACTOR_COUNT=1
+- RPRNG_ACTOR_COUNT=4
 
 language: scala
 
