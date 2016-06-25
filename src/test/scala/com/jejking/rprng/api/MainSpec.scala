@@ -5,14 +5,15 @@ import java.util.concurrent.TimeUnit
 
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
-import akka.http.scaladsl.model.{ContentTypes, StatusCodes, HttpRequest}
+import akka.http.scaladsl.model.{ContentTypes, HttpRequest, StatusCodes}
 import akka.stream.ActorMaterializer
 import akka.util.ByteString
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.{BeforeAndAfterAll, Matchers, FlatSpec}
+import org.scalatest.{BeforeAndAfterAll, FlatSpec, Matchers}
 import org.scalatest.time.SpanSugar._
 
-import scala.concurrent.duration.FiniteDuration
+import scala.concurrent.Await
+import scala.concurrent.duration.{Duration, FiniteDuration}
 
 /**
   * Tests that the server starts and the API is exposed
@@ -20,7 +21,7 @@ import scala.concurrent.duration.FiniteDuration
   */
 class MainSpec extends FlatSpec with Matchers with ScalaFutures with BeforeAndAfterAll {
 
-  implicit override val patienceConfig = PatienceConfig(timeout = 2 seconds, interval = 100 milliseconds)
+  implicit override val patienceConfig = PatienceConfig(timeout = 5 seconds, interval = 100 milliseconds)
 
 
   val baseUri = "http://localhost:8080"
@@ -30,7 +31,7 @@ class MainSpec extends FlatSpec with Matchers with ScalaFutures with BeforeAndAf
 
   override def beforeAll() {
     // start and wait for the binding to be ready before trying to use it
-    Main.createAndStartServer().value
+    Await.ready(Main.createAndStartServer(), (Duration(5, "seconds")))
   }
 
   "/byte/block" should "deliver 1kb of bytes" in {
@@ -187,7 +188,7 @@ class MainSpec extends FlatSpec with Matchers with ScalaFutures with BeforeAndAf
 
 
 
-    override def afterAll() {
+  override def afterAll() {
     Main.shutdown()
     system.terminate()
   }
