@@ -22,4 +22,4 @@ jdk:
   - oraclejdk8
 
 script:
-  - sbt ++$TRAVIS_SCALA_VERSION test assembly
+  - sbt ++$TRAVIS_SCALA_VERSION -Djava.security.egd=file:/dev/./urandom test assembly
