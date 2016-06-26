@@ -73,7 +73,7 @@ object Main {
       actorSystem.actorOf(RandomSourceActor.props(randomGeneratorByteSource, secureSeeder, timeRangeToReseed), "randomByteSource" + i)
     }
 
-    val paths = for (i <- 1 to 8) yield "/user/randomByteSource" + i
+    val paths = for (i <- 1 to actorCount) yield "/user/randomByteSource" + i
 
     actorSystem.actorOf(RandomGroup(paths).props(), "randomRouter")
   }
