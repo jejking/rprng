@@ -28,13 +28,14 @@ class RandomSourceActor(private val randomSource: RandomSource, private val secu
   import scala.concurrent.ExecutionContext.Implicits.global
 
   val scheduleHelper  =  scheduleHelperCreator(context.system)
+  val actorPath = context.self.path
 
   override def preStart(): Unit = {
     log.info(s"reseed interval is: $timeRangeToReseed")
     val seed = secureSeeder.generateSeed()
     this.randomSource.reseed(seed)
     scheduleReseed()
-    log.info("completed pre-start of " + context.self.path)
+    log.info("completed pre-start of " + actorPath)
 
   }
 
@@ -79,20 +80,20 @@ class RandomSourceActor(private val randomSource: RandomSource, private val secu
 
   def applyNewSeedAndScheduleReseed(newSeed: NewSeed): Unit = {
     this.randomSource.reseed(newSeed.seed)
-    log.info("applied new seed in actor " + context.self.path)
+    log.info("applied new seed in actor " + actorPath)
 
     // and off we go for the next round at some point in the future
     scheduleReseed()
   }
 
   def fetchSeedAndNotify(): Unit = {
-    log.info("about to trigger future to collect fresh seed for actor " + context.self.path)
+    log.info("about to trigger future to collect fresh seed for actor " + actorPath)
     // generate seed is likely to block as the seeder gathers entropy
     // therefore we do this in a future and send a message onto the actor's mailbox
     // for async application once we have a result
     Future {
       val seed = secureSeeder.generateSeed()
-      log.info("obtained fresh seed in actor " + context.self.path)
+      log.info("obtained fresh seed in actor " + actorPath)
       self ! NewSeed(seed)
     }
   }
@@ -102,9 +103,9 @@ class RandomSourceActor(private val randomSource: RandomSource, private val secu
     val timeToReseed = computeScheduledTimeToReseed(timeRangeToReseed, randomSource)
     scheduleHelper.scheduleOnce(timeToReseed) {
       self ! Reseed
-      log.info("sent reseed message to actor " + context.self.path)
+      log.info("sent reseed message to actor " + actorPath)
     }
-    log.info("scheduled reseed in actor " + context.self.path)
+    log.info("scheduled reseed in actor " + actorPath)
   }
 }
 
