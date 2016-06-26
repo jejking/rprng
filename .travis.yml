@@ -1,20 +1,25 @@
 ---
-sudo: required
+sudo: false
+
+cache:
+  directories:
+    - $HOME/.ivy2/cache
+    - $HOME/.sbt/boot/
+
+before_cache:
+  # Tricks to avoid unnecessary cache updates
+  - find $HOME/.ivy2 -name "ivydata-*.properties" -delete
+  - find $HOME/.sbt -name "*.lock" -delete
 
 env:
-- RPRNG_ACTOR_COUNT=4
+- RPRNG_ACTOR_COUNT=2
 
 language: scala
-
-services:
-  - docker
 
 scala:
     - 2.11.8
 jdk:
   - oraclejdk8
-
-# after main build is completed , build the docker container
 
 script:
   - sbt ++$TRAVIS_SCALA_VERSION test assembly
