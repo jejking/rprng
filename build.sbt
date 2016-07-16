@@ -10,27 +10,29 @@ scalaVersion := "2.11.8"
 scalacOptions := Seq("-unchecked", "-deprecation", "-encoding", "utf8", "-feature")
 
 libraryDependencies ++= {
-  val akkaV       = "2.4.2"
-  val akkaStreamV = "2.4.2"
-  val scalaTestV  = "2.2.6"
+  val akkaV        = "2.4.2"
+  val akkaStreamV  = "2.4.2"
+  val scalaTestV   = "2.2.6"
   val commonsMathV = "3.6"
-  val scalaMockV = "3.2.2"
-  val logbackV = "1.1.3"
+  val scalaMockV   = "3.2.2"
+  val logbackV     = "1.1.6"
 
   Seq(
-    "org.apache.commons" % "commons-math3"                        % commonsMathV,
-    "com.typesafe.akka" %% "akka-actor"                           % akkaV,
-    "com.typesafe.akka" %% "akka-slf4j"                           % akkaV,
-    "ch.qos.logback"    % "logback-classic"                       % logbackV,
-    "com.typesafe.akka" %% "akka-stream"                          % akkaV,
-    "com.typesafe.akka" %% "akka-http-experimental"               % akkaV,
-    "com.typesafe.akka" %% "akka-http-spray-json-experimental"    % akkaV,
-    "com.typesafe.akka" %% "akka-http-testkit-experimental"       % "2.4.2-RC3" % "test",
-    "com.typesafe.akka" %% "akka-stream-testkit"                  % akkaV % "test",
-    "org.scalatest"     %% "scalatest"                            % scalaTestV  % "test",
-    "com.typesafe.akka" %% "akka-testkit"                         % akkaV       % "test",
-    "org.scalamock"     %% "scalamock-core"                       % scalaMockV  % "test",
-    "org.scalamock"     %% "scalamock-scalatest-support"          % scalaMockV  % "test"
+    "org.apache.commons"   % "commons-math3"                         % commonsMathV,
+    "com.typesafe.akka"    %% "akka-actor"                           % akkaV,
+    "com.typesafe.akka"    %% "akka-slf4j"                           % akkaV,
+    "ch.qos.logback"       % "logback-classic"                       % logbackV,
+    "ch.qos.logback"       % "logback-core"                          % logbackV,
+    "net.logstash.logback" % "logstash-logback-encoder"              % "4.7",
+    "com.typesafe.akka"    %% "akka-stream"                          % akkaV,
+    "com.typesafe.akka"    %% "akka-http-experimental"               % akkaV,
+    "com.typesafe.akka"    %% "akka-http-spray-json-experimental"    % akkaV,
+    "com.typesafe.akka"    %% "akka-http-testkit-experimental"       % "2.4.2-RC3" % "test",
+    "com.typesafe.akka"    %% "akka-stream-testkit"                  % akkaV % "test",
+    "org.scalatest"        %% "scalatest"                            % scalaTestV  % "test",
+    "com.typesafe.akka"    %% "akka-testkit"                         % akkaV       % "test",
+    "org.scalamock"        %% "scalamock-core"                       % scalaMockV  % "test",
+    "org.scalamock"        %% "scalamock-scalatest-support"          % scalaMockV  % "test"
   )
 }
 

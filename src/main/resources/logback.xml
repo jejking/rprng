@@ -3,12 +3,27 @@
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
 
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>${RPRNG_LOG:-rprng}.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <fileNamePattern>${RPRNG_LOG_DIR:-.}/${RPRNG_LOG:-rprng}.%d{yyyy-MM-dd}.txt.log.gz</fileNamePattern>
             <maxHistory>10</maxHistory>
+            <maxFileSize>256MB</maxFileSize>
         </rollingPolicy>
 
         <encoder>
-            <pattern>%X{akkaTimestamp} %-5level %logger{36}  %X{akkaSource} - %msg%n</pattern>
+            <pattern>%X{akkaTimestamp} %-5level %logger{36} %X{sourceThread} %X{akkaSource} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="FILE2" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${RPRNG_LOG_DIR:-.}/${RPRNG_LOG:-rprng}.%d{yyyy-MM-dd}.json.log.gz</fileNamePattern>
+            <maxHistory>10</maxHistory>
+            <maxFileSize>256MB</maxFileSize>
+        </rollingPolicy>
+
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+            <includeMdcKeyName>akkaTimestamp</includeMdcKeyName>
+            <includeMdcKeyName>sourceThread</includeMdcKeyName>
+            <includeMdcKeyName>akkaSource</includeMdcKeyName>
         </encoder>
     </appender>
 
@@ -16,5 +31,6 @@
 
     <root level="INFO">
         <appender-ref ref="FILE" />
+        <appender-ref ref="FILE2" />
     </root>
 </configuration>
