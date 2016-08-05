@@ -6,6 +6,7 @@ enablePlugins(DockerPlugin)
 name := "rprng"
 organization := "com.jejking"
 scalaVersion := "2.11.8"
+autoAPIMappings := true
 
 scalacOptions := Seq("-unchecked", "-deprecation", "-encoding", "utf8", "-feature")
 

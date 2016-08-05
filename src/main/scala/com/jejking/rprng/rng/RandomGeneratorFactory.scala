@@ -10,7 +10,7 @@ import scala.reflect.ClassTag
 object RandomGeneratorFactory {
 
   /**
-   * Creates a new [[RandomGenerator]] instance of the specified concrete type.
+   * Creates a new [[org.apache.commons.math3.random.RandomGenerator]] instance of the specified concrete type.
    * @param tag implicit class tag, supplied by compiler
    * @tparam G the type. Note that this *must* have a zero arg constructor.
    * @return new instance, as yet unseeded.

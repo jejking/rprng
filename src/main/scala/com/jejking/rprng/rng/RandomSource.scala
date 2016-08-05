@@ -104,7 +104,7 @@ case object RandomAnyIntRequest
  * Request for an integer between min and max bound.
  * @param minBound inclusive minimum bound. Must be smaller than the maxBound
  * @param maxBound inclusive maximum bound. Must be greater than minBound.
- * @throws IllegalArgumentException if preconditions not met
+ * @throws java.lang.IllegalArgumentException if preconditions not met
  */
 case class RandomIntRequest(minBound: Int = 0, maxBound: Int) {
   require(minBound < maxBound, "minBound must be less than maxBound")
