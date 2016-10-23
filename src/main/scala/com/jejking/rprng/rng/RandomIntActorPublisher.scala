@@ -23,9 +23,6 @@ import scala.language.postfixOps
 class RandomIntActorPublisher(val randomIntRequest: RandomIntRequest, val randomServicePath: String)
   extends ActorPublisher[Int] with ActorLogging {
 
-  // for futures
-  import scala.concurrent.ExecutionContext.Implicits.global
-
   val wrappedActorPath = context.actorSelection(randomServicePath)
   implicit val timeout = Timeout(5 seconds)
 
@@ -67,14 +64,9 @@ class RandomIntActorPublisher(val randomIntRequest: RandomIntRequest, val random
   }
 
   def sendInts() {
-    // capture current demand and fire off that number of requests to the underlying actor without blocking
-    // The value is captured to allow for mutation of the variable by incoming demand and we run the requests in a
-    // future in order to allow reply messages to be received and passed on to the subscribers.
     val capturedDemand = totalDemand.toInt
-    Future {
-      for (i <- 1 to capturedDemand) {
-        wrappedActorPath ! this.randomIntRequest
-      }
+    for (i <- 1 to capturedDemand) {
+      wrappedActorPath ! this.randomIntRequest
     }
   }
 
