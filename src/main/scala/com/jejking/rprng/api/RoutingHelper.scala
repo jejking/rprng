@@ -17,24 +17,35 @@ import scala.concurrent.Future
  * Defines useful functionality for the Routing part of the API to use in interacting with the
  * underlying RPRNG infrastructure.
  */
-trait StreamsHelper {
+trait RoutingHelper {
 
   /**
-   * Creates a runnable graph that generates a single block of random bytes which is
-   * converted to a future http response.
+    * Generates a byte string of the requested size which is encapsulated
+    * in the entity of the HTTP Response.
     *
     * @param blockSize number of bytes to obtain, must be strictly positive
-   * @return graph to run
-   */
+    * @return future of http response
+    */
   def responseForByteBlock(blockSize: Int): Future[HttpResponse]
 
+  /**
+    * Generates a HTTP Response whose entity is a chunked stream of random bytes
+    * - terminated by the client aborting the connnection.
+    * @param chunkSize requested chunks of randomness
+    * @return http response with entity wired to a stream of randomness
+    */
   def responseForByteStream(chunkSize: Int): HttpResponse
 
+  /**
+    * Returns a structured response (for conversion to JSON) to the request
+    * @param req the request
+    * @return future of the requested structure
+    */
   def responseForIntegerCollection(req: RandomIntegerCollectionRequest): Future[RandomIntegerCollectionResponse]
 
 }
 
-class AkkaStreamsHelper(path: String = "/user/randomRouter")(implicit actorSystem: ActorSystem, actorMaterializer: ActorMaterializer) extends StreamsHelper {
+class AkkaRoutingHelper(path: String = "/user/randomRouter")(implicit actorSystem: ActorSystem, actorMaterializer: ActorMaterializer) extends RoutingHelper {
 
   private def createByteStringSource(blockSize: Int): Source[ByteString, NotUsed] = {
     val publisherActor = actorSystem.actorOf(RandomByteStringActorPublisher.props(blockSize, path))
@@ -86,12 +97,6 @@ class AkkaStreamsHelper(path: String = "/user/randomRouter")(implicit actorSyste
         .run()
     }
 
-    /*
-    Think about creating some form of custom PushPullStage that allows us
-    to map the source to a traversable to a set of size N *using WithToSizedSet.
-    Input would be ints, an the appropriately sized set.
-     */
-
     req.collectionType match {
       case RandomList => listsFromStream
       case RandomSet  => setsFromStream
@@ -100,6 +105,13 @@ class AkkaStreamsHelper(path: String = "/user/randomRouter")(implicit actorSyste
   }
 }
 
+/**
+  * Akka streams graph stage that takes a stream of random ints in - and emits
+  * a set of the requested size as soon as one has become available. Duplicate
+  * inputs during set construction are - obviously - discarded.
+  *
+  * @param requestedSize
+  */
 class ToSizedSet(requestedSize: Int) extends GraphStage[FlowShape[Int, Set[Int]]] {
 
   val in = Inlet[Int]("ints.in")
@@ -142,8 +154,3 @@ object ToSizedSet {
   def apply(requestedSetSize: Int) = new ToSizedSet(requestedSetSize)
 }
 
-object AkkaStreamsHelper {
-
-
-
-}

@@ -23,12 +23,9 @@ import scala.language.postfixOps
 class RandomByteStringActorPublisher(val byteStringSize: Int, val randomByteServicePath: String)
       extends ActorPublisher[ByteString] with ActorLogging {
 
-  // for futures
-  import scala.concurrent.ExecutionContext.Implicits.global
-
   val wrappedActorPath = context.actorSelection(randomByteServicePath)
-  implicit val timeout = Timeout(5 seconds)
 
+  implicit val timeout = Timeout(5 seconds)
 
   override def receive: Receive = {
     // reply from wrapped actor, we pass this on to our subscriber
@@ -68,13 +65,14 @@ class RandomByteStringActorPublisher(val byteStringSize: Int, val randomByteServ
 
   def sendByteStrings() {
     // capture current demand and fire off that number of requests to the underlying actor without blocking
-    // The value is captured to allow for mutation of the variable by incoming demand and we run the requests in a
-    // future in order to allow reply messages to be received and passed on to the subscribers.
+    // The value is captured to allow for mutation of the variable by incoming demand and we fire off
+    // the corresponding number of requests to the random router.
+
+    // Note that the RandomSourceActors will send their replies back here in the form of ByteStrings.
     val capturedDemand = totalDemand.toInt
-    Future {
-      for (i <- 1 to capturedDemand) {
-        wrappedActorPath ! RandomByteRequest(byteStringSize)
-      }
+
+    for (i <- 1 to capturedDemand) {
+      wrappedActorPath ! RandomByteRequest(byteStringSize)
     }
   }
 

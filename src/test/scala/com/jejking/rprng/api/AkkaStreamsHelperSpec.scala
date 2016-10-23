@@ -16,7 +16,7 @@ import org.scalatest.time.SpanSugar._
 
 
 /**
- * Tests for [[AkkaStreamsHelper]].
+ * Tests for [[AkkaRoutingHelper]].
  */
 class AkkaStreamsHelperSpec extends FlatSpec with Matchers with ScalaFutures with BeforeAndAfterAll {
 
@@ -24,10 +24,10 @@ class AkkaStreamsHelperSpec extends FlatSpec with Matchers with ScalaFutures wit
 
   implicit val system: ActorSystem = initActorSystem()
   implicit val materializer = ActorMaterializer()
-  val simpleAkkaStreamsHelper = new AkkaStreamsHelper()
+  val simpleAkkaStreamsHelper = new AkkaRoutingHelper()
 
   createProperlyRandomActor()
-  val randomAkkaStreamsHelper = new AkkaStreamsHelper("/user/randomlyRandom")
+  val randomAkkaStreamsHelper = new AkkaRoutingHelper("/user/randomlyRandom")
 
   def initActorSystem(): ActorSystem = {
 

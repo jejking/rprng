@@ -27,7 +27,7 @@ class RoutesSpec extends FlatSpec with Matchers with ScalaFutures with Scalatest
 
   "/byte/block" should "return 1024 'random' bytes" in {
 
-    val mockStreamsHelper = mock[StreamsHelper]
+    val mockStreamsHelper = mock[RoutingHelper]
     (mockStreamsHelper.responseForByteBlock _).expects(1024).returning(Future.successful(HttpResponse(entity = oneKb)))
 
     val routes = new Routes(mockStreamsHelper)
@@ -37,7 +37,7 @@ class RoutesSpec extends FlatSpec with Matchers with ScalaFutures with Scalatest
   }
 
   "/byte/block/" should "also return 1024 'random' bytes" in {
-    val mockStreamsHelper = mock[StreamsHelper]
+    val mockStreamsHelper = mock[RoutingHelper]
     (mockStreamsHelper.responseForByteBlock _).expects(1024).returning(Future.successful(HttpResponse(entity = oneKb)))
 
     val routes = new Routes(mockStreamsHelper)
@@ -48,7 +48,7 @@ class RoutesSpec extends FlatSpec with Matchers with ScalaFutures with Scalatest
   }
 
   "/byte/block/2048" should "return 2048 'random' bytes" in {
-    val mockStreamsHelper = mock[StreamsHelper]
+    val mockStreamsHelper = mock[RoutingHelper]
     (mockStreamsHelper.responseForByteBlock _).expects(2048).returning(Future.successful(HttpResponse(entity = twoKb)))
 
     val routes = new Routes(mockStreamsHelper)
@@ -59,7 +59,7 @@ class RoutesSpec extends FlatSpec with Matchers with ScalaFutures with Scalatest
   }
 
   "/byte/block/0" should "result in a ValidationRejection" in {
-    val mockStreamsHelper = mock[StreamsHelper]
+    val mockStreamsHelper = mock[RoutingHelper]
     (mockStreamsHelper.responseForByteBlock _).expects(*).never()
 
     val routes = new Routes(mockStreamsHelper)
@@ -69,7 +69,7 @@ class RoutesSpec extends FlatSpec with Matchers with ScalaFutures with Scalatest
   }
 
   "/byte/block/forty-two" should "be rejected (not matched)" in {
-    val mockStreamsHelper = mock[StreamsHelper]
+    val mockStreamsHelper = mock[RoutingHelper]
     (mockStreamsHelper.responseForByteBlock _).expects(*).never()
 
     val routes = new Routes(mockStreamsHelper)
@@ -79,7 +79,7 @@ class RoutesSpec extends FlatSpec with Matchers with ScalaFutures with Scalatest
   }
 
   "/byte/block/-64" should "be rejected" in {
-    val mockStreamsHelper = mock[StreamsHelper]
+    val mockStreamsHelper = mock[RoutingHelper]
     (mockStreamsHelper.responseForByteBlock _).expects(*).never()
 
     val routes = new Routes(mockStreamsHelper)
@@ -89,7 +89,7 @@ class RoutesSpec extends FlatSpec with Matchers with ScalaFutures with Scalatest
   }
 
   "/byte/block/" + (Integer.MAX_VALUE + 1L) should "be rejected" in {
-    val mockStreamsHelper = mock[StreamsHelper]
+    val mockStreamsHelper = mock[RoutingHelper]
     (mockStreamsHelper.responseForByteBlock _).expects(*).never()
 
     val routes = new Routes(mockStreamsHelper)
@@ -100,7 +100,7 @@ class RoutesSpec extends FlatSpec with Matchers with ScalaFutures with Scalatest
 
   "/byte/stream" should "deliver a chunked response" in {
     val httpResponse = HttpResponse(StatusCodes.OK).withEntity(Chunked(ContentTypes.`application/octet-stream`, Source.single(Chunk(oneKb))))
-    val mockStreamsHelper = mock[StreamsHelper]
+    val mockStreamsHelper = mock[RoutingHelper]
     (mockStreamsHelper.responseForByteStream _).expects(1024).returning(httpResponse)
 
     val routes = new Routes(mockStreamsHelper)
@@ -114,7 +114,7 @@ class RoutesSpec extends FlatSpec with Matchers with ScalaFutures with Scalatest
 
 
   "/int/list" should "request 1 list of 100 ints between " + Int.MinValue + " and " + Int.MaxValue in {
-    val mockStreamsHelper = mock[StreamsHelper]
+    val mockStreamsHelper = mock[RoutingHelper]
     (mockStreamsHelper.responseForIntegerCollection _)
       .expects(RandomIntegerCollectionRequest(RandomList))
       .returning(Future.successful(RandomIntegerCollectionResponse(List(1 to 100))))
@@ -130,7 +130,7 @@ class RoutesSpec extends FlatSpec with Matchers with ScalaFutures with Scalatest
 
 
   "/int/list?size=10" should "deliver 1 list of 10 ints between " + Int.MinValue + " and " + Int.MaxValue in {
-    val mockStreamsHelper = mock[StreamsHelper]
+    val mockStreamsHelper = mock[RoutingHelper]
     (mockStreamsHelper.responseForIntegerCollection _)
       .expects(RandomIntegerCollectionRequest(RandomList, size = 10))
       .returning(Future.successful(RandomIntegerCollectionResponse(List(1 to 10))))
@@ -147,7 +147,7 @@ class RoutesSpec extends FlatSpec with Matchers with ScalaFutures with Scalatest
 
 
   "/int/list?size=10&count=2" should "deliver 2 lists of 10 ints between " + Int.MinValue + " and " + Int.MaxValue in {
-    val mockStreamsHelper = mock[StreamsHelper]
+    val mockStreamsHelper = mock[RoutingHelper]
     (mockStreamsHelper.responseForIntegerCollection _)
       .expects(RandomIntegerCollectionRequest(RandomList, size = 10, count = 2))
       .returning(Future.successful(RandomIntegerCollectionResponse(List(1 to 10, 1 to 10))))
@@ -163,7 +163,7 @@ class RoutesSpec extends FlatSpec with Matchers with ScalaFutures with Scalatest
 
 
   "/int/list?min=0&max=1000" should "deliver 1 list of 100 ints between 0 and 100" in {
-    val mockStreamsHelper = mock[StreamsHelper]
+    val mockStreamsHelper = mock[RoutingHelper]
     (mockStreamsHelper.responseForIntegerCollection _)
       .expects(RandomIntegerCollectionRequest(RandomList, minBound = 0, maxBound = 100))
       .returning(Future.successful(RandomIntegerCollectionResponse(List(1 to 100))))
@@ -181,7 +181,7 @@ class RoutesSpec extends FlatSpec with Matchers with ScalaFutures with Scalatest
 
 
  "/int/list?size=10&min=100&max=10" should "result in a 400" in {
-   val mockStreamsHelper = mock[StreamsHelper]
+   val mockStreamsHelper = mock[RoutingHelper]
    (mockStreamsHelper.responseForIntegerCollection _).expects(*).never()
 
    val routes = new Routes(mockStreamsHelper)
@@ -191,7 +191,7 @@ class RoutesSpec extends FlatSpec with Matchers with ScalaFutures with Scalatest
  }
 
  "/int/set" should "give a single set of 100 ints" in {
-   val mockStreamsHelper = mock[StreamsHelper]
+   val mockStreamsHelper = mock[RoutingHelper]
    (mockStreamsHelper.responseForIntegerCollection _)
      .expects(RandomIntegerCollectionRequest(RandomSet))
      .returning(Future.successful(RandomIntegerCollectionResponse(Set(1 to 100))))
@@ -206,7 +206,7 @@ class RoutesSpec extends FlatSpec with Matchers with ScalaFutures with Scalatest
  }
 
  "/int/set?size=100&min=0&max=50" should "result in a 400" in {
-   val mockStreamsHelper = mock[StreamsHelper]
+   val mockStreamsHelper = mock[RoutingHelper]
    (mockStreamsHelper.responseForIntegerCollection _).expects(*).never()
 
    val routes = new Routes(mockStreamsHelper)

@@ -10,7 +10,7 @@ import com.jejking.rprng.rng.{RandomSet, RandomList, RandomIntegerCollectionRequ
 /**
  * Routing for web requests for randomness.
  */
-class Routes(streamsHelper: StreamsHelper) extends SprayJsonSupport {
+class Routes(streamsHelper: RoutingHelper) extends SprayJsonSupport {
 
   implicit val theRejectionHandler = RejectionHandler.newBuilder()
                                       .handle {

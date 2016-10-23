@@ -11,8 +11,8 @@ autoAPIMappings := true
 scalacOptions := Seq("-unchecked", "-deprecation", "-encoding", "utf8", "-feature")
 
 libraryDependencies ++= {
-  val akkaV        = "2.4.2"
-  val akkaStreamV  = "2.4.2"
+  val akkaV        = "2.4.10"
+  val akkaStreamV  = "2.4.10"
   val scalaTestV   = "2.2.6"
   val commonsMathV = "3.6"
   val scalaMockV   = "3.2.2"

@@ -1,6 +1,5 @@
-package com.jejking.rprng.api
+package com.jejking.rprng.main
 
-import spray.json._
 import java.util.concurrent.TimeUnit
 
 import akka.actor.ActorSystem
@@ -8,9 +7,11 @@ import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.{ContentTypes, HttpRequest, StatusCodes}
 import akka.stream.ActorMaterializer
 import akka.util.ByteString
+import com.typesafe.config.ConfigFactory
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.{BeforeAndAfterAll, FlatSpec, Matchers}
 import org.scalatest.time.SpanSugar._
+import org.scalatest.{BeforeAndAfterAll, FlatSpec, Matchers}
+import spray.json._
 
 import scala.concurrent.Await
 import scala.concurrent.duration.{Duration, FiniteDuration}
@@ -31,7 +32,8 @@ class MainSpec extends FlatSpec with Matchers with ScalaFutures with BeforeAndAf
 
   override def beforeAll() {
     // start and wait for the binding to be ready before trying to use it
-    Await.ready(Main.createAndStartServer(), (Duration(5, "seconds")))
+    val myConfig = processConfig(ConfigFactory.load())
+    Await.ready(Main.createAndStartServer(myConfig), (Duration(5, "seconds")))
   }
 
   "/byte/block" should "deliver 1kb of bytes" in {
