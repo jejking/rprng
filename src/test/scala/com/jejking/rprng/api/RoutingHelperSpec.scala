@@ -18,7 +18,7 @@ import org.scalatest.time.SpanSugar._
 /**
  * Tests for [[AkkaRoutingHelper]].
  */
-class AkkaStreamsHelperSpec extends FlatSpec with Matchers with ScalaFutures with BeforeAndAfterAll {
+class RoutingHelperSpec extends FlatSpec with Matchers with ScalaFutures with BeforeAndAfterAll {
 
   implicit override val patienceConfig = PatienceConfig(timeout = 2 seconds, interval = 100 milliseconds)
 

@@ -79,3 +79,4 @@ object RandomIntActorPublisher {
   def props(randomIntRequest: RandomIntRequest, randomServicePath: String = standardActorPath): Props = Props(new RandomIntActorPublisher(randomIntRequest, randomServicePath))
 
 }
+

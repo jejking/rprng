@@ -10,8 +10,9 @@ import com.jejking.rprng.rng.{RandomGeneratorFactory, RandomGeneratorSource, Ran
 import com.typesafe.config.Config
 import org.apache.commons.math3.random.ISAACRandom
 
-import scala.concurrent.duration.Duration
 import scala.concurrent.duration._
+
+import scala.language.postfixOps
 
 /**
   * Couple of useful types and functions for our main methods.
