@@ -1,4 +1,6 @@
-package com.jejking.rprng.rng
+package com.jejking.rprng.api
+
+import com.jejking.rprng.rng.RandomIntRequest
 
 sealed trait RandomCollectionType
 case object RandomList extends RandomCollectionType

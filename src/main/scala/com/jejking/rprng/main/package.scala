@@ -5,8 +5,8 @@ import java.util.concurrent.TimeUnit
 
 import akka.actor.{ActorRef, ActorSystem}
 import akka.routing.RandomGroup
-import com.jejking.rprng.rng.RandomSourceActor.TimeRangeToReseed
-import com.jejking.rprng.rng.{RandomGeneratorFactory, RandomGeneratorSource, RandomSourceActor, SecureRandomSeeder}
+import com.jejking.rprng.rng.RngActor.TimeRangeToReseed
+import com.jejking.rprng.rng.{RandomGeneratorFactory, CommonsMathRng, RngActor, SecureRandomSeeder}
 import com.typesafe.config.Config
 import org.apache.commons.math3.random.ISAACRandom
 
@@ -37,7 +37,7 @@ package object main {
   }
 
   /**
-    * Sets up the required number of [[RandomSourceActor]] instances behind
+    * Sets up the required number of [[com.jejking.rprng.rng.RngActor]] instances behind
     * an akka [[RandomGroup]].
     *
     * @param actorSystem the actor system to use to set up the actors
@@ -51,8 +51,8 @@ package object main {
       val secureRandom = new SecureRandom()
       val secureSeeder = new SecureRandomSeeder(secureRandom)
       val randomGenerator = RandomGeneratorFactory.createNewGeneratorInstance[ISAACRandom]
-      val randomGeneratorByteSource = RandomGeneratorSource(randomGenerator)
-      actorSystem.actorOf(RandomSourceActor.props(randomGeneratorByteSource, secureSeeder, myConfig.timeRangeToReseed), "randomByteSource" + i)
+      val randomGeneratorByteSource = CommonsMathRng(randomGenerator)
+      actorSystem.actorOf(RngActor.props(randomGeneratorByteSource, secureSeeder, myConfig.timeRangeToReseed), "randomByteSource" + i)
     }
       .map(_.path.toString)
 

@@ -24,7 +24,7 @@ class SecureRandomSeeder(private val secureRandom: SecureRandom) extends SecureS
 
   /**
    * Generates 8 bytes of randomness and converts these to a Long. The method
-   * is likely to block.
+   * will block.
    *
    * @return a random long derived from the `generateSeed()` method of `SecureRandom`
    */

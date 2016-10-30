@@ -6,7 +6,7 @@ import akka.stream.actor.ActorPublisher
 import akka.stream.scaladsl.Source
 import akka.stream.testkit.scaladsl.TestSink
 import akka.testkit.TestProbe
-import com.jejking.rprng.rng.TestUtils.{FailureActor, InsecureSeeder, ZeroRandomSource}
+import com.jejking.rprng.rng.TestUtils.{FailureActor, InsecureSeeder, ZeroRng}
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.{BeforeAndAfterAll, FlatSpec, Matchers}
 
@@ -21,7 +21,7 @@ class RandomIntActorPublisherSpec extends FlatSpec with Matchers with BeforeAndA
   def initActorSystem(): ActorSystem = {
 
     val actorSystem = ActorSystem("publisherSpec")
-    actorSystem.actorOf(RandomSourceActor.props(new ZeroRandomSource, new InsecureSeeder), "secureSeeder")
+    actorSystem.actorOf(RngActor.props(new ZeroRng, new InsecureSeeder), "secureSeeder")
     actorSystem.actorOf(Props[FailureActor], "failure")
     actorSystem
   }

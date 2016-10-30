@@ -1,6 +1,5 @@
 package com.jejking.rprng.api
 
-import com.jejking.rprng.rng.RandomIntegerCollectionResponse
 import spray.json.{DefaultJsonProtocol, RootJsonFormat}
 
 /**

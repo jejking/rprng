@@ -6,7 +6,7 @@ import akka.actor.{ActorSystem, Props}
 import akka.http.scaladsl.model.{ContentTypes, StatusCodes}
 import akka.stream.ActorMaterializer
 import akka.util.ByteString
-import com.jejking.rprng.rng.TestUtils.{FailureActor, InsecureSeeder, ZeroRandomSource}
+import com.jejking.rprng.rng.TestUtils.{FailureActor, InsecureSeeder, ZeroRng}
 import com.jejking.rprng.rng._
 import org.apache.commons.math3.random.Well44497a
 import org.scalatest.concurrent.ScalaFutures
@@ -32,7 +32,7 @@ class RoutingHelperSpec extends FlatSpec with Matchers with ScalaFutures with Be
   def initActorSystem(): ActorSystem = {
 
     val actorSystem = ActorSystem("akkaStreamsHelperSpec")
-    actorSystem.actorOf(RandomSourceActor.props(new ZeroRandomSource, new InsecureSeeder), "randomRouter")
+    actorSystem.actorOf(RngActor.props(new ZeroRng, new InsecureSeeder), "randomRouter")
     actorSystem.actorOf(Props[FailureActor], "failure")
     actorSystem
   }
@@ -41,8 +41,8 @@ class RoutingHelperSpec extends FlatSpec with Matchers with ScalaFutures with Be
     val secureRandom = new SecureRandom()
     val secureSeeder = new SecureRandomSeeder(secureRandom)
     val randomGenerator = RandomGeneratorFactory.createNewGeneratorInstance[Well44497a]
-    val randomGeneratorByteSource = RandomGeneratorSource(randomGenerator)
-    system.actorOf(RandomSourceActor.props(randomGeneratorByteSource, secureSeeder), "randomlyRandom")
+    val randomGeneratorByteSource = CommonsMathRng(randomGenerator)
+    system.actorOf(RngActor.props(randomGeneratorByteSource, secureSeeder), "randomlyRandom")
   }
 
   "the akka streams helper" should "deliver a block of random bytes" in {

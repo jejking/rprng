@@ -6,9 +6,9 @@ import org.scalamock.scalatest.MockFactory
 import org.scalatest.{FlatSpec, Matchers}
 
 /**
- * Simple tests of [[RandomGeneratorSource]].
+ * Simple tests of [[CommonsMathRng]].
  */
-class RandomGeneratorSourceSpec extends FlatSpec with Matchers with MockFactory {
+class CommonsMathRngSpec extends FlatSpec with Matchers with MockFactory {
 
   "a commons math byte source" should "generate request an array of bytes of correct size from underlying generator" in {
 
@@ -19,7 +19,7 @@ class RandomGeneratorSourceSpec extends FlatSpec with Matchers with MockFactory 
       (ba: Array[Byte]) => ba.length == 4
     }).onCall((ba: Array[Byte]) => notVeryRandomBytes.copyToArray(ba))
 
-    val byteSource = RandomGeneratorSource(randomGenerator)
+    val byteSource = CommonsMathRng(randomGenerator)
 
     val actual = byteSource.randomBytes(RandomByteRequest(4))
     actual should be (notVeryRandomBytes)
@@ -30,14 +30,14 @@ class RandomGeneratorSourceSpec extends FlatSpec with Matchers with MockFactory 
     val mockedGenerator = mock[RandomGenerator]
     (mockedGenerator.setSeed(_: Long)).expects(123L)
 
-    val byteSourceWithMockGenerator = new RandomGeneratorSource(mockedGenerator)
+    val byteSourceWithMockGenerator = new CommonsMathRng(mockedGenerator)
     byteSourceWithMockGenerator.reseed(123L)
   }
 
 
   it should "reject a request for 0 bytes" in {
 
-    val byteSource = RandomGeneratorSource(mock[RandomGenerator])
+    val byteSource = CommonsMathRng(mock[RandomGenerator])
     intercept[IllegalArgumentException] {
       byteSource.randomBytes(RandomByteRequest(0))
     }
@@ -45,7 +45,7 @@ class RandomGeneratorSourceSpec extends FlatSpec with Matchers with MockFactory 
 
   it should "reject a request for -1 bytes" in {
 
-    val byteSource = RandomGeneratorSource(mock[RandomGenerator])
+    val byteSource = CommonsMathRng(mock[RandomGenerator])
     intercept[IllegalArgumentException] {
       byteSource.randomBytes(RandomByteRequest(-1))
     }
@@ -58,7 +58,7 @@ class RandomGeneratorSourceSpec extends FlatSpec with Matchers with MockFactory 
       (ba: Array[Byte]) => ba.length == 8
     }).onCall((ba: Array[Byte]) => eightZeroes.copyToArray(ba))
 
-    val source = RandomGeneratorSource(randomGenerator)
+    val source = CommonsMathRng(randomGenerator)
 
     val notVeryRandomLong = source.nextLong()
 
@@ -73,7 +73,7 @@ class RandomGeneratorSourceSpec extends FlatSpec with Matchers with MockFactory 
       (ba: Array[Byte]) => ba.length == 4
     }).onCall((ba: Array[Byte]) => fourZeroes.copyToArray(ba))
 
-    val source = RandomGeneratorSource(randomGenerator)
+    val source = CommonsMathRng(randomGenerator)
 
     val notVeryRandomInt = source.nextInt()
 
@@ -85,7 +85,7 @@ class RandomGeneratorSourceSpec extends FlatSpec with Matchers with MockFactory 
     val randomGenerator = mock[RandomGenerator]
     (randomGenerator.nextInt (_:Int)).expects(10).returning(7)
 
-    val source = RandomGeneratorSource(randomGenerator)
+    val source = CommonsMathRng(randomGenerator)
     val notVeryRandomInt = source.nextInt(10)
 
     notVeryRandomInt should be (7)
@@ -93,7 +93,7 @@ class RandomGeneratorSourceSpec extends FlatSpec with Matchers with MockFactory 
 
   it should "respect the bounds between zero and the specified positive int bound" in {
     val randomGenerator = new MersenneTwister
-    val source = RandomGeneratorSource(randomGenerator)
+    val source = CommonsMathRng(randomGenerator)
     val frequency = new Frequency()
     for (i <- 1 to 10000) {
       val randomInt = source.nextInt(10)
@@ -109,7 +109,7 @@ class RandomGeneratorSourceSpec extends FlatSpec with Matchers with MockFactory 
 
   it should "respect the bounds between min and max when requesting a customer range" in {
     val randomGenerator = new MersenneTwister
-    val source = RandomGeneratorSource(randomGenerator)
+    val source = CommonsMathRng(randomGenerator)
     val frequency = new Frequency()
     for (i <- 1 to 10000) {
       val randomInt = source.nextInt(RandomIntRequest(11, 20))
@@ -125,7 +125,7 @@ class RandomGeneratorSourceSpec extends FlatSpec with Matchers with MockFactory 
 
   it should "respect the bounds between min and max when using negative to positive range" in {
     val randomGenerator = new MersenneTwister
-    val source = RandomGeneratorSource(randomGenerator)
+    val source = CommonsMathRng(randomGenerator)
 
     for (i <- 1 to 1000) {
       val randomInt = source.nextInt(RandomIntRequest(-10, 20))
@@ -136,7 +136,7 @@ class RandomGeneratorSourceSpec extends FlatSpec with Matchers with MockFactory 
 
   it should "respect the bounds between min and max when using range of negative integers" in {
     val randomGenerator = new MersenneTwister
-    val source = RandomGeneratorSource(randomGenerator)
+    val source = CommonsMathRng(randomGenerator)
 
     for (i <- 1 to 1000) {
       val randomInt = source.nextInt(RandomIntRequest(-20, -10))
@@ -147,7 +147,7 @@ class RandomGeneratorSourceSpec extends FlatSpec with Matchers with MockFactory 
 
   it should "generate a random int when min and max are " + Int.MinValue + " and " + Int.MaxValue in {
     val randomGenerator = new MersenneTwister
-    val source = RandomGeneratorSource(randomGenerator)
+    val source = CommonsMathRng(randomGenerator)
 
     source.nextInt(RandomIntRequest(Int.MinValue, Int.MaxValue))
   }

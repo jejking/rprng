@@ -16,7 +16,7 @@ object TestUtils {
     override def generateSeed(): Long = 0L
   }
 
-  class ZeroRandomSource extends RandomSource {
+  class ZeroRng extends Rng {
     override def randomBytes(request: RandomByteRequest): Array[Byte] = Array(0.toByte, 0.toByte, 0.toByte, 0.toByte, 0.toByte, 0.toByte, 0.toByte, 0.toByte)
 
     override def reseed(seed: Long): Unit = {}

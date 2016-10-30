@@ -5,7 +5,7 @@ import akka.stream.ActorMaterializer
 import akka.stream.actor.ActorPublisher
 import akka.stream.scaladsl.Source
 import akka.util.ByteString
-import com.jejking.rprng.rng.RandomSourceActor.TimeRangeToReseed
+import com.jejking.rprng.rng.RngActor.TimeRangeToReseed
 import com.jejking.rprng.rng._
 import org.reactivestreams.Publisher
 
@@ -14,7 +14,7 @@ import scala.concurrent.duration._
 import scala.language.postfixOps
 
 /**
- * Creates a bunch of [[RandomSourceActor]] instances, puts them behind
+ * Creates a bunch of [[RngActor]] instances, puts them behind
  * an Akka Random Router, hooks up a reactive stream to the router and writes
  * the stream as raw bytes to stdout until the program is killed.
  *

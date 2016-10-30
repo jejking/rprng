@@ -1,4 +1,4 @@
-package com.jejking.rprng.rng
+package com.jejking.rprng.api
 
 import org.scalatest.{FlatSpec, Matchers}
 
