@@ -2,6 +2,7 @@ package com.jejking.rprng.rng
 
 import java.nio.ByteBuffer
 
+import akka.util.ByteString
 import org.apache.commons.math3.random.RandomGenerator
 
 /**
@@ -51,6 +52,7 @@ trait Rng {
   def nextLong(): Long = {
     val bytes = randomBytes(RandomByteRequest(8))
     val wrapper = ByteBuffer.wrap(bytes)
+    val byteString = ByteString(bytes)
     wrapper.getLong
   }
 

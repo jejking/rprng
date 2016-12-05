@@ -107,7 +107,7 @@ class CommonsMathRngSpec extends FlatSpec with Matchers with MockFactory {
     }
   }
 
-  it should "respect the bounds between min and max when requesting a customer range" in {
+  it should "respect the bounds between min and max when requesting a positive range" in {
     val randomGenerator = new MersenneTwister
     val source = CommonsMathRng(randomGenerator)
     val frequency = new Frequency()
