@@ -1,4 +1,4 @@
-package com.jejking.rprng2
+package com.jejking.rprng.rng
 
 /**
   * Functions to operate on an [[EightByteString]] with a view

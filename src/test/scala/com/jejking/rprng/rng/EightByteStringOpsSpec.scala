@@ -1,7 +1,6 @@
-package com.jejking.rprng2
+package com.jejking.rprng.rng
 
 import akka.util.ByteString
-import com.jejking.rprng.rng.{CommonsMathRng, RandomIntRequest}
 import org.apache.commons.math3.random.MersenneTwister
 import org.apache.commons.math3.stat.Frequency
 import org.scalatest.{FlatSpec, Matchers}

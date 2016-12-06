@@ -26,7 +26,7 @@ class RngActorSpec extends TestKit(ActorSystem("test")) with DefaultTimeout with
   implicit override val patienceConfig = PatienceConfig(timeout = 1 second, interval = 100 milliseconds)
 
 
-  "the random byte source actor" should "send respond with bytes from the wrapped byte source in response to a request" in {
+  "the random byte source actor" should "respond with bytes from the wrapped byte source in response to a request" in {
 
     val request = RandomByteRequest(4)
     val notVeryRandomBytes = Array[Byte](1, 2, 3, 4)
@@ -50,6 +50,31 @@ class RngActorSpec extends TestKit(ActorSystem("test")) with DefaultTimeout with
 
     actual shouldBe notVeryRandomBytes
     actual shouldBe a [ByteString]
+  }
+
+  it should "response with eight bytes from the wrapped bye source in response to a EightByteStringRequest" in {
+    val notVeryRandomBytes = Array[Byte](1, 2, 3, 4, 5, 6, 7, 8)
+
+    val mockByteSource = mock[Rng]
+    (mockByteSource.randomBytes _).expects(where {
+      (request: RandomByteRequest) => request.count == 8
+    }).returning(notVeryRandomBytes)
+    (mockByteSource.reseed _).expects(*)
+
+    (mockByteSource.nextInt (_: Int)).expects(*)
+
+    val fixedSecureSeeder = stub[SecureSeeder]
+    val actorRef = TestActorRef(new RngActor(mockByteSource, fixedSecureSeeder))
+
+    // send request for an EightByteString
+    val future = actorRef ? EightByteStringRequest
+
+    val expected = EightByteString(ByteString(notVeryRandomBytes))
+
+    val actual = future.value.get.get
+
+    actual shouldBe expected
+    actual shouldBe a [EightByteString]
   }
 
   it should "request and return a random integer on receiving RandomAnyIntRequest" in {

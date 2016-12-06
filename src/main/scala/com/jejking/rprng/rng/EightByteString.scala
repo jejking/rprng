@@ -1,4 +1,4 @@
-package com.jejking.rprng2
+package com.jejking.rprng.rng
 
 import akka.util.ByteString
 

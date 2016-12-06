@@ -4,12 +4,12 @@ import java.util.concurrent.TimeUnit
 
 import akka.actor._
 import akka.util.ByteString
+
 import com.jejking.rprng.rng.RngActor.TimeRangeToReseed
 
 import scala.concurrent.duration.{FiniteDuration, _}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.blocking
-
 import scala.language.postfixOps
 
 /**
@@ -64,6 +64,10 @@ class RngActor(private val rng: Rng, private val secureSeeder: SecureSeeder,
         val max = r.maxBound
         log.debug(s"processed request for random int between $min and $max")
       }
+    }
+
+    case EightByteStringRequest => {
+      sender() ! EightByteString(ByteString(rng.randomBytes(RandomByteRequest(8))))
     }
 
     // trigger reseed
@@ -147,6 +151,8 @@ object RngActor {
      * Instruction to the actor to ask for more seed to apply
      */
     case object Reseed
+
+    case object EightByteStringRequest
 
     // errors
     sealed trait Error
