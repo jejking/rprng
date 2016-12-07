@@ -82,7 +82,7 @@ object EightByteStringOps {
   }
 
   /**
-    * Converst to a [[Long]] using the full eight bytes.
+    * Converts to a [[Long]] using the full eight bytes.
     * @param eightByteString input
     * @return converted to a long
     */
