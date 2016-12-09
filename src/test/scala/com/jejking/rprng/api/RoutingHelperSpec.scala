@@ -8,6 +8,7 @@ import akka.stream.ActorMaterializer
 import akka.util.ByteString
 import com.jejking.rprng.rng.TestUtils.{FailureActor, InsecureSeeder, ZeroRng}
 import com.jejking.rprng.rng._
+import com.jejking.rprng.rng.actors.RngActor
 import org.apache.commons.math3.random.Well44497a
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.time.{Seconds, Span}

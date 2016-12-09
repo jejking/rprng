@@ -4,10 +4,10 @@ import akka.actor.{ActorLogging, Props}
 import akka.stream.actor.ActorPublisher
 import akka.stream.actor.ActorPublisherMessage.{Cancel, Request}
 import akka.util.{ByteString, Timeout}
+import com.jejking.rprng.rng.actors.RngActor
 
 import scala.concurrent.Future
 import scala.concurrent.duration._
-
 import scala.language.postfixOps
 
 /**

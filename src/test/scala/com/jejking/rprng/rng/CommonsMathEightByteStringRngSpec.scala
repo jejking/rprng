@@ -29,7 +29,7 @@ class CommonsMathEightByteStringRngSpec extends FlatSpec with Matchers with Mock
     (randomGenerator.setSeed(_: Long)).expects(123L)
 
     val byteSource = CommonsMathEightByteStringRng(randomGenerator)
-    byteSource.seed(123L)
+    byteSource.seed(Seed(123L))
   }
 
 }

@@ -5,13 +5,12 @@ import java.util.concurrent.TimeUnit
 
 import akka.actor.{ActorRef, ActorSystem}
 import akka.routing.RandomGroup
-import com.jejking.rprng.rng.RngActor.TimeRangeToReseed
-import com.jejking.rprng.rng.{RandomGeneratorFactory, CommonsMathRng, RngActor, SecureRandomSeeder}
+import com.jejking.rprng.rng.actors.{RngActor, TimeRangeToReseed}
+import com.jejking.rprng.rng.{CommonsMathRng, RandomGeneratorFactory, SecureRandomSeeder}
 import com.typesafe.config.Config
 import org.apache.commons.math3.random.ISAACRandom
 
 import scala.concurrent.duration._
-
 import scala.language.postfixOps
 
 /**
@@ -37,7 +36,7 @@ package object main {
   }
 
   /**
-    * Sets up the required number of [[com.jejking.rprng.rng.RngActor]] instances behind
+    * Sets up the required number of [[RngActor]] instances behind
     * an akka [[RandomGroup]].
     *
     * @param actorSystem the actor system to use to set up the actors

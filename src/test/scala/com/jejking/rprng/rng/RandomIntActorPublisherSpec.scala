@@ -7,6 +7,7 @@ import akka.stream.scaladsl.Source
 import akka.stream.testkit.scaladsl.TestSink
 import akka.testkit.TestProbe
 import com.jejking.rprng.rng.TestUtils.{FailureActor, InsecureSeeder, ZeroRng}
+import com.jejking.rprng.rng.actors.RngActor
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.{BeforeAndAfterAll, FlatSpec, Matchers}
 

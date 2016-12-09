@@ -5,12 +5,11 @@ import akka.stream.ActorMaterializer
 import akka.stream.actor.ActorPublisher
 import akka.stream.scaladsl.Source
 import akka.util.ByteString
-import com.jejking.rprng.rng.RngActor.TimeRangeToReseed
 import com.jejking.rprng.rng._
+import com.jejking.rprng.rng.actors.{RngActor, TimeRangeToReseed}
 import org.reactivestreams.Publisher
 
 import scala.concurrent.duration._
-
 import scala.language.postfixOps
 
 /**

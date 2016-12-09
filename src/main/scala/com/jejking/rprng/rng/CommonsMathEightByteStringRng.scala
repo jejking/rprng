@@ -8,7 +8,7 @@ import org.apache.commons.math3.random.RandomGenerator
   *
   * @param randomGenerator
   */
-class CommonsMathEightByteStringRng(private val randomGenerator: RandomGenerator) extends EightByteStringRng {
+class CommonsMathEightByteStringRng(private val randomGenerator: RandomGenerator) extends RandomEightByteStringGenerator {
 
   /**
     * Generates a new, (pseudo)-random [[EightByteString]] for
@@ -27,8 +27,8 @@ class CommonsMathEightByteStringRng(private val randomGenerator: RandomGenerator
     *
     * @param seed new seed. Should be supplied from a good source of randomness.
     */
-  override def seed(seed: Long): Unit = {
-    randomGenerator.setSeed(seed)
+  override def seed(seed: Seed): Unit = {
+    randomGenerator.setSeed(seed.seed)
   }
 }
 

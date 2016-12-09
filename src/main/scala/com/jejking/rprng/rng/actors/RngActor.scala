@@ -1,15 +1,11 @@
-package com.jejking.rprng.rng
+package com.jejking.rprng.rng.actors
 
-import java.util.concurrent.TimeUnit
 
 import akka.actor._
 import akka.util.ByteString
+import com.jejking.rprng.rng._
 
-import com.jejking.rprng.rng.RngActor.TimeRangeToReseed
-
-import scala.concurrent.duration.{FiniteDuration, _}
-import scala.concurrent.{ExecutionContext, Future}
-import scala.concurrent.blocking
+import scala.concurrent.{Future, blocking}
 import scala.language.postfixOps
 
 /**
@@ -24,12 +20,32 @@ class RngActor(private val rng: Rng, private val secureSeeder: SecureSeeder,
                private val timeRangeToReseed: TimeRangeToReseed = TimeRangeToReseed()) extends Actor with ActorLogging {
 
   import RngActor.Protocol._
-  import RngActor._
 
   import scala.concurrent.ExecutionContext.Implicits.global
 
-  val scheduleHelper  =  scheduleHelperCreator(context.system)
-  val actorPath = context.self.path
+  private val scheduleHelper  =  scheduleHelperCreator(context.system)
+  private val actorPath = context.self.path
+
+  class RngRandomEightByteGenerator extends RandomEightByteStringGenerator {
+    /**
+      * Generates a random byte string of length 8.
+      *
+      * @return an [[EightByteString]]
+      */
+    override def randomEightByteString(): EightByteString = {
+      EightByteString(ByteString(rng.randomBytes(RandomByteRequest(8))))
+    }
+
+    /**
+      * Supplies some new random seed for an underlying PRNG.
+      *
+      * @param seed
+      */
+    override def seed(seed: Seed): Unit = {}
+  }
+
+  private val rngRandomEightByteGenerator = new RngRandomEightByteGenerator
+
 
   override def preStart(): Unit = {
     log.info(s"reseed interval is: $timeRangeToReseed")
@@ -64,10 +80,6 @@ class RngActor(private val rng: Rng, private val secureSeeder: SecureSeeder,
         val max = r.maxBound
         log.debug(s"processed request for random int between $min and $max")
       }
-    }
-
-    case EightByteStringRequest => {
-      sender() ! EightByteString(ByteString(rng.randomBytes(RandomByteRequest(8))))
     }
 
     // trigger reseed
@@ -108,7 +120,7 @@ class RngActor(private val rng: Rng, private val secureSeeder: SecureSeeder,
 
   def scheduleReseed(): Unit = {
     // non-blocking computation
-    val timeToReseed = computeScheduledTimeToReseed(timeRangeToReseed, rng)
+    val timeToReseed = TimeRangeToReseed.computeScheduledTimeToReseed(timeRangeToReseed, rngRandomEightByteGenerator)
     scheduleHelper.scheduleOnce(timeToReseed) {
       self ! Reseed
       log.info("sent reseed message to actor " + actorPath)
@@ -116,23 +128,9 @@ class RngActor(private val rng: Rng, private val secureSeeder: SecureSeeder,
   }
 }
 
-/**
- * Isolates the functionality we need from the Akka Scheduler.
- */
-trait ScheduleHelper {
-  def scheduleOnce(delay: FiniteDuration)(f: ⇒ Unit)(implicit executor: ExecutionContext): Cancellable
-}
 
-/**
- * Standard implementation that simply delegates to the akka scheduler.
- * @param scheduler reference to an akka scheduler to delegate to
- */
-class AkkaScheduleHelper(scheduler: Scheduler) extends ScheduleHelper {
 
-  override def scheduleOnce(delay: FiniteDuration)(f: ⇒ Unit)(implicit executor: ExecutionContext): Cancellable =  {
-    scheduler.scheduleOnce(delay)(f)
-  }
-}
+
 
 /**
  * Defines constants and helper function.
@@ -152,29 +150,9 @@ object RngActor {
      */
     case object Reseed
 
-    case object EightByteStringRequest
-
     // errors
     sealed trait Error
     case object UnknownInputType extends Error
-  }
-
-
-  /**
-   * Default time to reseed is between one and eight hours, a completely arbitrary time span.
-   */
-
-  val defaultMinLifeTime = FiniteDuration(1, TimeUnit.HOURS)
-  val defaultMaxLifeTime = FiniteDuration(8, TimeUnit.HOURS)
-
-  /**
-   * Defines a period of time within which the underlying PRNG should be reseeded.
-   * @param minLifeTime minimum period of time to reseed
-   * @param maxLifeTime maximum period of time to reseed
-   * @throws IllegalArgumentException if min is less than max, as might be expected
-   */
-  case class TimeRangeToReseed(minLifeTime: FiniteDuration = defaultMinLifeTime, maxLifeTime: FiniteDuration = defaultMaxLifeTime) {
-    require(minLifeTime < maxLifeTime, "minLifeTime must be less than maxLifeTime")
   }
 
 
@@ -198,20 +176,7 @@ object RngActor {
   def props(randomByteSource: Rng, secureSeeder: SecureSeeder, timeRangeToReseed: TimeRangeToReseed): Props =
     Props(new RngActor(rng = randomByteSource, secureSeeder = secureSeeder, timeRangeToReseed = timeRangeToReseed))
 
-  /**
-   * Utility function to find a random duration between the min and max of the configured time range which will
-   * be used to schedule a reseeding of the underlying PRNG.
-   * @param config determines the limits between which the point to reseed will lie
-   * @param randomBytesource used to find a random point between the limits
-   * @return a duration (de factor relative to "now") that effectively represents the point in time at which
-   *         the reseeding should be scheduled to start
-   */
-  def computeScheduledTimeToReseed(config: TimeRangeToReseed, randomBytesource: Rng): FiniteDuration = {
-    val actualDuration = config.maxLifeTime - config.minLifeTime
-    val numberOfMillis = actualDuration.toMillis.asInstanceOf[Int]
-    val randomInterval = randomBytesource.nextInt(numberOfMillis)
-    config.minLifeTime + (randomInterval milliseconds)
-  }
+
 
 
 

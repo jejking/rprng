@@ -19,7 +19,7 @@ trait RandomEightByteStringGenerator {
     * Supplies some new random seed for an underlying PRNG.
     * @param seed
     */
-  def reseed(seed: Long): Unit
+  def seed(seed: Seed): Unit
 
 }
 
@@ -31,7 +31,19 @@ class CommonsMathRandomEightByteStringGenerator(randomGenerator: RandomGenerator
     EightByteString(ByteString(theArray))
   }
 
-  override def reseed(seed: Long): Unit = {
-    randomGenerator.setSeed(seed)
+  override def seed(seed: Seed): Unit = {
+    randomGenerator.setSeed(seed.seed)
   }
 }
+
+/**
+  * Case object encapsulating a request for an [[EightByteString]] for
+  * example in an actor.
+  */
+case object EightByteStringRequest
+
+/**
+  * Tiny type encapsulating new seed for a PRNG.
+  * @param seed
+  */
+case class Seed(seed: Long) extends AnyVal
