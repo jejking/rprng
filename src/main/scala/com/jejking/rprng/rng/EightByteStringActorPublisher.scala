@@ -4,6 +4,7 @@ import akka.actor.ActorLogging
 import akka.stream.actor.ActorPublisher
 import akka.stream.actor.ActorPublisherMessage.{Cancel, Request}
 import akka.util.Timeout
+import com.jejking.rprng.rng.actors.Protocol.EightByteStringRequest
 import com.jejking.rprng.rng.actors.RngActor
 
 import scala.concurrent.duration._
@@ -16,7 +17,7 @@ import scala.language.postfixOps
   * In a web application such publishers are expected to be created at the API level and to be relatively short-lived.
   *
   * @param eightByteStringServicePath the wrapped actor path. Must exist and be able to process
-  *                                   [[EightByteStringRequest]] messages.
+  *                                   [[com.jejking.rprng.rng.actors.Protocol.EightByteStringRequest]] messages.
   */
 class EightByteStringActorPublisher(val eightByteStringServicePath: String) extends ActorPublisher[EightByteString]
   with ActorLogging{

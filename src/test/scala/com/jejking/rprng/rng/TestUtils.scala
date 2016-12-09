@@ -6,11 +6,11 @@ import akka.actor.Actor
 import akka.util.ByteString
 
 /**
- * Holds some useful test classes and things.
+ * Holds some useful test classes, constants and things.
  */
 object TestUtils {
 
-  val arrayOfEightZeroBytes: Array[Byte] = Array.ofDim(8)
+  def arrayOfEightZeroBytes(): Array[Byte] = Array.ofDim(8)
   val eightByteStringOfZeroes: EightByteString = EightByteString(ByteString.fromArray(arrayOfEightZeroBytes))
 
   class InsecureSeeder extends SecureSeeder {
@@ -62,7 +62,7 @@ object TestUtils {
 
   class FailureActor extends Actor {
     override def receive: Actor.Receive = {
-      case _ => sender() ! akka.actor.Status.Failure(new RuntimeException("I fail"))
+      case _ => sender() ! akka.actor.Status.Failure(new RuntimeException("I hereby fail miserably"))
     }
   }
 

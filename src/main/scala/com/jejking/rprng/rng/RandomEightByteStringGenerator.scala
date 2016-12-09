@@ -36,11 +36,7 @@ class CommonsMathRandomEightByteStringGenerator(randomGenerator: RandomGenerator
   }
 }
 
-/**
-  * Case object encapsulating a request for an [[EightByteString]] for
-  * example in an actor.
-  */
-case object EightByteStringRequest
+
 
 /**
   * Tiny type encapsulating new seed for a PRNG.

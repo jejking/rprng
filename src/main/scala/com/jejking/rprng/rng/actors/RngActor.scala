@@ -19,7 +19,7 @@ class RngActor(private val rng: Rng, private val secureSeeder: SecureSeeder,
                private val scheduleHelperCreator: (ActorSystem) => ScheduleHelper = a => new AkkaScheduleHelper(a.scheduler),
                private val timeRangeToReseed: TimeRangeToReseed = TimeRangeToReseed()) extends Actor with ActorLogging {
 
-  import RngActor.Protocol._
+  import Protocol._
 
   import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -86,7 +86,7 @@ class RngActor(private val rng: Rng, private val secureSeeder: SecureSeeder,
     case Reseed => fetchSeedAndNotify()
 
     // apply fresh seed, non blocking action
-    case newSeed: NewSeed => applyNewSeedAndScheduleReseed(newSeed)
+    case newSeed: Seed => applyNewSeedAndScheduleReseed(newSeed)
 
     // ooops
     case _ => {
@@ -95,7 +95,7 @@ class RngActor(private val rng: Rng, private val secureSeeder: SecureSeeder,
     }
   }
 
-  def applyNewSeedAndScheduleReseed(newSeed: NewSeed): Unit = {
+  def applyNewSeedAndScheduleReseed(newSeed: Seed): Unit = {
     this.rng.reseed(newSeed.seed)
     log.info("applied new seed in actor " + actorPath)
 
@@ -112,7 +112,7 @@ class RngActor(private val rng: Rng, private val secureSeeder: SecureSeeder,
       blocking {
         val seed = secureSeeder.generateSeed()
         log.info("obtained fresh seed in actor " + actorPath)
-        self ! NewSeed(seed)
+        self ! Seed(seed)
       }
 
     }
@@ -137,23 +137,7 @@ class RngActor(private val rng: Rng, private val secureSeeder: SecureSeeder,
  */
 object RngActor {
 
-  object Protocol {
 
-    /**
-     * Wraps long that encapsulates eight bytes of seed to apply to the underlying PRNG.
-     * @param seed a long
-     */
-    case class NewSeed(seed: Long) extends AnyVal
-
-    /**
-     * Instruction to the actor to ask for more seed to apply
-     */
-    case object Reseed
-
-    // errors
-    sealed trait Error
-    case object UnknownInputType extends Error
-  }
 
 
 

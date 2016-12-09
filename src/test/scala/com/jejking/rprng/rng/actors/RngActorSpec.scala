@@ -20,8 +20,7 @@ import scala.language.postfixOps
 class RngActorSpec extends TestKit(ActorSystem("test")) with DefaultTimeout with ImplicitSender
   with FlatSpecLike with Matchers with BeforeAndAfterAll with MockFactory with Eventually with ScalaFutures  {
 
-  import RngActor.Protocol._
-  import RngActor._
+  import Protocol._
 
   implicit override val patienceConfig = PatienceConfig(timeout = 1 second, interval = 100 milliseconds)
 
