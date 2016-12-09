@@ -50,7 +50,7 @@ class RngActor(private val rng: Rng, private val secureSeeder: SecureSeeder,
   override def preStart(): Unit = {
     log.info(s"reseed interval is: $timeRangeToReseed")
     val seed = secureSeeder.generateSeed()
-    this.rng.reseed(seed)
+    this.rng.reseed(seed.seed)
     scheduleReseed()
     log.info("completed pre-start of " + actorPath)
 
@@ -112,7 +112,7 @@ class RngActor(private val rng: Rng, private val secureSeeder: SecureSeeder,
       blocking {
         val seed = secureSeeder.generateSeed()
         log.info("obtained fresh seed in actor " + actorPath)
-        self ! Seed(seed)
+        self ! seed
       }
 
     }
@@ -120,7 +120,7 @@ class RngActor(private val rng: Rng, private val secureSeeder: SecureSeeder,
 
   def scheduleReseed(): Unit = {
     // non-blocking computation
-    val timeToReseed = TimeRangeToReseed.computeScheduledTimeToReseed(timeRangeToReseed, rngRandomEightByteGenerator)
+    val timeToReseed = TimeRangeToReseed.durationToReseed(timeRangeToReseed, rngRandomEightByteGenerator)
     scheduleHelper.scheduleOnce(timeToReseed) {
       self ! Reseed
       log.info("sent reseed message to actor " + actorPath)
@@ -128,18 +128,10 @@ class RngActor(private val rng: Rng, private val secureSeeder: SecureSeeder,
   }
 }
 
-
-
-
-
 /**
  * Defines constants and helper function.
  */
 object RngActor {
-
-
-
-
 
   /**
    * Assembles Akka Props for the actor to avoid closing over actor state.

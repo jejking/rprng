@@ -42,12 +42,12 @@ class TimeRangeToReseedSpec extends FlatSpec with Matchers with MockFactory {
     val maxLifeTime: FiniteDuration = 2 minutes
 
     val lifeSpanRange = TimeRangeToReseed(minLifeTime, maxLifeTime)
-    TimeRangeToReseed.computeScheduledTimeToReseed(lifeSpanRange, byteSource) shouldBe (1 minute)
+    TimeRangeToReseed.durationToReseed(lifeSpanRange, byteSource) shouldBe (1 minute)
 
     val mersenneTwister = new MersenneTwister()
 
     for (i <- 1 to 100) {
-      val computedScheduledTimeOfDeath = TimeRangeToReseed.computeScheduledTimeToReseed(lifeSpanRange,
+      val computedScheduledTimeOfDeath = TimeRangeToReseed.durationToReseed(lifeSpanRange,
         new CommonsMathRandomEightByteStringGenerator(mersenneTwister))
       assert(computedScheduledTimeOfDeath >= minLifeTime)
       assert(computedScheduledTimeOfDeath <= maxLifeTime)

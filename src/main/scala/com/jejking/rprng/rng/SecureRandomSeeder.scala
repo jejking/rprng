@@ -13,7 +13,7 @@ trait SecureSeeder {
    * call this method in the receive block of an Actor.
    * @return long with 8 bytes of high quality randomness
    */
-  def generateSeed(): Long
+  def generateSeed(): Seed
 }
 
 /**
@@ -28,10 +28,10 @@ class SecureRandomSeeder(private val secureRandom: SecureRandom) extends SecureS
    *
    * @return a random long derived from the `generateSeed()` method of `SecureRandom`
    */
-  override def generateSeed(): Long = {
+  override def generateSeed(): Seed = {
     val bytes = secureRandom.generateSeed(8)
     val wrapper = ByteBuffer.wrap(bytes)
-    wrapper.getLong
+    Seed(wrapper.getLong)
   }
 
 }

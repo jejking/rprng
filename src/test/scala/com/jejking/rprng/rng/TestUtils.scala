@@ -18,7 +18,7 @@ object TestUtils {
      * Generates a long. Implementations may block.
      * @return
      */
-    override def generateSeed(): Long = 0L
+    override def generateSeed(): Seed = Seed(0L)
   }
 
   /**

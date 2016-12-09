@@ -2,7 +2,7 @@ package com.jejking.rprng.rng.actors
 
 import java.util.concurrent.TimeUnit
 
-import com.jejking.rprng.rng.{RandomEightByteStringGenerator, Rng}
+import com.jejking.rprng.rng.RandomEightByteStringGenerator
 
 import scala.concurrent.duration._
 import scala.language.postfixOps
@@ -27,18 +27,19 @@ object TimeRangeToReseed {
 
   /**
     * Utility function to find a random duration between the min and max of the configured time range which will
-    * be used to schedule a reseeding of the underlying PRNG.*
+    * be used to schedule a reseeding of the underlying PRNG.
+    *
     * @param config determines the limits between which the point to reseed will lie
-    * @param eightStringRng used to find a random point between the limits
-    * @return a duration (de facto relative to "now") that effectively represents the point
+    * @param randomEightByteStringGenerator used to find a random point between the limits
+    * @return a duration (de facto from "now") that effectively represents the point
     *         in time at which the reseeding should be scheduled to start
     */
-  def computeScheduledTimeToReseed(config: TimeRangeToReseed, eightStringRng: RandomEightByteStringGenerator): FiniteDuration = {
+  def durationToReseed(config: TimeRangeToReseed, randomEightByteStringGenerator: RandomEightByteStringGenerator): FiniteDuration = {
     import com.jejking.rprng.rng.EightByteStringOps.toInt
 
     val actualDuration = config.maxLifeTime - config.minLifeTime
     val numberOfMillis = actualDuration.toMillis.asInstanceOf[Int]
-    val randomInterval = toInt(eightStringRng.randomEightByteString, numberOfMillis)
+    val randomInterval = toInt(randomEightByteStringGenerator.randomEightByteString, numberOfMillis)
     config.minLifeTime + (randomInterval milliseconds)
   }
 }

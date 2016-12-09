@@ -42,6 +42,7 @@ class RngActorSpec extends TestKit(ActorSystem("test")) with DefaultTimeout with
     }).returning(fourNotVeryRandomBytes)
 
     val fixedSecureSeeder = stub[SecureSeeder]
+    (fixedSecureSeeder.generateSeed _).when().returning(Seed(0L))
     val actorRef = system.actorOf(RngActor.props(mockByteSource, fixedSecureSeeder))
 
     // send request for four "random" bytes
@@ -60,6 +61,7 @@ class RngActorSpec extends TestKit(ActorSystem("test")) with DefaultTimeout with
     (mockRandomSource.reseed _).expects(*)
 
     val fixedSecureSeeder = stub[SecureSeeder]
+    (fixedSecureSeeder.generateSeed _).when().returning(Seed(0L))
     val actorRef = TestActorRef(new RngActor(mockRandomSource, fixedSecureSeeder))
 
     // send request for any random int
@@ -82,6 +84,7 @@ class RngActorSpec extends TestKit(ActorSystem("test")) with DefaultTimeout with
 
 
     val fixedSecureSeeder = stub[SecureSeeder]
+    (fixedSecureSeeder.generateSeed _).when().returning(Seed(0L))
     val actorRef = TestActorRef(new RngActor(mockRandomSource, fixedSecureSeeder))
 
     // send request for any random int
@@ -96,7 +99,7 @@ class RngActorSpec extends TestKit(ActorSystem("test")) with DefaultTimeout with
   it should "initialise itself from a proper seed source" in {
     val mockByteSource = mock[Rng]
     val mockSecureSeeder = mock[SecureSeeder]
-    (mockSecureSeeder.generateSeed _).expects()
+    (mockSecureSeeder.generateSeed _).expects().returning(Seed(0L))
     (mockByteSource.reseed _).expects(*)
     (mockByteSource.randomBytes _).expects(where {
       (request: RandomByteRequest) => request.count == 8
@@ -115,7 +118,7 @@ class RngActorSpec extends TestKit(ActorSystem("test")) with DefaultTimeout with
     
 
     val mockSecureSeeder = mock[SecureSeeder]
-    (mockSecureSeeder.generateSeed _).expects().returning(0)
+    (mockSecureSeeder.generateSeed _).expects().returning(Seed(0))
 
     val mockScheduleHelper = mock[ScheduleHelper]
     // we expect that the scheduler is called to send a reseed message between min and max duration from now...
@@ -142,7 +145,7 @@ class RngActorSpec extends TestKit(ActorSystem("test")) with DefaultTimeout with
     (mockByteSource.reseed _).expects(0)
 
     val mockSecureSeeder = mock[SecureSeeder]
-    (mockSecureSeeder.generateSeed _).expects().atLeastTwice()
+    (mockSecureSeeder.generateSeed _).expects().returning(Seed(0L)).atLeastTwice()
     val actorRef = TestActorRef(new RngActor(mockByteSource, mockSecureSeeder, timeRangeToReseed = timeRange))
 
     Thread.sleep(250) // wait for the async stuff to happen before evaluating the expectations
@@ -160,7 +163,7 @@ class RngActorSpec extends TestKit(ActorSystem("test")) with DefaultTimeout with
     (mockByteSource.reseed _).expects(*).atLeastTwice()
 
     val mockSecureSeeder = mock[SecureSeeder]
-    (mockSecureSeeder.generateSeed _).expects().atLeastTwice()
+    (mockSecureSeeder.generateSeed _).expects().returning(Seed(0L)).atLeastTwice()
     val actorRef = TestActorRef(new RngActor(mockByteSource, mockSecureSeeder, timeRangeToReseed = timeRange))
 
     Thread.sleep(250) // wait for the async stuff to happen before evaluating the expectations
@@ -178,6 +181,7 @@ class RngActorSpec extends TestKit(ActorSystem("test")) with DefaultTimeout with
     (mockByteSource.reseed _).expects(*)
 
     val fixedSecureSeeder = stub[SecureSeeder]
+    (fixedSecureSeeder.generateSeed _).when().returning(Seed(0L))
     val actorRef = TestActorRef(new RngActor(mockByteSource, fixedSecureSeeder))
 
     // send request for four "random" bytes

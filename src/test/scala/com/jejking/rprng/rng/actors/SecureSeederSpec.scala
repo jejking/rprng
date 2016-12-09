@@ -1,6 +1,6 @@
 package com.jejking.rprng.rng.actors
 
-import com.jejking.rprng.rng.{SecureRandomSeeder, TestUtils}
+import com.jejking.rprng.rng.{SecureRandomSeeder, Seed, TestUtils}
 import org.scalatest.{FlatSpec, Matchers}
 
 /**
@@ -12,7 +12,7 @@ class SecureSeederSpec extends FlatSpec with Matchers {
     val secureRandom = new TestUtils.FixedSeedGeneratingSecureRandom()
     val secureSeeder = new SecureRandomSeeder(secureRandom)
 
-    secureSeeder.generateSeed() shouldBe byteArrayToLong(Array.ofDim(8))
+    secureSeeder.generateSeed() shouldBe Seed(byteArrayToLong(Array.ofDim(8)))
 
   }
 
