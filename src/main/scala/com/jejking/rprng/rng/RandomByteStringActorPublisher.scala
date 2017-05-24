@@ -78,7 +78,7 @@ class RandomByteStringActorPublisher(val byteStringSize: Int, val randomByteServ
 
 }
 
-object RandomByteStringActorPublisher {
+object  RandomByteStringActorPublisher {
 
   val standardActorPath = "/user/randomRouter"
 

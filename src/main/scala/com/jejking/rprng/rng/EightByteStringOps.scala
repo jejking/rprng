@@ -14,7 +14,7 @@ object EightByteStringOps {
     * @param eightByteString input
     * @return converted int
     */
-  def toInt(eightByteString: EightByteString): Int = {
+    def toInt(eightByteString: EightByteString): Int = {
     eightByteString.byteString.toByteBuffer.asIntBuffer().get()
   }
 

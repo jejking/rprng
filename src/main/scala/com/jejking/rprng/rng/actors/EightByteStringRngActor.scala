@@ -2,12 +2,24 @@ package com.jejking.rprng.rng.actors
 
 import akka.actor.Actor.Receive
 import akka.actor.{Actor, ActorLogging, ActorSystem, Props}
-import com.jejking.rprng.rng.actors.Protocol.Reseed
-import com.jejking.rprng.rng.{RandomEightByteStringGenerator, Rng, SecureSeeder}
+import akka.util.ByteString
+import com.jejking.rprng.rng.actors.Protocol.{EightByteStringRequest, Reseed, UnknownInputType}
+import com.jejking.rprng.rng._
+
+import scala.concurrent.{Future, blocking}
 
 /**
   * Actor encapsulating a [[RandomEightByteStringGenerator]] for thread safety and with additional
-  * capability to seed and then - at random intervals - reseed the underlying PRNG.
+  * capability to seed via a [[SecureSeeder]] and then - at random intervals - reseed the underlying PRNG.
+  *
+  * @param randomEightByteStringGenerator underlying generator that is wrapped with the thread safety and scheduling
+  *                                       capabilities of the actor
+  * @param secureSeeder source of secure randomness which is used to seed - and then reseed - the
+  *                     underlying generator
+  * @param scheduleHelperCreator abstraction over ability to schedule actions (here reseeding) in the
+  *                              future
+  * @param timeRangeToReseed abstraction over minimum and maximum time between which a random reseeding time
+  *                          is selected at which to schedule a reseed of the underlying generator.
   */
 class EightByteStringRngActor(private val randomEightByteStringGenerator: RandomEightByteStringGenerator,
                               private val secureSeeder: SecureSeeder,
@@ -19,14 +31,62 @@ class EightByteStringRngActor(private val randomEightByteStringGenerator: Random
   private implicit val ec = context.system.dispatcher
 
   override def preStart(): Unit = {
-    val seed = secureSeeder.generateSeed()
-    this.randomEightByteStringGenerator.seed(seed)
+    val theSeed = secureSeeder.generateSeed()
+    this.randomEightByteStringGenerator.seed(theSeed)
     scheduleReseed()
     log.info(s"completed pre-start of $actorPath")
+    println(s"Did preStart() of $actorPath")
+
   }
 
+  override def receive: Receive = {
+    // main use case, fetch random bytes on demand
+    case EightByteStringRequest => {
+      println("Got EightByteStringRequest")
+      //val eightByteString = randomEightByteStringGenerator.randomEightByteString()
 
-  override def receive: Receive = ???
+      sender() ! EightByteString(ByteString(1, 2, 3 ,4, 5 , 6, 7, 8))
+      //println(s"Sent EightByteString $eightByteString")
+      if (log.isDebugEnabled) {
+        log.debug("processed EightByteStringRequest")
+      }
+    }
+
+    // trigger reseed
+    case Reseed => fetchSeedAndNotify()
+
+    // apply fresh seed, non blocking action
+    case newSeed: Seed => applyNewSeedAndScheduleReseed(newSeed)
+
+    // ooops
+    case _ => {
+      log.warning("received unknown message type")
+      sender() ! UnknownInputType
+    }
+  }
+
+  def applyNewSeedAndScheduleReseed(newSeed: Seed): Unit = {
+    this.randomEightByteStringGenerator.seed(newSeed)
+    log.info("applied new seed in actor " + actorPath)
+
+    // and off we go for the next round at some point in the future
+    scheduleReseed()
+  }
+
+  def fetchSeedAndNotify(): Unit = {
+    log.info("about to trigger future to collect fresh seed for actor " + actorPath)
+    // generate seed is likely to block as the seeder gathers entropy
+    // therefore we do this in a future and send a message onto the actor's mailbox
+    // for async application once we have a result
+    Future {
+      blocking {
+        val seed = secureSeeder.generateSeed()
+        log.info("obtained fresh seed in actor " + actorPath)
+        self ! seed
+      }
+
+    }
+  }
 
   def scheduleReseed(): Unit = {
     // non-blocking computation
