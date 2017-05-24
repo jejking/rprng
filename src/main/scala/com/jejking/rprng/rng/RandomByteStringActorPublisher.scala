@@ -1,6 +1,6 @@
 package com.jejking.rprng.rng
 
-import akka.actor.{ActorLogging, Props}
+import akka.actor.{ActorLogging, ActorSelection, Props}
 import akka.stream.actor.ActorPublisher
 import akka.stream.actor.ActorPublisherMessage.{Cancel, Request}
 import akka.util.{ByteString, Timeout}
@@ -23,7 +23,7 @@ import scala.language.postfixOps
 class RandomByteStringActorPublisher(val byteStringSize: Int, val randomByteServicePath: String)
       extends ActorPublisher[ByteString] with ActorLogging {
 
-  val wrappedActorPath = context.actorSelection(randomByteServicePath)
+  val wrappedActorPath: ActorSelection = context.actorSelection(randomByteServicePath)
 
   implicit val timeout = Timeout(5 seconds)
 
