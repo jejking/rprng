@@ -39,7 +39,7 @@ libraryDependencies ++= {
 }
 
 test in assembly := {}
-mainClass in assembly := Some("com.jejking.rprng.api.Main")
+mainClass in assembly := Some("com.jejking.rprng.main.Main")
 
 lazy val rprng = (project in file(".")).
   enablePlugins(BuildInfoPlugin).
