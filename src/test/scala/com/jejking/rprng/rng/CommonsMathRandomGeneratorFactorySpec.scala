@@ -6,10 +6,10 @@ import org.scalatest.{FlatSpec, Matchers}
 /**
  * Tests factory.
  */
-class RandomGeneratorFactorySpec extends FlatSpec with Matchers {
+class CommonsMathRandomGeneratorFactorySpec extends FlatSpec with Matchers {
 
   "the factory" should "create a fresh instance of the requested PRNG" in {
-    val mt: MersenneTwister = RandomGeneratorFactory.createNewGeneratorInstance[MersenneTwister]
+    val mt: MersenneTwister = CommonsMathRandomGeneratorFactory.createNewGeneratorInstance[MersenneTwister]
     mt shouldBe a [MersenneTwister]
   }
 

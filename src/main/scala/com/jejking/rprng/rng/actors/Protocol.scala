@@ -3,15 +3,10 @@ package com.jejking.rprng.rng.actors
 import com.jejking.rprng.rng.Seed
 
 /**
-  * Defines the types that can be sent to an [[EightByteStringRngActor]] in addition
-  * to [[Seed]].
+  * Defines additional types that can be sent to and from an [[RngActor]] in addition
+  * to [[Seed]] and [[com.jejking.rprng.rng.RandomByteRequest]].
   */
 object Protocol {
-
-  /**
-    * Case object encapsulating a request for an [[com.jejking.rprng.rng.EightByteString]].
-    */
-  case object EightByteStringRequest
 
   /**
     * Instruction to the actor to ask for more seed to apply to the wrapped PRNG.

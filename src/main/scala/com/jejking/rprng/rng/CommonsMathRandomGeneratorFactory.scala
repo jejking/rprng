@@ -5,9 +5,9 @@ import org.apache.commons.math3.random.RandomGenerator
 import scala.reflect.ClassTag
 
 /**
- * Provides functionality to instantiate various PRNG types.
+ * Provides functionality to instantiate various Commons Math [[RandomGenerator]] types.
  */
-object RandomGeneratorFactory {
+object CommonsMathRandomGeneratorFactory {
 
   /**
    * Creates a new [[org.apache.commons.math3.random.RandomGenerator]] instance of the specified concrete type.

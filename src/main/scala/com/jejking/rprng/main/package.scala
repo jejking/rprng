@@ -49,7 +49,7 @@ package object main {
     val paths = (1 to myConfig.randomSourceActorCount).map { i =>
       val secureRandom = new SecureRandom()
       val secureSeeder = new SecureRandomSeeder(secureRandom)
-      val randomGenerator = RandomGeneratorFactory.createNewGeneratorInstance[ISAACRandom]
+      val randomGenerator = CommonsMathRandomGeneratorFactory.createNewGeneratorInstance[ISAACRandom]
       val randomGeneratorByteSource = CommonsMathRng(randomGenerator)
       actorSystem.actorOf(RngActor.props(randomGeneratorByteSource, secureSeeder, myConfig.timeRangeToReseed), "randomByteSource" + i)
     }

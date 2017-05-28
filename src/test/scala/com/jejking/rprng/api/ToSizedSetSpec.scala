@@ -4,7 +4,7 @@ import akka.actor._
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Keep, Sink, Source}
 import akka.stream.testkit.scaladsl.TestSink
-import com.jejking.rprng.rng.RandomGeneratorFactory
+import com.jejking.rprng.rng.CommonsMathRandomGeneratorFactory
 import org.apache.commons.math3.random.MersenneTwister
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{BeforeAndAfterAll, FlatSpec, Inspectors, Matchers}
@@ -47,7 +47,7 @@ class ToSizedSetSpec extends FlatSpec with Matchers with Inspectors with ScalaFu
 
     val randomIterator = new Iterator[Int] {
 
-      val rng = RandomGeneratorFactory.createNewGeneratorInstance[MersenneTwister]
+      val rng = CommonsMathRandomGeneratorFactory.createNewGeneratorInstance[MersenneTwister]
 
       override def hasNext: Boolean = true
 

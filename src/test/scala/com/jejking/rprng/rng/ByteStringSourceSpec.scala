@@ -5,7 +5,6 @@ import akka.actor.{Actor, ActorSelection, ActorSystem, Props}
 import akka.stream.scaladsl.{Keep, Sink, Source}
 import akka.stream.{ActorMaterializer, Graph, SourceShape}
 import akka.util.ByteString
-import com.jejking.rprng.rng.actors.Protocol.EightByteStringRequest
 import org.scalatest.{BeforeAndAfterAll, FlatSpec, Inspectors, Matchers}
 import org.scalatest.concurrent.ScalaFutures
 

@@ -1,6 +1,5 @@
 package com.jejking.rprng.rng.actors
 
-
 import akka.actor._
 import akka.util.ByteString
 import com.jejking.rprng.rng._

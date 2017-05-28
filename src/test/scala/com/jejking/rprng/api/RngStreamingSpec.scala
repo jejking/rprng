@@ -41,7 +41,7 @@ class RngStreamingSpec extends FlatSpec with Matchers with ScalaFutures with Bef
   def createProperlyRandomActor(): Unit = {
     val secureRandom = new SecureRandom()
     val secureSeeder = new SecureRandomSeeder(secureRandom)
-    val randomGenerator = RandomGeneratorFactory.createNewGeneratorInstance[Well44497a]
+    val randomGenerator = CommonsMathRandomGeneratorFactory.createNewGeneratorInstance[Well44497a]
     val randomGeneratorByteSource = CommonsMathRng(randomGenerator)
     system.actorOf(RngActor.props(randomGeneratorByteSource, secureSeeder), "randomlyRandom")
   }
