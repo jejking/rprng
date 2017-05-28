@@ -19,11 +19,6 @@ class CommonsMathRng(val randomGenerator: RandomGenerator) extends Rng {
     randomGenerator.setSeed(seed)
   }
 
-  override def nextInt(bound: Int): Int = {
-    require(bound > 0, s"Bound must be strictly positive, but was $bound")
-    randomGenerator.nextInt(bound)
-  }
-
 }
 
 

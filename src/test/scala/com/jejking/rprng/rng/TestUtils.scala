@@ -36,8 +36,7 @@ object TestUtils {
     override def randomBytes(request: RandomByteRequest): Array[Byte] = Array.ofDim(8)
 
     override def reseed(seed: Long): Unit = {}
-
-    override def nextInt(bound:Int): Int = 0
+    
   }
 
   class ZeroEightByteStringRng extends RandomEightByteStringGenerator {
