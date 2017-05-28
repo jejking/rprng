@@ -66,22 +66,6 @@ class RngActor(private val rng: Rng, private val secureSeeder: SecureSeeder,
       }
     }
 
-    case RandomAnyIntRequest => {
-      sender() ! rng.nextInt()
-      if (log.isDebugEnabled) {
-        log.debug("processed request for random int with no specified bounds")
-      }
-    }
-
-    case r: RandomIntRequest => {
-      sender() ! rng.nextInt(r)
-      if (log.isDebugEnabled) {
-        val min = r.minBound
-        val max = r.maxBound
-        log.debug(s"processed request for random int between $min and $max")
-      }
-    }
-
     // trigger reseed
     case Reseed => fetchSeedAndNotify()
 

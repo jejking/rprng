@@ -51,51 +51,6 @@ class RngActorSpec extends TestKit(ActorSystem("test")) with DefaultTimeout with
 
   }
 
-  it should "request and return a random integer on receiving RandomAnyIntRequest" in {
-
-    val mockRandomSource = mock[Rng]
-    (mockRandomSource.randomBytes _).expects(where {
-      (request: RandomByteRequest) => request.count == 8
-    }).returning(eightNotVeryRandomBytes)
-    (mockRandomSource.nextInt _).expects().returning(1234)
-    (mockRandomSource.reseed _).expects(*)
-
-    val fixedSecureSeeder = stub[SecureSeeder]
-    (fixedSecureSeeder.generateSeed _).when().returning(Seed(0L))
-    val actorRef = TestActorRef(new RngActor(mockRandomSource, fixedSecureSeeder))
-
-    // send request for any random int
-    val response = (actorRef ? RandomAnyIntRequest).mapTo[Int]
-
-    whenReady(response) { i =>
-      i should be (1234)
-    }
-
-  }
-
-  it should "request and return an appropriate random integer on receiving a RandomIntRequeest" in {
-
-    val mockRandomSource = mock[Rng]
-    (mockRandomSource.nextInt (_:RandomIntRequest)).expects(RandomIntRequest(10, 20)).returning(19)
-    (mockRandomSource.reseed _).expects(*)
-    (mockRandomSource.randomBytes _).expects(where {
-      (request: RandomByteRequest) => request.count == 8
-    }).returning(eightNotVeryRandomBytes)
-
-
-    val fixedSecureSeeder = stub[SecureSeeder]
-    (fixedSecureSeeder.generateSeed _).when().returning(Seed(0L))
-    val actorRef = TestActorRef(new RngActor(mockRandomSource, fixedSecureSeeder))
-
-    // send request for any random int
-    val response = (actorRef ? RandomIntRequest(10, 20)).mapTo[Int]
-
-    whenReady(response) { i =>
-      i should be (19)
-    }
-
-  }
-
   it should "initialise itself from a proper seed source" in {
     val mockByteSource = mock[Rng]
     val mockSecureSeeder = mock[SecureSeeder]
