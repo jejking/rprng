@@ -1,7 +1,7 @@
 package com.jejking.rprng.api
 
 import akka.NotUsed
-import akka.actor.ActorSystem
+import akka.actor.{ActorSelection, ActorSystem}
 import akka.http.scaladsl.model.HttpEntity.{Chunk, ChunkStreamPart, Chunked}
 import akka.http.scaladsl.model._
 import akka.stream._
@@ -45,12 +45,11 @@ trait RoutingHelper {
 
 }
 
-class AkkaRoutingHelper(path: String = "/user/randomRouter")(implicit actorSystem: ActorSystem, actorMaterializer: ActorMaterializer) extends RoutingHelper {
+class AkkaRoutingHelper(path: ActorSelection)(implicit actorSystem: ActorSystem, actorMaterializer: ActorMaterializer) extends RoutingHelper {
 
   private def createByteStringSource(blockSize: Int): Source[ByteString, NotUsed] = {
-    val publisherActor = actorSystem.actorOf(RandomByteStringActorPublisher.props(blockSize, path))
-    val publisher = ActorPublisher[ByteString](publisherActor)
-    Source.fromPublisher(publisher)
+    val sourceGraph: Graph[SourceShape[ByteString], NotUsed] = new ByteStringSource(path, blockSize)
+    Source.fromGraph(sourceGraph)
   }
 
   override def responseForByteBlock(blockSize: Int): Future[HttpResponse] = {
@@ -72,7 +71,7 @@ class AkkaRoutingHelper(path: String = "/user/randomRouter")(implicit actorSyste
     builder.sizeHint(req.count)
 
     def createIntSource(): Source[Int, NotUsed] = {
-      val publisherActor = actorSystem.actorOf(RandomIntActorPublisher.props(req.randomIntRequest(), path))
+      val publisherActor = actorSystem.actorOf(RandomIntActorPublisher.props(req.randomIntRequest(), path.pathString))
       val publisher = ActorPublisher[Int](publisherActor)
       Source.fromPublisher(publisher)
     }

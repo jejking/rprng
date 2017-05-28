@@ -1,7 +1,8 @@
 package com.jejking.rprng.main
 
+import akka.NotUsed
 import akka.actor.ActorSystem
-import akka.stream.ActorMaterializer
+import akka.stream.{ActorMaterializer, Graph, SourceShape}
 import akka.stream.actor.ActorPublisher
 import akka.stream.scaladsl.Source
 import akka.util.ByteString
@@ -28,13 +29,12 @@ object RandomBytesToStandardOut {
     implicit val materializer = ActorMaterializer()
 
     val routerActorRef = createRandomSourceActors(actorSystem, RprngConfig(0, TimeRangeToReseed(1 hour, 8 hours), 8))
-    val publisherActor = actorSystem.actorOf(RandomByteStringActorPublisher.props(512, routerActorRef.path.toString))
 
-    val streamActorPublisher: Publisher[ByteString] = ActorPublisher[ByteString](publisherActor)
-    Source.fromPublisher(streamActorPublisher)
-          .takeWhile(_ => true)
-          .runForeach(bs => System.out.write(bs.toArray))
+    val sourceGraph: Graph[SourceShape[ByteString], NotUsed] = new ByteStringSource(actorSystem.actorSelection(routerActorRef.path), 512)
 
+    Source.fromGraph(sourceGraph)
+      .takeWhile(_ => true)
+      .runForeach(bs => System.out.write(bs.toArray))
 
   }
 

@@ -30,8 +30,8 @@ class ByteStringSource(rngActorSelection: ActorSelection, byteStringSize: Int) e
 
       setHandler(out, new OutHandler {
         override def onPull(): Unit = {
-          val futureByteSTring = (rngActorSelection ? RandomByteRequest(byteStringSize)).mapTo[ByteString]
-          futureByteSTring.foreach(byteString => callback.invoke(byteString))
+          val futureByteString = (rngActorSelection ? RandomByteRequest(byteStringSize)).mapTo[ByteString]
+          futureByteString.foreach(byteString => callback.invoke(byteString))
         }
       })
     }

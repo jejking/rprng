@@ -25,10 +25,10 @@ class RoutingHelperSpec extends FlatSpec with Matchers with ScalaFutures with Be
 
   implicit val system: ActorSystem = initActorSystem()
   implicit val materializer = ActorMaterializer()
-  val simpleAkkaStreamsHelper = new AkkaRoutingHelper()
+  val simpleAkkaStreamsHelper = new AkkaRoutingHelper(system.actorSelection("/user/randomRouter"))
 
   createProperlyRandomActor()
-  val randomAkkaStreamsHelper = new AkkaRoutingHelper("/user/randomlyRandom")
+  val randomAkkaStreamsHelper = new AkkaRoutingHelper(system.actorSelection("/user/randomlyRandom"))
 
   def initActorSystem(): ActorSystem = {
 

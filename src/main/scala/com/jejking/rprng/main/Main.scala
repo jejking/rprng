@@ -15,7 +15,6 @@ import scala.language.postfixOps
 object Main {
 
   val randomRouterPath = "/user/randomRouter"
-  val randomEightByteStringRouterPath = "/user/randomEightByteStringRouter"
 
   private implicit val actorSystem = ActorSystem("rprng")
   private implicit val materializer = ActorMaterializer()
@@ -30,7 +29,7 @@ object Main {
     actorSystem.registerOnTermination(() -> println("shutting down actor system"))
     createRandomSourceActors(actorSystem, myConfig)
 
-    val streamsHelper = new AkkaRoutingHelper()
+    val streamsHelper = new AkkaRoutingHelper(actorSystem.actorSelection(randomRouterPath))
     val route = new Routes(streamsHelper).route
 
     Http().bindAndHandle(route, "0.0.0.0", myConfig.port)
