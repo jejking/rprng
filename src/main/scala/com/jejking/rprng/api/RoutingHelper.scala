@@ -70,10 +70,11 @@ class AkkaRoutingHelper(path: ActorSelection)(implicit actorSystem: ActorSystem,
     val builder = List.newBuilder[Iterable[Int]]
     builder.sizeHint(req.count)
 
+
     def createIntSource(): Source[Int, NotUsed] = {
-      val publisherActor = actorSystem.actorOf(RandomIntActorPublisher.props(req.randomIntRequest(), path.pathString))
-      val publisher = ActorPublisher[Int](publisherActor)
-      Source.fromPublisher(publisher)
+      createByteStringSource(8)
+        .map(bs => EightByteString(bs))
+        .map(ebs => EightByteStringOps.toInt(ebs, req.minBound, req.maxBound))
     }
 
     def listsFromStream(): Future[RandomIntegerCollectionResponse] = {
