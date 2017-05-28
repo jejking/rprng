@@ -35,29 +35,9 @@ object TestUtils {
   class ZeroRng extends Rng {
     override def randomBytes(request: RandomByteRequest): Array[Byte] = Array.ofDim(8)
 
-    override def reseed(seed: Long): Unit = {}
-    
+    override def reseed(seed: Seed): Unit = {}
+
   }
-
-  class ZeroEightByteStringRng extends RandomEightByteStringGenerator {
-
-    /**
-      * Generates a new, (pseudo)-random [[EightByteString]] for
-      * subsequent processing.
-      *
-      * @return random eight byte string
-      */
-    override val randomEightByteString = TestUtils.eightByteStringOfZeroes
-
-
-    /**
-      * Supplies new seed to be used at the discretion of the implementation.
-      *
-      * @param seed new seed. Should be supplied from a good source of randomness.
-      */
-    override def seed(seed: Seed): Unit = {}
-  }
-
 
   class FailureActor extends Actor {
     override def receive: Actor.Receive = {

@@ -26,31 +26,11 @@ class RngActor(private val rng: Rng, private val secureSeeder: SecureSeeder,
   private val scheduleHelper  =  scheduleHelperCreator(context.system)
   private val actorPath = context.self.path
 
-  class RngRandomEightByteGenerator extends RandomEightByteStringGenerator {
-    /**
-      * Generates a random byte string of length 8.
-      *
-      * @return an [[EightByteString]]
-      */
-    override def randomEightByteString(): EightByteString = {
-      EightByteString(ByteString(rng.randomBytes(RandomByteRequest(8))))
-    }
-
-    /**
-      * Supplies some new random seed for an underlying PRNG.
-      *
-      * @param seed
-      */
-    override def seed(seed: Seed): Unit = {}
-  }
-
-  private val rngRandomEightByteGenerator = new RngRandomEightByteGenerator
-
 
   override def preStart(): Unit = {
     log.info(s"reseed interval is: $timeRangeToReseed")
     val seed = secureSeeder.generateSeed()
-    this.rng.reseed(seed.seed)
+    this.rng.reseed(seed)
     scheduleReseed()
     log.info("completed pre-start of " + actorPath)
 
@@ -80,7 +60,7 @@ class RngActor(private val rng: Rng, private val secureSeeder: SecureSeeder,
   }
 
   def applyNewSeedAndScheduleReseed(newSeed: Seed): Unit = {
-    this.rng.reseed(newSeed.seed)
+    this.rng.reseed(newSeed)
     log.info("applied new seed in actor " + actorPath)
 
     // and off we go for the next round at some point in the future
@@ -104,7 +84,7 @@ class RngActor(private val rng: Rng, private val secureSeeder: SecureSeeder,
 
   def scheduleReseed(): Unit = {
     // non-blocking computation
-    val timeToReseed = TimeRangeToReseed.durationToReseed(timeRangeToReseed, rngRandomEightByteGenerator)
+    val timeToReseed = TimeRangeToReseed.durationToReseed(timeRangeToReseed, rng)
     scheduleHelper.scheduleOnce(timeToReseed) {
       self ! Reseed
       log.info("sent reseed message to actor " + actorPath)
@@ -135,9 +115,6 @@ object RngActor {
    */
   def props(randomByteSource: Rng, secureSeeder: SecureSeeder, timeRangeToReseed: TimeRangeToReseed): Props =
     Props(new RngActor(rng = randomByteSource, secureSeeder = secureSeeder, timeRangeToReseed = timeRangeToReseed))
-
-
-
 
 
 }

@@ -36,8 +36,8 @@ class TimeRangeToReseedSpec extends FlatSpec with Matchers with MockFactory {
   }
 
   "the companion object" should "compute an appropriate schedule" in {
-    val byteSource = stub[RandomEightByteStringGenerator]
-    (byteSource.randomEightByteString _).when().returns(TestUtils.eightByteStringOfZeroes)
+    val byteSource = stub[Rng]
+    (byteSource.randomBytes _).when(*).returns(TestUtils.arrayOfEightZeroBytes())
     val minLifeTime: FiniteDuration = 1 minute
     val maxLifeTime: FiniteDuration = 2 minutes
 
@@ -48,7 +48,7 @@ class TimeRangeToReseedSpec extends FlatSpec with Matchers with MockFactory {
 
     for (i <- 1 to 100) {
       val computedScheduledTimeOfDeath = TimeRangeToReseed.durationToReseed(lifeSpanRange,
-        new CommonsMathRandomEightByteStringGenerator(mersenneTwister))
+        new CommonsMathRng(mersenneTwister))
       assert(computedScheduledTimeOfDeath >= minLifeTime)
       assert(computedScheduledTimeOfDeath <= maxLifeTime)
     }

@@ -15,8 +15,8 @@ class CommonsMathRng(val randomGenerator: RandomGenerator) extends Rng {
     theArray
   }
 
-  override def reseed(seed: Long): Unit = {
-    randomGenerator.setSeed(seed)
+  override def reseed(seed: Seed): Unit = {
+    randomGenerator.setSeed(seed.seed)
   }
 
 }

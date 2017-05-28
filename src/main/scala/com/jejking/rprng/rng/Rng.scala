@@ -35,10 +35,16 @@ trait Rng {
    * Supplies eight bytes worth of high-quality entropy to reseed the PRNG.
    * @param seed long, hopefully quite random.
    */
-  def reseed(seed: Long): Unit
+  def reseed(seed: Seed): Unit
 
 
 }
+
+/**
+  * Tiny type encapsulating new seed for a PRNG.
+  * @param seed
+  */
+case class Seed(seed: Long) extends AnyVal
 
 
 

@@ -1,7 +1,6 @@
 package com.jejking.rprng.rng
 
-import org.apache.commons.math3.random.{MersenneTwister, RandomGenerator}
-import org.apache.commons.math3.stat.Frequency
+import org.apache.commons.math3.random.RandomGenerator
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.{FlatSpec, Matchers}
 
@@ -31,7 +30,7 @@ class CommonsMathRngSpec extends FlatSpec with Matchers with MockFactory {
     (mockedGenerator.setSeed(_: Long)).expects(123L)
 
     val byteSourceWithMockGenerator = new CommonsMathRng(mockedGenerator)
-    byteSourceWithMockGenerator.reseed(123L)
+    byteSourceWithMockGenerator.reseed(Seed(123L))
   }
 
 

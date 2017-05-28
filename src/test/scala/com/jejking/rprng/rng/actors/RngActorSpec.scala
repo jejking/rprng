@@ -5,7 +5,6 @@ import akka.pattern.ask
 import akka.testkit.{DefaultTimeout, ImplicitSender, TestActorRef, TestKit}
 import akka.util.ByteString
 import com.jejking.rprng.rng._
-import org.apache.commons.math3.random.MersenneTwister
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.{BeforeAndAfterAll, FlatSpecLike, Matchers}
@@ -97,7 +96,7 @@ class RngActorSpec extends TestKit(ActorSystem("test")) with DefaultTimeout with
     (mockByteSource.randomBytes _).expects(where {
       (request: RandomByteRequest) => request.count == 8
     }).returning(eightNotVeryRandomBytes)
-    (mockByteSource.reseed _).expects(0)
+    (mockByteSource.reseed _).expects(Seed(0))
 
     val mockSecureSeeder = mock[SecureSeeder]
     (mockSecureSeeder.generateSeed _).expects().returning(Seed(0L)).atLeastTwice()
