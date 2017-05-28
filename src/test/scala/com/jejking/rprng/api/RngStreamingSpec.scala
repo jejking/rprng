@@ -17,18 +17,18 @@ import org.scalatest.time.SpanSugar._
 
 
 /**
- * Tests for [[AkkaRoutingHelper]].
+ * Tests for [[AkkaRngStreaming]].
  */
-class RoutingHelperSpec extends FlatSpec with Matchers with ScalaFutures with BeforeAndAfterAll {
+class RngStreamingSpec extends FlatSpec with Matchers with ScalaFutures with BeforeAndAfterAll {
 
   implicit override val patienceConfig = PatienceConfig(timeout = 2 seconds, interval = 100 milliseconds)
 
   implicit val system: ActorSystem = initActorSystem()
   implicit val materializer = ActorMaterializer()
-  val simpleAkkaStreamsHelper = new AkkaRoutingHelper(system.actorSelection("/user/randomRouter"))
+  val simpleAkkaStreamsHelper = new AkkaRngStreaming(system.actorSelection("/user/randomRouter"))
 
   createProperlyRandomActor()
-  val randomAkkaStreamsHelper = new AkkaRoutingHelper(system.actorSelection("/user/randomlyRandom"))
+  val randomAkkaStreamsHelper = new AkkaRngStreaming(system.actorSelection("/user/randomlyRandom"))
 
   def initActorSystem(): ActorSystem = {
 

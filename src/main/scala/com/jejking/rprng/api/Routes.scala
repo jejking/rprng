@@ -9,7 +9,7 @@ import akka.http.scaladsl.server.{ExceptionHandler, RejectionHandler, Route, Val
 /**
  * Routing for web requests for randomness.
  */
-class Routes(streamsHelper: RoutingHelper) extends SprayJsonSupport {
+class Routes(streamsHelper: RngStreaming) extends SprayJsonSupport {
 
   implicit val theRejectionHandler = RejectionHandler.newBuilder()
                                       .handle {

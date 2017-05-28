@@ -5,7 +5,6 @@ import akka.actor.{ActorSelection, ActorSystem}
 import akka.http.scaladsl.model.HttpEntity.{Chunk, ChunkStreamPart, Chunked}
 import akka.http.scaladsl.model._
 import akka.stream._
-import akka.stream.actor.ActorPublisher
 import akka.stream.scaladsl.{Keep, Sink, Source}
 import akka.stream.stage._
 import akka.util.ByteString
@@ -15,9 +14,9 @@ import scala.concurrent.Future
 
 /**
  * Defines useful functionality for the Routing part of the API to use in interacting with the
- * underlying RPRNG infrastructure.
+ * underlying streams of pseudo-randomness.
  */
-trait RoutingHelper {
+trait RngStreaming {
 
   /**
     * Generates a byte string of the requested size which is encapsulated
@@ -45,7 +44,7 @@ trait RoutingHelper {
 
 }
 
-class AkkaRoutingHelper(path: ActorSelection)(implicit actorSystem: ActorSystem, actorMaterializer: ActorMaterializer) extends RoutingHelper {
+class AkkaRngStreaming(path: ActorSelection)(implicit actorSystem: ActorSystem, actorMaterializer: ActorMaterializer) extends RngStreaming {
 
   private def createByteStringSource(blockSize: Int): Source[ByteString, NotUsed] = {
     val sourceGraph: Graph[SourceShape[ByteString], NotUsed] = new ByteStringSource(path, blockSize)
@@ -70,11 +69,12 @@ class AkkaRoutingHelper(path: ActorSelection)(implicit actorSystem: ActorSystem,
     val builder = List.newBuilder[Iterable[Int]]
     builder.sizeHint(req.count)
 
+    import EightByteStringOps.toInt
 
     def createIntSource(): Source[Int, NotUsed] = {
       createByteStringSource(8)
         .map(bs => EightByteString(bs))
-        .map(ebs => EightByteStringOps.toInt(ebs, req.minBound, req.maxBound))
+        .map(ebs => toInt(ebs, req.minBound, req.maxBound))
     }
 
     def listsFromStream(): Future[RandomIntegerCollectionResponse] = {
