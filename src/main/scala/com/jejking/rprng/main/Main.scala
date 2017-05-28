@@ -15,6 +15,7 @@ import scala.language.postfixOps
 object Main {
 
   val randomRouterPath = "/user/randomRouter"
+  val randomEightByteStringRouterPath = "/user/randomEightByteStringRouter"
 
   private implicit val actorSystem = ActorSystem("rprng")
   private implicit val materializer = ActorMaterializer()

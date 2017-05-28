@@ -6,7 +6,7 @@ import java.util.concurrent.TimeUnit
 import akka.actor.{ActorRef, ActorSystem}
 import akka.routing.RandomGroup
 import com.jejking.rprng.rng.actors.{RngActor, TimeRangeToReseed}
-import com.jejking.rprng.rng.{CommonsMathRng, RandomGeneratorFactory, SecureRandomSeeder}
+import com.jejking.rprng.rng._
 import com.typesafe.config.Config
 import org.apache.commons.math3.random.ISAACRandom
 
@@ -58,5 +58,4 @@ package object main {
     // constructs random router around the actor paths
     actorSystem.actorOf(RandomGroup(paths).props(), "randomRouter")
   }
-
 }
