@@ -15,7 +15,7 @@ libraryDependencies ++= {
   val akkaHttpV    = "10.0.6"
   val scalaTestV   = "3.0.1"
   val commonsMathV = "3.6"
-  val scalaMockV   = "3.5.0"
+  val scalaMockV   = "3.6.0"
   val logbackV     = "1.1.6"
 
   Seq(
