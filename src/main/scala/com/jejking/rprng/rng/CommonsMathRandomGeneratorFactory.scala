@@ -5,7 +5,7 @@ import org.apache.commons.math3.random.RandomGenerator
 import scala.reflect.ClassTag
 
 /**
- * Provides functionality to instantiate various Commons Math [[RandomGenerator]] types.
+ * Provides functionality to instantiate various Commons Math [[org.apache.commons.math3.random.RandomGenerator]] types.
  */
 object CommonsMathRandomGeneratorFactory {
 

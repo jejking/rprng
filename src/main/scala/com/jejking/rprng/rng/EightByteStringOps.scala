@@ -9,7 +9,7 @@ object EightByteStringOps {
   private val DOUBLE_UNIT: Double =  1.0 / (1L << 53)
 
   /**
-    * Converts to an [[Int]] - effectively takes the first four bytes
+    * Converts to an [[scala.Int]] - effectively takes the first four bytes
     * and converts these to the expected signed 32 bit integer.
     * @param eightByteString input
     * @return converted int
@@ -19,7 +19,7 @@ object EightByteStringOps {
   }
 
   /**
-    * Converts to an [[Int]], scaling down to a value between zero (inclusive)
+    * Converts to an [[scala.Int]], scaling down to a value between zero (inclusive)
     * and the upper bound (exclusive).
     * @param eightByteString input
     * @param upperBound exclusive upper bound
@@ -38,9 +38,9 @@ object EightByteStringOps {
 
   /**
     * Converts to an int, scaled down to be between the lower bound (inclusive)
-    * and the upper bound (exclusive). In the edge case that lower bound is [[Int.MinValue]]
-    * and the upper bound is [[Int.MaxValue]] then the behaviour is the same as [[EightByteStringOps.toInt()]]
-    * with no parameters.
+    * and the upper bound (exclusive). In the edge case that lower bound is [[scala.Int.MinValue]]
+    * and the upper bound is [[scala.Int.MaxValue]] then the behaviour is the same as
+    * [[com.jejking.rprng.rng.EightByteStringOps.toInt()]]  with no parameters.
     *
     * @param eightByteString input
     * @param lowerBound inclusive lower bound
@@ -58,7 +58,7 @@ object EightByteStringOps {
   }
 
   /**
-    * Converts to a [[Double]] using the full eight bytes.
+    * Converts to a [[scala.Double]] using the full eight bytes.
     * @param eightByteString input
     * @return converted double
     */
@@ -67,7 +67,7 @@ object EightByteStringOps {
   }
 
   /**
-    * Converts to a [[Double]], scaled down to be between zero and one.
+    * Converts to a [[scala.Double]], scaled down to be between zero and one.
     * @param eightByteString input
     * @return scaled down double
     */
@@ -82,7 +82,7 @@ object EightByteStringOps {
   }
 
   /**
-    * Converts to a [[Long]] using the full eight bytes.
+    * Converts to a [[scala.Long]] using the full eight bytes.
     * @param eightByteString input
     * @return converted to a long
     */

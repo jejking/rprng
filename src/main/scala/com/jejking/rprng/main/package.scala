@@ -36,8 +36,8 @@ package object main {
   }
 
   /**
-    * Sets up the required number of [[RngActor]] instances behind
-    * an akka [[RandomGroup]].
+    * Sets up the required number of [[com.jejking.rprng.rng.actors.RngActor]] instances behind
+    * an akka [[akka.routing.RandomGroup]].
     *
     * @param actorSystem the actor system to use to set up the actors
     * @param myConfig the config

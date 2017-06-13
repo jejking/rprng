@@ -15,7 +15,7 @@ case object RandomSet extends RandomCollectionType
  * @param count the number of collections (each of the requested size). Must be strictly positive, i.e. 1 or more
  * @param minBound inclusive minimum bound. Must be smaller than the maxBound
  * @param maxBound inclusive maximum bound. Must be greater than minBound.
- * @throws IllegalArgumentException if the described preconditions are not met.
+ * @throws java.lang.IllegalArgumentException if the described preconditions are not met.
  */
 case class RandomIntegerCollectionRequest(collectionType: RandomCollectionType, size: Int = 100, count: Int = 1,
                                           minBound: Int = Integer.MIN_VALUE, maxBound: Int = Integer.MAX_VALUE) {
@@ -31,7 +31,7 @@ case class RandomIntegerCollectionRequest(collectionType: RandomCollectionType, 
   }
 
   /**
-   * Extracts [[minBound]] and [[maxBound]] as a [[RandomIntRequest]]
+   * Extracts [[minBound]] and [[maxBound]] as a [[com.jejking.rprng.rng.RandomIntRequest]]
    * @return corresponding object
    */
   def randomIntRequest(): RandomIntRequest = RandomIntRequest(this.minBound, this.maxBound)

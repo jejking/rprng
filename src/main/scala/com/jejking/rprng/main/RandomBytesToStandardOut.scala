@@ -2,19 +2,17 @@ package com.jejking.rprng.main
 
 import akka.NotUsed
 import akka.actor.ActorSystem
-import akka.stream.{ActorMaterializer, Graph, SourceShape}
-import akka.stream.actor.ActorPublisher
 import akka.stream.scaladsl.Source
+import akka.stream.{ActorMaterializer, Graph, SourceShape}
 import akka.util.ByteString
 import com.jejking.rprng.rng._
 import com.jejking.rprng.rng.actors.{RngActor, TimeRangeToReseed}
-import org.reactivestreams.Publisher
 
 import scala.concurrent.duration._
 import scala.language.postfixOps
 
 /**
- * Creates a bunch of [[RngActor]] instances, puts them behind
+ * Creates a bunch of [[com.jejking.rprng.rng.actors.RngActor]] instances, puts them behind
  * an Akka Random Router, hooks up a reactive stream to the router and writes
  * the stream as raw bytes to stdout until the program is killed.
  *
