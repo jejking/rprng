@@ -19,22 +19,23 @@ libraryDependencies ++= {
   val logbackV     = "1.1.6"
 
   Seq(
-    "org.apache.commons"   % "commons-math3"                         % commonsMathV,
-    "com.typesafe.akka"    %% "akka-actor"                           % akkaV,
-    "com.typesafe.akka"    %% "akka-slf4j"                           % akkaV,
-    "ch.qos.logback"       % "logback-classic"                       % logbackV,
-    "ch.qos.logback"       % "logback-core"                          % logbackV,
-    "net.logstash.logback" % "logstash-logback-encoder"              % "4.7",
-    "com.typesafe.akka"    %% "akka-stream"                          % akkaV,
-    "com.typesafe.akka"    %% "akka-http-core"                       % akkaHttpV,
-    "com.typesafe.akka"    %% "akka-http"                            % akkaHttpV,
-    "com.typesafe.akka"    %% "akka-http-spray-json"                 % akkaHttpV,
-    "com.typesafe.akka"    %% "akka-http-testkit"                    % akkaHttpV   % "test",
-    "com.typesafe.akka"    %% "akka-stream-testkit"                  % akkaV       % "test",
-    "org.scalatest"        %% "scalatest"                            % scalaTestV  % "test",
-    "com.typesafe.akka"    %% "akka-testkit"                         % akkaV       % "test",
-    "org.scalamock"        %% "scalamock-core"                       % scalaMockV  % "test",
-    "org.scalamock"        %% "scalamock-scalatest-support"          % scalaMockV  % "test"
+    "org.apache.commons"    % "commons-math3"                         % commonsMathV,
+    "com.typesafe.akka"     %% "akka-actor"                           % akkaV,
+    "com.typesafe.akka"     %% "akka-slf4j"                           % akkaV,
+    "ch.qos.logback"        % "logback-classic"                       % logbackV,
+    "ch.qos.logback"        % "logback-core"                          % logbackV,
+    "net.logstash.logback"  % "logstash-logback-encoder"              % "4.7",
+    "com.sksamuel.scrimage" %% "scrimage-core"                        % "2.1.8",
+    "com.typesafe.akka"     %% "akka-stream"                          % akkaV,
+    "com.typesafe.akka"     %% "akka-http-core"                       % akkaHttpV,
+    "com.typesafe.akka"     %% "akka-http"                            % akkaHttpV,
+    "com.typesafe.akka"     %% "akka-http-spray-json"                 % akkaHttpV,
+    "com.typesafe.akka"     %% "akka-http-testkit"                    % akkaHttpV   % "test",
+    "com.typesafe.akka"     %% "akka-stream-testkit"                  % akkaV       % "test",
+    "org.scalatest"         %% "scalatest"                            % scalaTestV  % "test",
+    "com.typesafe.akka"     %% "akka-testkit"                         % akkaV       % "test",
+    "org.scalamock"         %% "scalamock-core"                       % scalaMockV  % "test",
+    "org.scalamock"         %% "scalamock-scalatest-support"          % scalaMockV  % "test"
   )
 }
 
@@ -122,10 +123,8 @@ dockerfile in docker := {
   val artifact: File = assembly.value
   val artifactTargetPath = s"/app/${artifact.name}"
 
-  // should be able to use alpine linux and install openjdk8-jre on top
-
   new Dockerfile {
-    from("java:8")
+    from("openjdk:alpine")
     add(artifact, artifactTargetPath)
     entryPoint("java", "-jar", artifactTargetPath)
     expose(8080)
