@@ -1,6 +1,8 @@
 package com.jejking.rprng.png
 
+import java.io.ByteArrayOutputStream
 import java.nio.ByteBuffer
+import java.nio.charset.Charset
 import java.util.zip.CRC32
 
 import org.scalatest.{FlatSpec, Matchers}
@@ -28,7 +30,12 @@ class PngSpec extends FlatSpec with Matchers {
 
   "crc32" should "behave like the Java one" in {
     val bytes = ByteString(1, 2, 3, 4, 5, 6, 7, 8)
-    Png.crc32(bytes) shouldBe myCrc(bytes)
+    Png.crc32(bytes) shouldBe javaCrc(bytes)
+  }
+
+  it should "also do so with negative bytes" in {
+    val bytes = ByteString(-1, -2, -3, -4, -5, -6, -7, -8)
+    Png.crc32(bytes) shouldBe javaCrc(bytes)
   }
 
   "ihdr" should "convert a signed 32 bit integer to unsigned four byte array" in {
@@ -61,11 +68,11 @@ class PngSpec extends FlatSpec with Matchers {
     }
   }
 
-  it should "define the correct IHDR_CHUNK_TYPE chunk given a positive width and a positive header" in {
+  it should "define the correct IHDR chunk given a positive width and a positive header" in {
     val width = ByteString.fromArray(ByteBuffer.allocate(4).putInt(256).array())
     val height = ByteString.fromArray(ByteBuffer.allocate(4).putInt(512).array())
 
-    val crc = myCrc(Png.IHDR_CHUNK_TYPE ++ width ++ height ++ ByteString(8, 6, 0, 0, 0))
+    val crc = javaCrc(Png.IHDR_CHUNK_TYPE ++ width ++ height ++ ByteString(8, 6, 0, 0, 0))
 
     val expectedBytes = ByteString(13) ++ Png.IHDR_CHUNK_TYPE ++ width ++ height ++ ByteString(8, 6, 0, 0, 0) ++ crc
 
@@ -73,7 +80,30 @@ class PngSpec extends FlatSpec with Matchers {
 
   }
 
-  def myCrc(byteString: ByteString): ByteString = {
+
+  "idat" should "create an IDAT chunk given a byte string assumed to represent pixels" in {
+      val bytes = ByteString("this is a very nice picture", Charset.forName("UTF-8"))
+      val compressedBytes = javaDeflate(bytes)
+      val toChecksum = Png.IDAT_CHUNK_TYPE ++ compressedBytes
+      val checkSum = javaCrc(toChecksum)
+      val expected = Png.toUnsignedFourByteInt(toChecksum.length) ++ toChecksum ++ checkSum
+
+      Png.idat(bytes) shouldBe expected
+  }
+
+  private def javaDeflate(bytes: ByteString): ByteString = {
+    import java.util.zip.Deflater
+    val deflater = new Deflater(Deflater.BEST_COMPRESSION, false)
+    deflater.setInput(bytes.toArray)
+    deflater.finish()
+    val buffer = new Array[Byte](1024)
+    val writtenBytes = deflater.deflate(buffer)
+    deflater.end()
+    ByteString.fromArray(buffer, 0, writtenBytes)
+  }
+
+
+  private def javaCrc(byteString: ByteString): ByteString = {
     val crc = new CRC32()
     crc.update(byteString.toArray)
     val crcValue = crc.getValue
