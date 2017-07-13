@@ -13,12 +13,12 @@ import akka.util.ByteString
   */
 object Png {
 
-
   private val US_ASCII = Charset.forName("US-ASCII")
 
   val PNG_SIGNATURE = ByteString(137, 80, 78, 71, 13, 10, 26, 10)
   val IHDR_CHUNK_TYPE = ByteString("IHDR", US_ASCII)
   val IDAT_CHUNK_TYPE = ByteString("IDAT", US_ASCII)
+  val IEND_CHUNK_TYPE = ByteString("IEND", US_ASCII)
 
   def ihdr(width: Int, height:Int): ByteString = {
 
@@ -52,6 +52,11 @@ object Png {
 
     length ++ toCheckSum ++ crc
   }
+
+  def iend() = {
+    toUnsignedFourByteInt(0) ++ IEND_CHUNK_TYPE ++ crc32(IEND_CHUNK_TYPE)
+  }
+
 
 
   def toUnsignedFourByteInt(value: Int): ByteString = {

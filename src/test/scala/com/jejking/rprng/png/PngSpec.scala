@@ -28,6 +28,12 @@ class PngSpec extends FlatSpec with Matchers {
     Png.IDAT_CHUNK_TYPE shouldBe expectedBytes
   }
 
+  it should "define correct bytes for IEND_CHUNK_TYPE critical chunk type" in {
+    val expectedBytes = ByteString(73, 69, 78, 68)
+    Png.IEND_CHUNK_TYPE shouldBe expectedBytes
+  }
+
+
   "crc32" should "behave like the Java one" in {
     val bytes = ByteString(1, 2, 3, 4, 5, 6, 7, 8)
     Png.crc32(bytes) shouldBe javaCrc(bytes)
@@ -82,13 +88,21 @@ class PngSpec extends FlatSpec with Matchers {
 
 
   "idat" should "create an IDAT chunk given a byte string assumed to represent pixels" in {
-      val bytes = ByteString("this is a very nice picture", Charset.forName("UTF-8"))
-      val compressedBytes = javaDeflate(bytes)
-      val toChecksum = Png.IDAT_CHUNK_TYPE ++ compressedBytes
-      val checkSum = javaCrc(toChecksum)
-      val expected = Png.toUnsignedFourByteInt(toChecksum.length) ++ toChecksum ++ checkSum
+    val bytes = ByteString("this is a very nice picture", Charset.forName("UTF-8"))
+    val compressedBytes = javaDeflate(bytes)
+    val toChecksum = Png.IDAT_CHUNK_TYPE ++ compressedBytes
+    val checkSum = javaCrc(toChecksum)
+    val expected = Png.toUnsignedFourByteInt(toChecksum.length) ++ toChecksum ++ checkSum
 
-      Png.idat(bytes) shouldBe expected
+    Png.idat(bytes) shouldBe expected
+  }
+
+  "iend" should "create an IEND chunk" in {
+    val zeroLength = Png.toUnsignedFourByteInt(0)
+    val crc = javaCrc(Png.IEND_CHUNK_TYPE)
+    val expectedByteString = zeroLength ++ Png.IEND_CHUNK_TYPE ++ crc
+
+    Png.iend shouldBe expectedByteString
   }
 
   private def javaDeflate(bytes: ByteString): ByteString = {
