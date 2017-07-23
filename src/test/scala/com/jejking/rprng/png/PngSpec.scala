@@ -5,6 +5,7 @@ import java.nio.ByteBuffer
 import java.nio.charset.Charset
 import java.util.zip.CRC32
 
+import akka.http.scaladsl.coding.DeflateCompressor
 import org.scalatest.{FlatSpec, Matchers}
 import akka.util.ByteString
 
@@ -80,21 +81,55 @@ class PngSpec extends FlatSpec with Matchers {
 
     val crc = javaCrc(Png.IHDR_CHUNK_TYPE ++ width ++ height ++ ByteString(8, 6, 0, 0, 0))
 
-    val expectedBytes = ByteString(13) ++ Png.IHDR_CHUNK_TYPE ++ width ++ height ++ ByteString(8, 6, 0, 0, 0) ++ crc
+    val expectedBytes = Png.toUnsignedFourByteInt(13) ++ Png.IHDR_CHUNK_TYPE ++ width ++ height ++ ByteString(8, 6, 0, 0, 0) ++ crc
 
     Png.ihdr(256, 512) shouldBe expectedBytes
 
   }
 
+  "scanline" should "create prepend a filter type 0 to a byte string assumed to represent a scanline" in {
+    val width = 3
+    val bytesPerPixel = 2
+    val inputBytes = ByteString(1, 2, 3, 4, 5, 6)
+    val expected = ByteString(0) ++ inputBytes
 
-  "idat" should "create an IDAT chunk given a byte string assumed to represent pixels" in {
+    val scanline: ByteString => ByteString = Png.scanline(bytesPerPixel, width)
+    scanline(inputBytes) shouldBe expected
+  }
+
+  it should "fail if the scanline is not the same size as the value given in the width parameter" in {
+    assertThrows[IllegalArgumentException] {
+      val width = 5
+      val bytesPerPixel = 1
+      val inputBytes = ByteString(1, 2, 3)
+      Png.scanline(bytesPerPixel, width)(inputBytes)
+    }
+  }
+
+  "idat" should "create an IDAT chunk given a byte string assumed to represent scanlines and finish deflate" in {
     val bytes = ByteString("this is a very nice picture", Charset.forName("UTF-8"))
-    val compressedBytes = javaDeflate(bytes)
+    val compressedBytes = javaDeflateFinish(bytes)
     val toChecksum = Png.IDAT_CHUNK_TYPE ++ compressedBytes
     val checkSum = javaCrc(toChecksum)
-    val expected = Png.toUnsignedFourByteInt(toChecksum.length) ++ toChecksum ++ checkSum
+    val expected = Png.toUnsignedFourByteInt(compressedBytes.length) ++ toChecksum ++ checkSum
 
-    Png.idat(bytes) shouldBe expected
+    val deflateCompressor = new DeflateCompressor()
+
+    val idat = Png.idat(deflateCompressor) _
+    idat(bytes, true) shouldBe expected
+  }
+
+  it should "create an IDAT chunk given a byte string assumed to represent scanlines and flush deflate" in {
+    val bytes = ByteString("this is a very nice picture", Charset.forName("UTF-8"))
+    val compressedBytes = javaDeflateFlush(bytes)
+    val toChecksum = Png.IDAT_CHUNK_TYPE ++ compressedBytes
+    val checkSum = javaCrc(toChecksum)
+    val expected = Png.toUnsignedFourByteInt(compressedBytes.length) ++ toChecksum ++ checkSum
+
+    val deflateCompressor = new DeflateCompressor()
+
+    val idat = Png.idat(deflateCompressor) _
+    idat(bytes, false) shouldBe expected
   }
 
   "iend" should "create an IEND chunk" in {
@@ -105,7 +140,7 @@ class PngSpec extends FlatSpec with Matchers {
     Png.iend shouldBe expectedByteString
   }
 
-  private def javaDeflate(bytes: ByteString): ByteString = {
+  private def javaDeflateFinish(bytes: ByteString): ByteString = {
     import java.util.zip.Deflater
     val deflater = new Deflater(Deflater.BEST_COMPRESSION, false)
     deflater.setInput(bytes.toArray)
@@ -116,6 +151,15 @@ class PngSpec extends FlatSpec with Matchers {
     ByteString.fromArray(buffer, 0, writtenBytes)
   }
 
+
+  private def javaDeflateFlush(bytes: ByteString): ByteString = {
+    import java.util.zip.Deflater
+    val deflater = new Deflater(Deflater.BEST_COMPRESSION, false)
+    deflater.setInput(bytes.toArray)
+    val buffer = new Array[Byte](1024)
+    val writtenBytes = deflater.deflate(buffer, 0, buffer.length, Deflater.SYNC_FLUSH)
+    ByteString.fromArray(buffer, 0, writtenBytes)
+  }
 
   private def javaCrc(byteString: ByteString): ByteString = {
     val crc = new CRC32()
