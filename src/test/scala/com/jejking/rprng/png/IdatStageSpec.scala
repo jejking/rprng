@@ -89,14 +89,22 @@ class IdatStageSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     val scanlineSource = Source.repeat(twoHundredAndFortyPixels).map(scanline)
     val idatStage = new IdatStage(240, 100)
     val idat = Png.idat() _
-    val expected = idat(scanline(twoHundredAndFortyPixels), true)
 
+    val targetNumberOfScanlines = IdatStage.numberOfScanlinesPerIdatChunk(240)
+
+    val thirtyFourLines = scanlines(scanline(twoHundredAndFortyPixels), 34)
+    val thirtyTwoLines = scanlines(scanline(twoHundredAndFortyPixels), 32)
     scanlineSource
       .via(idatStage)
       .runWith(TestSink.probe[ByteString])
-      .request(3)
-      .expectNextOrComplete()
-    
+      .request(1)
+      .expectNext(idat(thirtyFourLines, false))
+      .request(1)
+      .expectNext(idat(thirtyFourLines, false))
+      .request(1)
+      .expectNext(idat(thirtyTwoLines, true))
+      .expectComplete()
+
   }
 
   override def afterAll(): Unit = {
@@ -107,6 +115,12 @@ class IdatStageSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     val onePixel = ByteString(1, 2, 3, 4)
     val byteStringBuilder = new ByteStringBuilder()
     (1 to width).foreach(i => byteStringBuilder ++= onePixel)
+    byteStringBuilder.result()
+  }
+
+  def scanlines(scanline: ByteString, n: Int): ByteString = {
+    val byteStringBuilder = new ByteStringBuilder()
+    (1 to n).foreach(i => byteStringBuilder ++= scanline)
     byteStringBuilder.result()
   }
 
