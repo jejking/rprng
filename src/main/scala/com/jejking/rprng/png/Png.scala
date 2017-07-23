@@ -13,6 +13,7 @@ import akka.util.ByteString
   */
 object Png {
 
+  private val TARGET_IDAT_CHUNK_SIZE = 1024 * 32
   private val US_ASCII = Charset.forName("US-ASCII")
 
   val PNG_SIGNATURE = ByteString(137, 80, 78, 71, 13, 10, 26, 10)
@@ -25,7 +26,7 @@ object Png {
     require(width > 0)
     require(height > 0)
 
-    val IHDR_LENGTH = 13
+    val IHDR_LENGTH = toUnsignedFourByteInt(13)
 
     // constant for our case, not in general
     val BIT_DEPTH = 8
@@ -33,24 +34,41 @@ object Png {
     val COMPRESSION_METHOD = 0 // deflate
     val FILTER_METHOD = 0 // adaptive filtering as per PNG spec
     val INTERLACE_METHOD = 0 // none
-    val constantPart = ByteString(BIT_DEPTH, COLOUR_TYPE, COMPRESSION_METHOD, FILTER_METHOD, INTERLACE_METHOD)
+    val constantPart = ByteString(BIT_DEPTH.toByte,
+                                  COLOUR_TYPE.toByte,
+                                  COMPRESSION_METHOD.toByte,
+                                  FILTER_METHOD.toByte,
+                                  INTERLACE_METHOD.toByte)
 
     val chunkData = toUnsignedFourByteInt(width) ++ toUnsignedFourByteInt(height) ++ constantPart
 
     val partToCrc = IHDR_CHUNK_TYPE ++ chunkData
     val crc = crc32(partToCrc)
 
-    ByteString(IHDR_LENGTH) ++ partToCrc ++ crc
+    IHDR_LENGTH ++ partToCrc ++ crc
   }
 
-  def idat(bytes: ByteString): ByteString = {
-    val deflateCompressor: DeflateCompressor = new DeflateCompressor()
-    val compressedBytes = deflateCompressor.compressAndFinish(bytes)
+  def scanline(bytesPerPixel: Int, expectedWidth: Int): ByteString => ByteString = bs => {
+    require(bs.length == expectedWidth * bytesPerPixel)
+    ByteString(0.toByte) ++ bs
+  }
+
+  def idat(deflateCompressor: DeflateCompressor = new DeflateCompressor())(bytes: ByteString, shouldFinish: Boolean) = {
+
+    def doCompression(): ByteString = {
+      if (shouldFinish) {
+        deflateCompressor.compressAndFinish(bytes)
+      } else {
+        deflateCompressor.compressAndFlush(bytes)
+      }
+    }
+
+    val compressedBytes = doCompression()
     val toCheckSum = IDAT_CHUNK_TYPE ++ compressedBytes
     val crc = crc32(toCheckSum)
-    val length = toUnsignedFourByteInt(toCheckSum.length)
-
+    val length = toUnsignedFourByteInt(compressedBytes.length)
     length ++ toCheckSum ++ crc
+
   }
 
   def iend() = {
@@ -86,5 +104,6 @@ object Png {
 
     toUnsignedFourByteInt(crc)
   }
+
 
 }
