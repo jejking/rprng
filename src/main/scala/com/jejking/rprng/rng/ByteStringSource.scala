@@ -2,12 +2,12 @@ package com.jejking.rprng.rng
 
 import akka.pattern.ask
 import akka.actor.ActorSelection
+import akka.event.Logging
 import akka.stream.{Attributes, Outlet, SourceShape}
 import akka.stream.stage.{GraphStage, GraphStageLogic, OutHandler}
 import akka.util.{ByteString, Timeout}
 
 import scala.concurrent.duration._
-
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.language.postfixOps
 
@@ -31,6 +31,7 @@ class ByteStringSource(rngActorSelection: ActorSelection, byteStringSize: Int) e
   val out: Outlet[ByteString] = Outlet("ByteStringSource")
   override val shape: SourceShape[ByteString] = SourceShape(out)
   implicit val timeout = Timeout(2 seconds)
+
 
   override def createLogic(inheritedAttributes: Attributes): GraphStageLogic = {
     new GraphStageLogic(shape) {

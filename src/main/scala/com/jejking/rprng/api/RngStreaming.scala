@@ -8,6 +8,7 @@ import akka.stream._
 import akka.stream.scaladsl.{Keep, Sink, Source}
 import akka.stream.stage._
 import akka.util.ByteString
+import com.jejking.rprng.png.PngSourceFactory
 import com.jejking.rprng.rng._
 
 import scala.concurrent.Future
@@ -42,9 +43,24 @@ trait RngStreaming {
     */
   def responseForIntegerCollection(req: RandomIntegerCollectionRequest): Future[RandomIntegerCollectionResponse]
 
+  /**
+    * Generates a HTTP Response whose entity is a stream of bytes
+    * representing a PNG with random RGBA channel values of the
+    * requested width and height.
+    *
+    * The PNG is streamed, being broken down into IDAT chunks
+    * of around 32KB.
+    *
+    * @param width of the PNG requested
+    * @param height of the PNG requested
+    * @return response with appropriate content-type set and entity being the PNG
+    */
+  def responseForPng(width: Int, height: Int): HttpResponse
 }
 
 class AkkaRngStreaming(path: ActorSelection)(implicit actorSystem: ActorSystem, actorMaterializer: ActorMaterializer) extends RngStreaming {
+
+  private val pngSourceFactory = PngSourceFactory.pngSource(path) _
 
   private def createByteStringSource(blockSize: Int): Source[ByteString, NotUsed] = {
     val sourceGraph: Graph[SourceShape[ByteString], NotUsed] = new ByteStringSource(path, blockSize)
@@ -103,6 +119,13 @@ class AkkaRngStreaming(path: ActorSelection)(implicit actorSystem: ActorSystem, 
     }
 
   }
+
+  override def responseForPng(width: Int, height: Int): HttpResponse = {
+    val pngSource = pngSourceFactory(width, height)
+    val entity: ResponseEntity = HttpEntity(ContentType(MediaTypes.`image/png`), pngSource)
+    HttpResponse(StatusCodes.OK).withEntity(entity)
+  }
+
 }
 
 /**
