@@ -11,17 +11,32 @@ Idea here is to try and build a very simple set of classes for creating a random
  
  
 For the streaming part, we want to write 4 channels: red, green, blue, alpha. (Color type 6).
-We can write 8 or 16 bits per channel.
+We can write 8 or 16 bits per channel - but will use 8, giving 32 bits per pixel, or 4 bytes.
  
  
  Write:
  PNG signature
  IHDR chunk  image's width, height, bit depth, color type, compression method, filter method, and interlace method (13 data bytes total
- PLTE - not needed, we're going full random across RGBA
- IDAT - how many are we going to need?
+ IDAT - deflate compressed stream of scanlines
  IEND
  
- (Any other ancilliary chunks can be left out)
+ # Graph Processing
+ 
+ `ByteStringStage` will provide the random input. Create at `width` * 4.
+ 
+ `ScanlineStage` consumes raw byte strings that represent random RGBA pixels for a line, prepends the filter byte.
+ - this can be done by doing a map with the Png.scanline() function.
+ 
+ 
+ `IdatGraphStage` consumes `height` scanlines and emits IDAT chunks.
+ 
+ `PNG Stage`
+ 
+ send the png signature and the header
+ consume idats for as long as there are any
+ when there no more idats, send the footer
+ - 
+ 
  
  # Not Covered
  Any other filter than "none"
