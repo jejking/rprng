@@ -4,7 +4,17 @@ import akka.stream.{Attributes, FlowShape, Inlet, Outlet}
 import akka.stream.stage.{GraphStage, GraphStageLogic, InHandler, OutHandler}
 import akka.util.ByteString
 
-class PngStage(width: Int, height: Int) extends GraphStage[FlowShape[ByteString, ByteString]] {
+/**
+  * Graph stage to emit PNG signature, IHDR, IDAT and IEND chunks.
+  *
+  * The stage starts by emitting the signature and IHDR chunks. Next, all the IDAT chunks that
+  * represent the input to the stage are consumed and passed downstream. When the input source
+  * is exhausted, the IEND chunk is emitted and the stage completes.
+  *
+  * @param width of the PNG to be generated
+  * @param height of the PNG to be generated
+  */
+private[png] class PngStage(width: Int, height: Int) extends GraphStage[FlowShape[ByteString, ByteString]] {
 
   val in = Inlet[ByteString]("Idat.in")
   val out = Outlet[ByteString]("Png.out")

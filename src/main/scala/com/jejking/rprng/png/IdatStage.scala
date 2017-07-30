@@ -5,9 +5,16 @@ import akka.stream.stage.{GraphStage, GraphStageLogic, InHandler, OutHandler}
 import akka.util.{ByteString, ByteStringBuilder}
 
 /**
-  * Created by jking on 23/07/2017.
+  * Graph stage to emit Png IDAT chunks as [[akka.util.ByteString]] instances from a source of byte strings
+  * which are assumed to represent Png scanlines of [[width]] pixels.
+  *
+  * The stage consumes [[height]] number of scanlines and attempts to build IDAT chunks of round about 32kb
+  * which are emitted downstream. The stage is completed when [[height]] lines have been consumed.
+  *
+  * @param width of the PNG to be generated
+  * @param height of the PNG to be generated
   */
-class IdatStage(width: Int, height: Int) extends GraphStage[FlowShape[ByteString, ByteString]] {
+private[png] class IdatStage(width: Int, height: Int) extends GraphStage[FlowShape[ByteString, ByteString]] {
 
   import IdatStage._
 
@@ -80,6 +87,12 @@ object IdatStage {
   private val filterByte = 1
   private val thirtyTwoKilobytes = 32 * 1024
 
+  /**
+    * Computes the number of scanlines we should be aiming to
+    * put into an IDAT chunk so that we get as close as possible to 32 kB.
+    * @param width width of the PNG
+    * @return number of scanlines
+    */
   def numberOfScanlinesPerIdatChunk(width: Int): Int = {
     val bytesPerScanline = (width * bytesPerPixel) + filterByte
     val initialResult = thirtyTwoKilobytes / bytesPerScanline // deliberate use of int division

@@ -13,6 +13,9 @@ object PngSourceFactory {
 
   def pngSource(rngActorSelection: ActorSelection)(width: Int, height: Int): Source[ByteString, NotUsed] = {
 
+    require(width >= 1)
+    require(height >= 1)
+
     val sourceGraph: Graph[SourceShape[ByteString], NotUsed] = new ByteStringSource(rngActorSelection, bytesPerLine(width))
     val toScanline = Png.scanline(BYTES_PER_PIXEL, width)
 
