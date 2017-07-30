@@ -215,7 +215,76 @@ class RoutesSpec extends FlatSpec with Matchers with ScalaFutures with Scalatest
    }
  }
 
+  "/png" should "return a default sized png" in {
+    val mockStreamsHelper = mock[RngStreaming]
+    (mockStreamsHelper.responseForPng _).expects(250, 250)
 
+    val routes = new Routes(mockStreamsHelper)
+    Get("/png") ~> routes.route
+  }
 
+  "/png?width=100&height=200" should "return a png of width 100 and height 200" in {
+    val mockStreamsHelper = mock[RngStreaming]
+    (mockStreamsHelper.responseForPng _).expects(100, 200)
 
+    val routes = new Routes(mockStreamsHelper)
+    Get("/png?width=100&height=200") ~> routes.route
+  }
+
+  "/png?width=100" should "return a png of width 100 and default height" in {
+    val mockStreamsHelper = mock[RngStreaming]
+    (mockStreamsHelper.responseForPng _).expects(100, 250)
+
+    val routes = new Routes(mockStreamsHelper)
+    Get("/png?width=100") ~> routes.route
+  }
+
+  "/png?height=50" should "ask for a png of default width and height 50" in {
+    val mockStreamsHelper = mock[RngStreaming]
+    (mockStreamsHelper.responseForPng _).expects(250, 50)
+
+    val routes = new Routes(mockStreamsHelper)
+    Get("/png?height=50") ~> routes.route
+  }
+
+  "/png?width=0" should "result in a bad request" in {
+    val mockStreamsHelper = mock[RngStreaming]
+    (mockStreamsHelper.responseForPng _).expects(*, *).never()
+
+    val routes = new Routes(mockStreamsHelper)
+    Get("/png?width=0") ~> routes.route ~> check {
+      rejection shouldBe a [ValidationRejection]
+    }
+  }
+
+  "/png?width=-1" should "result in a bad request" in {
+    val mockStreamsHelper = mock[RngStreaming]
+    (mockStreamsHelper.responseForPng _).expects(*, *).never()
+
+    val routes = new Routes(mockStreamsHelper)
+    Get("/png?width=-1") ~> routes.route ~> check {
+      rejection shouldBe a [ValidationRejection]
+    }
+  }
+
+  "/png?height=0" should "result in a bad request" in {
+    val mockStreamsHelper = mock[RngStreaming]
+    (mockStreamsHelper.responseForPng _).expects(*, *).never()
+
+    val routes = new Routes(mockStreamsHelper)
+    Get("/png?height=0") ~> routes.route ~> check {
+      rejection shouldBe a [ValidationRejection]
+    }
+  }
+
+  "/png?height=-1" should "result in a bad request" in {
+    val mockStreamsHelper = mock[RngStreaming]
+    (mockStreamsHelper.responseForPng _).expects(*, *).never()
+
+    val routes = new Routes(mockStreamsHelper)
+    Get("/png?height=-1") ~> routes.route ~> check {
+      rejection shouldBe a [ValidationRejection]
+    }
+  }
+  
 }
