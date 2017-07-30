@@ -76,6 +76,7 @@ class Routes(streamsHelper: RngStreaming) extends SprayJsonSupport {
     }
   }
 
+
   val route = handleExceptions(theExceptionHandler) {
     logRequest("rprng-routes",  Logging.InfoLevel) {
       byteRoute ~ intRoute

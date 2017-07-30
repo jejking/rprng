@@ -1,11 +1,15 @@
 package com.jejking.rprng.api
 
+import java.io.ByteArrayInputStream
 import java.security.SecureRandom
+import javax.imageio.ImageIO
 
 import akka.actor.{ActorSystem, Props}
-import akka.http.scaladsl.model.{ContentTypes, StatusCodes}
+import akka.http.scaladsl.model.{ContentType, ContentTypes, MediaTypes, StatusCodes}
+import akka.http.scaladsl.server.ContentNegotiator.Alternative.MediaType
 import akka.stream.ActorMaterializer
-import akka.util.ByteString
+import akka.stream.scaladsl.Sink
+import akka.util.{ByteString, ByteStringBuilder}
 import com.jejking.rprng.rng.TestUtils.{FailureActor, InsecureSeeder, ZeroRng}
 import com.jejking.rprng.rng._
 import com.jejking.rprng.rng.actors.RngActor
@@ -14,6 +18,8 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.time.{Seconds, Span}
 import org.scalatest.{BeforeAndAfterAll, FlatSpec, Matchers}
 import org.scalatest.time.SpanSugar._
+
+import scala.concurrent.Future
 
 
 /**
@@ -111,7 +117,7 @@ class RngStreamingSpec extends FlatSpec with Matchers with ScalaFutures with Bef
     }
   }
 
-  it should "deliver a lit of size 10 of sets of size 100" in {
+  it should "deliver a list of size 10 of sets of size 100" in {
 
     val req = RandomIntegerCollectionRequest(RandomSet, 100, 10, 0, 2000)
     whenReady(randomAkkaStreamsHelper.responseForIntegerCollection(req)) {
@@ -123,6 +129,29 @@ class RngStreamingSpec extends FlatSpec with Matchers with ScalaFutures with Bef
         })
       }
     }
+  }
+
+  it should "deliver a png of size 250 * 500" in {
+
+    val width = 250
+    val height = 500
+
+    val resp = randomAkkaStreamsHelper.responseForPng(width, height)
+    resp.status should be (StatusCodes.OK)
+    // correct mime type, png
+    resp.entity.contentType should be (ContentType(MediaTypes.`image/png`))
+    val body:Future[ByteStringBuilder] = resp.entity.dataBytes
+                                        .runWith(Sink.fold(new ByteStringBuilder())((bsb, bs) => bsb ++= bs))
+    whenReady(body) {
+      body => {
+        val byteString = body.result()
+        val bufferedImage = ImageIO.read(new ByteArrayInputStream(byteString.toArray))
+        bufferedImage.getWidth shouldBe width
+        bufferedImage.getHeight shouldBe height
+      }
+    }
+
+
   }
 
   override def afterAll(): Unit = {
