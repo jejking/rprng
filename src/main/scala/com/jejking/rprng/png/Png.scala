@@ -1,8 +1,6 @@
 package com.jejking.rprng.png
 
-import java.nio.ByteBuffer
 import java.nio.charset.Charset
-import java.util.zip.CRC32
 
 import akka.http.scaladsl.coding.DeflateCompressor
 import akka.util.ByteString

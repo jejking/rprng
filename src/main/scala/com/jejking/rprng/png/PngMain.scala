@@ -1,11 +1,14 @@
 package com.jejking.rprng.png
 
-import java.io.{BufferedOutputStream, File, FileOutputStream, OutputStream}
-import java.util.Random
-import javax.imageio.ImageIO
+import java.nio.file.Paths
 
-import akka.util.{ByteString, ByteStringBuilder}
+import akka.actor.ActorSystem
+import akka.stream.ActorMaterializer
+import akka.stream.scaladsl.FileIO
+import com.jejking.rprng.main.{RprngConfig, createRandomSourceActors}
+import com.jejking.rprng.rng.actors.TimeRangeToReseed
 
+import scala.concurrent.duration._
 import scala.language.postfixOps
 
 /**
@@ -15,41 +18,25 @@ object PngMain {
 
   def main(args: Array[String]): Unit = {
 
-    val bufferedOutputStream = new BufferedOutputStream(new FileOutputStream("/tmp/test1.png"))
+    import scala.concurrent.ExecutionContext.Implicits.global
+    implicit val actorSystem = ActorSystem("RandomByteToStandardOut")
+    implicit val materializer = ActorMaterializer()
 
+    val routerActorRef = createRandomSourceActors(actorSystem, RprngConfig(0, TimeRangeToReseed(1 hour, 8 hours), 8))
 
-    writeByteStringToStream(Png.PNG_SIGNATURE, bufferedOutputStream)
-    writeByteStringToStream(Png.ihdr(250, 500), bufferedOutputStream)
+    val pngSourceFactory = PngSourceFactory.pngSource(actorSystem.actorSelection(routerActorRef.path)) _
 
-    val rng = new Random()
+    val width = 100
+    val height = 400
 
-//    for (i <- 1 to 50) {
-//      val scanLinesByteStringBuilder = new ByteStringBuilder()
-//      for (j <- 1 to 10) {
-//        val picData = new Array[Byte](1 * 250 * 4)
-//        rng.nextBytes(picData)
-//
-//        val rawScanLineBytes = ByteString(picData)
-//        val scanLine = Png.scanline(4, 250)(rawScanLineBytes)
-//        scanLinesByteStringBuilder ++= scanLine
-//      }
-//      writeByteStringToStream(Png.idat(scanLinesByteStringBuilder.result()), bufferedOutputStream)
-//    }
+    val future = pngSourceFactory(width, height)
+        .runWith(FileIO.toPath(Paths.get("/tmp/streamingPng.png")))
 
-    writeByteStringToStream(Png.iend(), bufferedOutputStream)
+    future.foreach(_ => {
+      println("done")
+      actorSystem.terminate()
+    })
 
-    bufferedOutputStream.close()
-
-    println("done writing")
-
-    val bufferedImage = ImageIO.read(new File("/tmp/test1.png"))
-
-    println(bufferedImage.getWidth + " x " + bufferedImage.getHeight())
-  }
-
-  def writeByteStringToStream(byteString: ByteString, outputStream: OutputStream): Unit = {
-    outputStream.write(byteString.toArray)
-    outputStream.flush()
   }
 
 }
