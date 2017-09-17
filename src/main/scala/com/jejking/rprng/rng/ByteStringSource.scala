@@ -24,7 +24,7 @@ import scala.language.postfixOps
   * @param byteStringSize determines the size of the [[ByteString]]s to be emitted by the stream.
   *                       Must be a strictly positive integer.
   */
-class ByteStringSource(rngActorSelection: ActorSelection, byteStringSize: Int) extends GraphStage[SourceShape[ByteString]] {
+class ByteStringSource(rngActorSelection: ActorSelection, val byteStringSize: Int) extends GraphStage[SourceShape[ByteString]] {
 
   require(byteStringSize > 0, s"byteStringSize must be greater than 0, but is ${byteStringSize}")
 
