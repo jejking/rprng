@@ -8,7 +8,7 @@ import scala.concurrent.{Future, blocking}
 import scala.language.postfixOps
 
 /**
- * Actor wrapping a [[Rng]] to allow thread-safe access to it and to manage its lifecycle,
+ * Actor wrapping a [[com.jejking.rprng.rng.Rng]] to allow thread-safe access to it and to manage its lifecycle,
  * especially with regard to re-seeding.
  *
  * @param rng PRNG wrapped by actor
@@ -31,7 +31,7 @@ class RngActor(private val rng: Rng, private val secureSeeder: SecureSeeder,
     val seed = secureSeeder.generateSeed()
     this.rng.reseed(seed)
     scheduleReseed()
-    log.info("completed pre-start of " + actorPath)
+    log.info(s"completed pre-start of ${actorPath}")
 
   }
 
@@ -41,7 +41,7 @@ class RngActor(private val rng: Rng, private val secureSeeder: SecureSeeder,
     case r: RandomByteRequest => {
       sender() ! ByteString(rng.randomBytes(r))
       if (log.isDebugEnabled) {
-        log.debug("processed request for " + r.count + "bytes")
+        log.debug(s"processed request for ${r.count} bytes")
       }
     }
 
@@ -60,14 +60,14 @@ class RngActor(private val rng: Rng, private val secureSeeder: SecureSeeder,
 
   def applyNewSeedAndScheduleReseed(newSeed: Seed): Unit = {
     this.rng.reseed(newSeed)
-    log.info("applied new seed in actor " + actorPath)
+    log.info(s"applied new seed in actor ${actorPath}")
 
     // and off we go for the next round at some point in the future
     scheduleReseed()
   }
 
   def fetchSeedAndNotify(): Unit = {
-    log.info("about to trigger future to collect fresh seed for actor " + actorPath)
+    log.info(s"about to trigger future to collect fresh seed for actor ${actorPath}")
     // generate seed is likely to block as the seeder gathers entropy
     // therefore we do this in a future and send a message onto the actor's mailbox
     // for async application once we have a result
@@ -86,7 +86,7 @@ class RngActor(private val rng: Rng, private val secureSeeder: SecureSeeder,
     val timeToReseed = TimeRangeToReseed.durationToReseed(timeRangeToReseed, rng)
     scheduleHelper.scheduleOnce(timeToReseed) {
       self ! Reseed
-      log.info("sent reseed message to actor " + actorPath)
+      log.info(s"sent reseed message to actor ${actorPath}")
     }
   }
 }
