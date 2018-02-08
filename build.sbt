@@ -5,18 +5,18 @@ enablePlugins(DockerPlugin)
 
 name := "rprng"
 organization := "com.jejking"
-scalaVersion := "2.12.2"
+scalaVersion := "2.12.4"
 autoAPIMappings := true
 
 scalacOptions := Seq("-unchecked", "-deprecation", "-encoding", "utf8", "-feature")
 
 libraryDependencies ++= {
-  val akkaV        = "2.5.2"
-  val akkaHttpV    = "10.0.7"
-  val scalaTestV   = "3.0.1"
-  val commonsMathV = "3.6"
+  val akkaV        = "2.5.9"
+  val akkaHttpV    = "10.0.11"
+  val scalaTestV   = "3.0.4"
+  val commonsMathV = "3.6.1"
   val scalaMockV   = "3.6.0"
-  val logbackV     = "1.1.6"
+  val logbackV     = "1.2.3"
 
   Seq(
     "org.apache.commons"    % "commons-math3"                         % commonsMathV,
@@ -24,8 +24,7 @@ libraryDependencies ++= {
     "com.typesafe.akka"     %% "akka-slf4j"                           % akkaV,
     "ch.qos.logback"        % "logback-classic"                       % logbackV,
     "ch.qos.logback"        % "logback-core"                          % logbackV,
-    "net.logstash.logback"  % "logstash-logback-encoder"              % "4.7",
-    "com.sksamuel.scrimage" %% "scrimage-core"                        % "2.1.8",
+    "net.logstash.logback"  % "logstash-logback-encoder"              % "4.11",
     "com.typesafe.akka"     %% "akka-stream"                          % akkaV,
     "com.typesafe.akka"     %% "akka-http-core"                       % akkaHttpV,
     "com.typesafe.akka"     %% "akka-http"                            % akkaHttpV,
