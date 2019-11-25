@@ -147,7 +147,7 @@ class MainSpec extends FlatSpec with Matchers with ScalaFutures with BeforeAndAf
             .map(jsnumber => jsnumber.value)
             .foreach((bigdecimal) => {
               bigdecimal.isValidInt should be (true)
-              val fieldVal = bigdecimal.intValue()
+              val fieldVal = bigdecimal.intValue
               fieldVal should be >= 0
               fieldVal should be <= 100
             })
@@ -181,7 +181,7 @@ class MainSpec extends FlatSpec with Matchers with ScalaFutures with BeforeAndAf
         list.size should be(100)
 
         list.map((jsValue) => jsValue.asInstanceOf[JsNumber])
-          .map(jsnumber => jsnumber.value.intValue())
+          .map(jsnumber => jsnumber.value.intValue)
           .toSet.size should be(100)
       }
 

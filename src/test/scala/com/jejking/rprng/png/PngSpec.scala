@@ -142,7 +142,7 @@ class PngSpec extends FlatSpec with Matchers {
 
   private def javaDeflateFinish(bytes: ByteString): ByteString = {
     import java.util.zip.Deflater
-    val deflater = new Deflater(Deflater.BEST_COMPRESSION, false)
+    val deflater = new Deflater(6, false)
     deflater.setInput(bytes.toArray)
     deflater.finish()
     val buffer = new Array[Byte](1024)
@@ -154,7 +154,7 @@ class PngSpec extends FlatSpec with Matchers {
 
   private def javaDeflateFlush(bytes: ByteString): ByteString = {
     import java.util.zip.Deflater
-    val deflater = new Deflater(Deflater.BEST_COMPRESSION, false)
+    val deflater = new Deflater(6, false)
     deflater.setInput(bytes.toArray)
     val buffer = new Array[Byte](1024)
     val writtenBytes = deflater.deflate(buffer, 0, buffer.length, Deflater.SYNC_FLUSH)

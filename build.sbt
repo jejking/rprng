@@ -1,21 +1,23 @@
 import sbt._
 import ReleaseTransformations._
 
+resolvers += Resolver.sonatypeRepo("public")
+
 enablePlugins(DockerPlugin)
 
 name := "rprng"
 organization := "com.jejking"
-scalaVersion := "2.12.4"
+scalaVersion := "2.13.1"
 autoAPIMappings := true
 
-scalacOptions := Seq("-unchecked", "-deprecation", "-encoding", "utf8", "-feature")
+scalacOptions := Seq("-unchecked", "-deprecation", "-encoding", "utf8", "-feature", "-language:postfixOps")
 
 libraryDependencies ++= {
-  val akkaV        = "2.5.9"
-  val akkaHttpV    = "10.0.11"
-  val scalaTestV   = "3.0.4"
+  val akkaV        = "2.6.0"
+  val akkaHttpV    = "10.1.10"
+  val scalaTestV   = "3.0.8"
   val commonsMathV = "3.6.1"
-  val scalaMockV   = "3.6.0"
+  val scalaMockV   = "4.4.0"
   val logbackV     = "1.2.3"
 
   Seq(
@@ -24,7 +26,7 @@ libraryDependencies ++= {
     "com.typesafe.akka"     %% "akka-slf4j"                           % akkaV,
     "ch.qos.logback"        % "logback-classic"                       % logbackV,
     "ch.qos.logback"        % "logback-core"                          % logbackV,
-    "net.logstash.logback"  % "logstash-logback-encoder"              % "4.11",
+    "net.logstash.logback"  % "logstash-logback-encoder"              % "6.2",
     "com.typesafe.akka"     %% "akka-stream"                          % akkaV,
     "com.typesafe.akka"     %% "akka-http-core"                       % akkaHttpV,
     "com.typesafe.akka"     %% "akka-http"                            % akkaHttpV,
@@ -33,8 +35,7 @@ libraryDependencies ++= {
     "com.typesafe.akka"     %% "akka-stream-testkit"                  % akkaV       % "test",
     "org.scalatest"         %% "scalatest"                            % scalaTestV  % "test",
     "com.typesafe.akka"     %% "akka-testkit"                         % akkaV       % "test",
-    "org.scalamock"         %% "scalamock-core"                       % scalaMockV  % "test",
-    "org.scalamock"         %% "scalamock-scalatest-support"          % scalaMockV  % "test"
+    "org.scalamock"         %% "scalamock"                            % scalaMockV  % "test"
   )
 }
 

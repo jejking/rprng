@@ -16,7 +16,10 @@ class CommonsMathRngSpec extends FlatSpec with Matchers with MockFactory {
     val randomGenerator = mock[RandomGenerator]
     (randomGenerator.nextBytes _).expects(where {
       (ba: Array[Byte]) => ba.length == 4
-    }).onCall((ba: Array[Byte]) => notVeryRandomBytes.copyToArray(ba))
+    }).onCall((ba: Array[Byte]) => {
+      notVeryRandomBytes.copyToArray(ba)
+      ()
+    })
 
     val byteSource = CommonsMathRng(randomGenerator)
 
