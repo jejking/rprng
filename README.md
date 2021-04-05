@@ -83,7 +83,7 @@ The application is relatively simple in its design which is intended to provide 
  * it should be difficult to observe the running service and draw conclusions about the state of the underlying PRNGs and hence to predict future output
  * it should be reasonably performant and provide a robust, non-blocking service
  
-At the heart of the system is the `Rng` trait which defines methods to obtain a random array of bytes and to reseed some underlying PRNG. There is currently just one regular implementation (`CommonsMathRng`), which wraps an instance of `RandomGenerator` from Apache Commons math. The web application uses the [IsaacRandom](http://commons.apache.org/proper/commons-math/apidocs/org/apache/commons/math3/random/ISAACRandom.html) as its underlying PRNG implementation.
+At the heart of the system is the `Rng` trait which defines methods to obtain a random array of bytes and to reseed some underlying PRNG. There is currently just one regular implementation (`CommonsMathRng`), which wraps an instance of `RandomGenerator` from Apache Commons math. The web application uses the [IsaacRandom](https://commons.apache.org/proper/commons-math/javadocs/api-3.6.1/org/apache/commons/math3/random/ISAACRandom.html) as its underlying PRNG implementation.
 
 As the Apache `RandomGenerator` instances are not thread-safe, the `Rng` instances are managed by the `RngActor`. The external API for the actor is simply `RandomByteRequest` messages which are responded to using Akka `ByteStrings`. 
 
