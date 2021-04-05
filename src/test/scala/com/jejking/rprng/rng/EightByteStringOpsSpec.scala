@@ -123,7 +123,7 @@ class EightByteStringOpsSpec extends FlatSpec with Matchers  {
 
     // rough check for proper distribution
     for (i <- -10 to 19) {
-      frequency.getPct(i) should be (0.03 +- 0.01)
+      frequency.getPct(i) should be (0.03 +- 0.015)
     }
 
   }
