@@ -2,12 +2,13 @@ package com.jejking.rprng.rng
 
 import org.apache.commons.math3.random.RandomGenerator
 import org.scalamock.scalatest.MockFactory
-import org.scalatest.{FlatSpec, Matchers}
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
 /**
  * Simple tests of [[CommonsMathRng]].
  */
-class CommonsMathRngSpec extends FlatSpec with Matchers with MockFactory {
+class CommonsMathRngSpec extends AnyFlatSpec with Matchers with MockFactory {
 
   "a commons math byte source" should "generate request an array of bytes of correct size from underlying generator" in {
 

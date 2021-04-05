@@ -6,7 +6,7 @@ import akka.stream.scaladsl.Source
 import akka.stream.{ActorMaterializer, Graph, SourceShape}
 import akka.util.ByteString
 import com.jejking.rprng.rng._
-import com.jejking.rprng.rng.actors.{RngActor, TimeRangeToReseed}
+import com.jejking.rprng.rng.actors.TimeRangeToReseed
 
 import scala.concurrent.duration._
 import scala.language.postfixOps

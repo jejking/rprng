@@ -1,10 +1,9 @@
 package com.jejking.rprng.rng.actors
 
-import java.util.concurrent.TimeUnit
-
 import akka.util.ByteString
 import com.jejking.rprng.rng.{EightByteString, RandomByteRequest, Rng}
 
+import java.util.concurrent.TimeUnit
 import scala.concurrent.duration._
 import scala.language.postfixOps
 

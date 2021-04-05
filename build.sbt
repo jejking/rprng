@@ -7,17 +7,22 @@ enablePlugins(DockerPlugin)
 
 name := "rprng"
 organization := "com.jejking"
-scalaVersion := "2.13.1"
+scalaVersion := "2.13.5"
 autoAPIMappings := true
 
-scalacOptions := Seq("-unchecked", "-deprecation", "-encoding", "utf8", "-feature", "-language:postfixOps")
+scalacOptions := Seq(
+  "-unchecked",
+  "-deprecation",
+  "-encoding", "utf8",
+  "-feature", "-language:postfixOps",
+  "-target:11")
 
 libraryDependencies ++= {
-  val akkaV        = "2.6.0"
-  val akkaHttpV    = "10.1.10"
-  val scalaTestV   = "3.0.8"
+  val akkaV        = "2.6.13"
+  val akkaHttpV    = "10.2.4"
+  val scalaTestV   = "3.2.5"
   val commonsMathV = "3.6.1"
-  val scalaMockV   = "4.4.0"
+  val scalaMockV   = "5.1.0"
   val logbackV     = "1.2.3"
 
   Seq(
@@ -26,7 +31,7 @@ libraryDependencies ++= {
     "com.typesafe.akka"     %% "akka-slf4j"                           % akkaV,
     "ch.qos.logback"        % "logback-classic"                       % logbackV,
     "ch.qos.logback"        % "logback-core"                          % logbackV,
-    "net.logstash.logback"  % "logstash-logback-encoder"              % "6.2",
+    "net.logstash.logback"  % "logstash-logback-encoder"              % "6.6",
     "com.typesafe.akka"     %% "akka-stream"                          % akkaV,
     "com.typesafe.akka"     %% "akka-http-core"                       % akkaHttpV,
     "com.typesafe.akka"     %% "akka-http"                            % akkaHttpV,

@@ -1,19 +1,21 @@
 package com.jejking.rprng.rng
 
 import akka.NotUsed
-import akka.actor.{Actor, ActorSelection, ActorSystem, Props}
+import akka.actor.{Actor, ActorSystem, Props}
 import akka.stream.scaladsl.{Keep, Sink, Source}
 import akka.stream.{ActorMaterializer, Graph, SourceShape}
 import akka.util.ByteString
-import org.scalatest.{BeforeAndAfterAll, FlatSpec, Inspectors, Matchers}
 import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.{BeforeAndAfterAll, Inspectors}
 
 import scala.concurrent.Future
 
 /**
   * Tests for [[ByteStringSource]].
   */
-class ByteStringSourceSpec extends FlatSpec with Matchers with Inspectors with ScalaFutures with BeforeAndAfterAll {
+class ByteStringSourceSpec extends AnyFlatSpec with Matchers with Inspectors with ScalaFutures with BeforeAndAfterAll {
 
   val singleByteString = ByteString(1)
   val eightByteString = ByteString(1, 2, 3, 4, 5, 6, 7, 8)

@@ -1,9 +1,9 @@
 package com.jejking.rprng.png
 
-import java.nio.charset.Charset
-
 import akka.http.scaladsl.coding.DeflateCompressor
 import akka.util.ByteString
+
+import java.nio.charset.Charset
 
 /**
   * Functions for doing some basic work encoding random streams

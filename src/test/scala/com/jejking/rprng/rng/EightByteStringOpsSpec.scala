@@ -3,12 +3,13 @@ package com.jejking.rprng.rng
 import akka.util.ByteString
 import org.apache.commons.math3.random.MersenneTwister
 import org.apache.commons.math3.stat.Frequency
-import org.scalatest.{FlatSpec, Matchers}
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
 /**
   * Tests for [[EightByteStringOps]].
   */
-class EightByteStringOpsSpec extends FlatSpec with Matchers  {
+class EightByteStringOpsSpec extends AnyFlatSpec with Matchers  {
 
   import EightByteStringOps._
 

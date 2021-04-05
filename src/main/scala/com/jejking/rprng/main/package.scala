@@ -1,15 +1,14 @@
 package com.jejking.rprng
 
-import java.security.SecureRandom
-import java.util.concurrent.TimeUnit
-
 import akka.actor.{ActorRef, ActorSystem}
 import akka.routing.RandomGroup
-import com.jejking.rprng.rng.actors.{RngActor, TimeRangeToReseed}
 import com.jejking.rprng.rng._
+import com.jejking.rprng.rng.actors.{RngActor, TimeRangeToReseed}
 import com.typesafe.config.Config
 import org.apache.commons.math3.random.ISAACRandom
 
+import java.security.SecureRandom
+import java.util.concurrent.TimeUnit
 import scala.concurrent.duration._
 import scala.language.postfixOps
 

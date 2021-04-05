@@ -1,12 +1,7 @@
 package com.jejking.rprng.api
 
-import java.io.ByteArrayInputStream
-import java.security.SecureRandom
-import javax.imageio.ImageIO
-
 import akka.actor.{ActorSystem, Props}
 import akka.http.scaladsl.model.{ContentType, ContentTypes, MediaTypes, StatusCodes}
-import akka.http.scaladsl.server.ContentNegotiator.Alternative.MediaType
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.Sink
 import akka.util.{ByteString, ByteStringBuilder}
@@ -14,18 +9,23 @@ import com.jejking.rprng.rng.TestUtils.{FailureActor, InsecureSeeder, ZeroRng}
 import com.jejking.rprng.rng._
 import com.jejking.rprng.rng.actors.RngActor
 import org.apache.commons.math3.random.Well44497a
+import org.scalatest.BeforeAndAfterAll
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.time.{Seconds, Span}
-import org.scalatest.{BeforeAndAfterAll, FlatSpec, Matchers}
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 import org.scalatest.time.SpanSugar._
+import org.scalatest.time.{Seconds, Span}
 
+import java.io.ByteArrayInputStream
+import java.security.SecureRandom
+import javax.imageio.ImageIO
 import scala.concurrent.Future
 
 
 /**
  * Tests for [[AkkaRngStreaming]].
  */
-class RngStreamingSpec extends FlatSpec with Matchers with ScalaFutures with BeforeAndAfterAll {
+class RngStreamingSpec extends AnyFlatSpec with Matchers with ScalaFutures with BeforeAndAfterAll {
 
   implicit override val patienceConfig = PatienceConfig(timeout = 2 seconds, interval = 100 milliseconds)
 

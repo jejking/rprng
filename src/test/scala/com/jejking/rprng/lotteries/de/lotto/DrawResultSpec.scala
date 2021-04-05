@@ -1,8 +1,10 @@
 package com.jejking.rprng.lotteries.de.lotto
 
-import org.scalatest.{FlatSpec, Matchers}
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
-class DrawResultSpec extends FlatSpec with Matchers {
+
+class DrawResultSpec extends AnyFlatSpec with Matchers {
 
   "the draw result validation" should "permit a correct result to be created" in {
     val drawResult = DrawResult(Set(1, 2, 3, 4, 5, 6), 7)

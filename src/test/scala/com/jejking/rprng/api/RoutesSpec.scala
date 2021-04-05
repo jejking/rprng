@@ -1,7 +1,6 @@
 package com.jejking.rprng.api
 
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
-import akka.http.scaladsl.model
 import akka.http.scaladsl.model.HttpEntity.{Chunk, Chunked}
 import akka.http.scaladsl.model.{ContentTypes, HttpResponse, StatusCodes}
 import akka.http.scaladsl.server.ValidationRejection
@@ -11,14 +10,15 @@ import akka.util.ByteString
 import com.jejking.rprng.rng._
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.{FlatSpec, Matchers}
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
 import scala.concurrent.Future
 
 /**
  * Tests for Routes at HTTP API level.
  */
-class RoutesSpec extends FlatSpec with Matchers with ScalaFutures with ScalatestRouteTest with MockFactory with SprayJsonSupport {
+class RoutesSpec extends AnyFlatSpec with Matchers with ScalaFutures with ScalatestRouteTest with MockFactory with SprayJsonSupport {
 
   import RandomIntegerCollectionResponseProtocol.format
 

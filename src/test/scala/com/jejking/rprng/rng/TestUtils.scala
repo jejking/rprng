@@ -1,9 +1,9 @@
 package com.jejking.rprng.rng
 
-import java.security.SecureRandom
-
 import akka.actor.Actor
 import akka.util.ByteString
+
+import java.security.SecureRandom
 
 /**
  * Holds some useful test classes, constants and things.

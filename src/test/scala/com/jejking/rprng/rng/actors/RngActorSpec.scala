@@ -6,8 +6,10 @@ import akka.testkit.{DefaultTimeout, ImplicitSender, TestActorRef, TestKit}
 import akka.util.ByteString
 import com.jejking.rprng.rng._
 import org.scalamock.scalatest.MockFactory
+import org.scalatest.BeforeAndAfterAll
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
-import org.scalatest.{BeforeAndAfterAll, FlatSpecLike, Matchers}
+import org.scalatest.flatspec.AnyFlatSpecLike
+import org.scalatest.matchers.should.Matchers
 
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
@@ -17,7 +19,7 @@ import scala.language.postfixOps
  * Test of functionality around [[RngActor]].
  */
 class RngActorSpec extends TestKit(ActorSystem("test")) with DefaultTimeout with ImplicitSender
-  with FlatSpecLike with Matchers with BeforeAndAfterAll with MockFactory with Eventually with ScalaFutures  {
+  with AnyFlatSpecLike with Matchers with BeforeAndAfterAll with MockFactory with Eventually with ScalaFutures  {
 
   import Protocol._
 

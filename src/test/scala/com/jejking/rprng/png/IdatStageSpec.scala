@@ -5,12 +5,14 @@ import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.Source
 import akka.stream.testkit.scaladsl.TestSink
 import akka.util.{ByteString, ByteStringBuilder}
-import org.scalatest.{BeforeAndAfterAll, FlatSpec, Matchers}
+import org.scalatest.BeforeAndAfterAll
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
 /**
   * Created by jking on 23/07/2017.
   */
-class IdatStageSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
+class IdatStageSpec extends AnyFlatSpec with Matchers with BeforeAndAfterAll {
 
   import IdatStage._
 

@@ -1,12 +1,13 @@
 package com.jejking.rprng.rng.actors
 
 import com.jejking.rprng.rng.{SecureRandomSeeder, Seed, TestUtils}
-import org.scalatest.{FlatSpec, Matchers}
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
 /**
  * Tests for [[SecureRandomSeeder]].
  */
-class SecureSeederSpec extends FlatSpec with Matchers {
+class SecureSeederSpec extends AnyFlatSpec with Matchers {
 
   "the secure seeder" should "generate 64 bits of seed (a long) using generateSeed on the supplied SecureRandom instance" in {
     val secureRandom = new TestUtils.FixedSeedGeneratingSecureRandom()

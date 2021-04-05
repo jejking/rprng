@@ -3,7 +3,8 @@ package com.jejking.rprng.rng.actors
 import com.jejking.rprng.rng._
 import org.apache.commons.math3.random.MersenneTwister
 import org.scalamock.scalatest.MockFactory
-import org.scalatest.{FlatSpec, Matchers}
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
 import scala.concurrent.duration._
 import scala.language.postfixOps
@@ -11,7 +12,7 @@ import scala.language.postfixOps
 /**
   * Created by jking on 09/12/2016.
   */
-class TimeRangeToReseedSpec extends FlatSpec with Matchers with MockFactory {
+class TimeRangeToReseedSpec extends AnyFlatSpec with Matchers with MockFactory {
 
   "TimeRangeToReseed" should "provide a default min and max lifetime" in {
     val lifeSpanRange = TimeRangeToReseed()

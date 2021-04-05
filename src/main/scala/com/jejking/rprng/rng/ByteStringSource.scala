@@ -1,14 +1,13 @@
 package com.jejking.rprng.rng
 
-import akka.pattern.ask
 import akka.actor.ActorSelection
-import akka.event.Logging
-import akka.stream.{Attributes, Outlet, SourceShape}
+import akka.pattern.ask
 import akka.stream.stage.{GraphStage, GraphStageLogic, OutHandler}
+import akka.stream.{Attributes, Outlet, SourceShape}
 import akka.util.{ByteString, Timeout}
 
-import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration._
 import scala.language.postfixOps
 
 /**

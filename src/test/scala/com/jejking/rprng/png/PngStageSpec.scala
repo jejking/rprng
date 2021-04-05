@@ -6,9 +6,11 @@ import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.Source
 import akka.stream.testkit.scaladsl.TestSink
 import akka.util.ByteString
-import org.scalatest.{BeforeAndAfterAll, FlatSpec, Matchers}
+import org.scalatest.BeforeAndAfterAll
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
-class PngStageSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
+class PngStageSpec extends AnyFlatSpec with Matchers with BeforeAndAfterAll {
 
   implicit val system = ActorSystem("test")
   implicit val materializer = ActorMaterializer()

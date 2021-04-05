@@ -1,11 +1,12 @@
 package com.jejking.rprng.api
 
-import org.scalatest.{FlatSpec, Matchers}
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
 /**
  * Tests for [[RandomIntegerCollectionRequest]].
  */
-class RandomIntegerCollectionRequestSpec extends FlatSpec with Matchers {
+class RandomIntegerCollectionRequestSpec extends AnyFlatSpec with Matchers {
 
   "a request" should "be constructed OK given valid input" in {
     RandomIntegerCollectionRequest(RandomList)

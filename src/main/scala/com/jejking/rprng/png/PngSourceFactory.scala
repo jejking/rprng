@@ -2,8 +2,8 @@ package com.jejking.rprng.png
 
 import akka.NotUsed
 import akka.actor.ActorSelection
-import akka.stream.{Graph, SourceShape}
 import akka.stream.scaladsl.Source
+import akka.stream.{Graph, SourceShape}
 import akka.util.ByteString
 import com.jejking.rprng.rng.ByteStringSource
 

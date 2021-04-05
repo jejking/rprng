@@ -1,12 +1,13 @@
 package com.jejking.rprng.rng
 
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
-import org.scalatest.{Matchers, FlatSpec}
 
 /**
  * Tests for [[WithToSizedSet]]
  */
-class WithToSizedSetSpec extends FlatSpec with Matchers {
+class WithToSizedSetSpec extends AnyFlatSpec with Matchers {
 
   "the class" should "reject a negative target size" in {
     intercept[IllegalArgumentException] {

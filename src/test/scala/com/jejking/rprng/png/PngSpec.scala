@@ -1,18 +1,18 @@
 package com.jejking.rprng.png
 
-import java.io.ByteArrayOutputStream
+import akka.http.scaladsl.coding.DeflateCompressor
+import akka.util.ByteString
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
+
 import java.nio.ByteBuffer
 import java.nio.charset.Charset
 import java.util.zip.CRC32
 
-import akka.http.scaladsl.coding.DeflateCompressor
-import org.scalatest.{FlatSpec, Matchers}
-import akka.util.ByteString
-
 /**
   * Created by jking on 09/07/2017.
   */
-class PngSpec extends FlatSpec with Matchers {
+class PngSpec extends AnyFlatSpec with Matchers {
 
   "Png" should "define the PNG signature" in {
     val expectedBytes = ByteString(0xFFFFFF89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A)

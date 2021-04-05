@@ -1,14 +1,13 @@
 package com.jejking.rprng.lotteries.de.lotto
 
-import java.time.Clock
-import java.time.temporal.{ChronoField, ChronoUnit, Temporal, TemporalUnit}
-import java.util.concurrent.TimeUnit
-
 import akka.NotUsed
 import akka.stream.scaladsl.Source
 import com.jejking.rprng.api.ToSizedSet
 import com.jejking.rprng.rng.{EightByteString, EightByteStringOps}
 
+import java.time.Clock
+import java.time.temporal.ChronoUnit
+import java.util.concurrent.TimeUnit
 import scala.concurrent.duration.FiniteDuration
 
 class DrawResultSourceFactory(eightByteStringSource: Source[EightByteString, NotUsed]) {

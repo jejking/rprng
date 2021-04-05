@@ -1,22 +1,23 @@
 package com.jejking.rprng.png
 
-import java.io.ByteArrayInputStream
-import javax.imageio.ImageIO
-
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.Sink
 import akka.util.ByteStringBuilder
 import com.jejking.rprng.main.{RprngConfig, createRandomSourceActors}
 import com.jejking.rprng.rng.actors.TimeRangeToReseed
+import org.scalatest.BeforeAndAfterAll
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.{BeforeAndAfterAll, FlatSpec, Matchers}
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
+import java.io.ByteArrayInputStream
+import javax.imageio.ImageIO
 import scala.concurrent.Future
 import scala.concurrent.duration._
 import scala.language.postfixOps
 
-class PngSourceFactorySpec extends FlatSpec with ScalaFutures with Matchers with BeforeAndAfterAll {
+class PngSourceFactorySpec extends AnyFlatSpec with ScalaFutures with Matchers with BeforeAndAfterAll {
 
   implicit override val patienceConfig = PatienceConfig(timeout = 1 second, interval = 100 milliseconds)
 

@@ -7,15 +7,17 @@ import akka.stream.testkit.scaladsl.TestSink
 import com.jejking.rprng.rng.CommonsMathRandomGeneratorFactory
 import org.apache.commons.math3.random.MersenneTwister
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.{BeforeAndAfterAll, FlatSpec, Inspectors, Matchers}
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 import org.scalatest.time.SpanSugar._
+import org.scalatest.{BeforeAndAfterAll, Inspectors}
 
 import scala.concurrent.Future
 
 /**
  * Tests [[ToSizedSet]] custom streams processing stage.
  */
-class ToSizedSetSpec extends FlatSpec with Matchers with Inspectors with ScalaFutures with BeforeAndAfterAll {
+class ToSizedSetSpec extends AnyFlatSpec with Matchers with Inspectors with ScalaFutures with BeforeAndAfterAll {
 
   implicit override val patienceConfig = PatienceConfig(timeout = 1 second, interval = 100 milliseconds)
   implicit val system = ActorSystem("test")

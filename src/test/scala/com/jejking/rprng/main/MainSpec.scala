@@ -1,18 +1,19 @@
 package com.jejking.rprng.main
 
-import java.util.concurrent.TimeUnit
-
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.{ContentTypes, HttpRequest, StatusCodes}
 import akka.stream.ActorMaterializer
 import akka.util.ByteString
 import com.typesafe.config.ConfigFactory
+import org.scalatest.BeforeAndAfterAll
 import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 import org.scalatest.time.SpanSugar._
-import org.scalatest.{BeforeAndAfterAll, FlatSpec, Matchers}
 import spray.json._
 
+import java.util.concurrent.TimeUnit
 import scala.concurrent.Await
 import scala.concurrent.duration.{Duration, FiniteDuration}
 
@@ -20,7 +21,7 @@ import scala.concurrent.duration.{Duration, FiniteDuration}
   * Tests that the server starts and the API is exposed
   * as expected.
   */
-class MainSpec extends FlatSpec with Matchers with ScalaFutures with BeforeAndAfterAll {
+class MainSpec extends AnyFlatSpec with Matchers with ScalaFutures with BeforeAndAfterAll {
 
   implicit override val patienceConfig = PatienceConfig(timeout = 15 seconds, interval = 250 milliseconds)
 
