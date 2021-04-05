@@ -2,7 +2,7 @@ package com.jejking.rprng.png
 
 import akka.NotUsed
 import akka.actor.ActorSystem
-import akka.stream.ActorMaterializer
+import akka.stream.{ActorMaterializer, SystemMaterializer}
 import akka.stream.scaladsl.Source
 import akka.stream.testkit.scaladsl.TestSink
 import akka.util.ByteString
@@ -13,7 +13,7 @@ import org.scalatest.matchers.should.Matchers
 class PngStageSpec extends AnyFlatSpec with Matchers with BeforeAndAfterAll {
 
   implicit val system = ActorSystem("test")
-  implicit val materializer = ActorMaterializer()
+  implicit val materializer = SystemMaterializer.get(system)
 
   "the png stage" should "stream a png" in {
 

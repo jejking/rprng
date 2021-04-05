@@ -2,7 +2,7 @@ package com.jejking.rprng.lotteries.de.lotto
 
 import akka.NotUsed
 import akka.actor.ActorSystem
-import akka.stream.ActorMaterializer
+import akka.stream.{ActorMaterializer, SystemMaterializer}
 import akka.stream.scaladsl.{Sink, Source}
 import akka.util.ByteString
 import com.jejking.rprng.rng.EightByteString
@@ -17,7 +17,7 @@ import scala.concurrent.duration._
 class DrawResultSourceFactorySpec extends AnyFlatSpec with Matchers with ScalaFutures {
 
   implicit val system = ActorSystem("test")
-  implicit val materializer = ActorMaterializer()
+  implicit val materializer = SystemMaterializer.get(system)
 
   object EightByteStringGenerator {
 

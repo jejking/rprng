@@ -11,7 +11,7 @@ import java.security.SecureRandom
 object TestUtils {
 
   def arrayOfEightZeroBytes(): Array[Byte] = Array.ofDim(8)
-  val eightByteStringOfZeroes: EightByteString = EightByteString(ByteString.fromArray(arrayOfEightZeroBytes))
+  val eightByteStringOfZeroes: EightByteString = EightByteString(ByteString.fromArray(arrayOfEightZeroBytes()))
 
   class InsecureSeeder extends SecureSeeder {
     /**

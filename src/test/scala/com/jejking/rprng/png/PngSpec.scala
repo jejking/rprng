@@ -137,7 +137,7 @@ class PngSpec extends AnyFlatSpec with Matchers {
     val crc = javaCrc(Png.IEND_CHUNK_TYPE)
     val expectedByteString = zeroLength ++ Png.IEND_CHUNK_TYPE ++ crc
 
-    Png.iend shouldBe expectedByteString
+    Png.iend() shouldBe expectedByteString
   }
 
   private def javaDeflateFinish(bytes: ByteString): ByteString = {

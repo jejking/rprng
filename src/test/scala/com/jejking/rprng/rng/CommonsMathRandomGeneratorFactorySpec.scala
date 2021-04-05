@@ -10,7 +10,7 @@ import org.scalatest.matchers.should.Matchers
 class CommonsMathRandomGeneratorFactorySpec extends AnyFlatSpec with Matchers {
 
   "the factory" should "create a fresh instance of the requested PRNG" in {
-    val mt: MersenneTwister = CommonsMathRandomGeneratorFactory.createNewGeneratorInstance[MersenneTwister]
+    val mt: MersenneTwister = CommonsMathRandomGeneratorFactory.createNewGeneratorInstance[MersenneTwister]()
     mt shouldBe a [MersenneTwister]
   }
 

@@ -56,7 +56,7 @@ class Routes(streamsHelper: RngStreaming) extends SprayJsonSupport {
 
   val intRoute: Route = get {
     pathPrefix("int") {
-      parameters('size.as[Int] ? 100, 'count.as[Int]? 1, 'min.as[Int] ? Int.MinValue, 'max.as[Int] ? Int.MaxValue) {
+      parameters("size".as[Int] ? 100, "count".as[Int]? 1, "min".as[Int] ? Int.MinValue, "max".as[Int] ? Int.MaxValue) {
         (size: Int, count: Int, min: Int, max: Int) => {
           pathPrefix("list") {
             complete {
@@ -78,7 +78,7 @@ class Routes(streamsHelper: RngStreaming) extends SprayJsonSupport {
 
   val pngRoute: Route = get {
     pathPrefix("png") {
-      parameters('width.as[Int] ? 250, 'height.as[Int] ? 250) {
+      parameters("width".as[Int] ? 250, "height".as[Int] ? 250) {
         (width: Int, height: Int) => {
           validate(width > 0 && height > 0, "Width and height must both be greater than 0") {
             complete {

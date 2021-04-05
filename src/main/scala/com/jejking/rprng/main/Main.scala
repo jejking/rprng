@@ -2,7 +2,7 @@ package com.jejking.rprng.main
 
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
-import akka.stream.ActorMaterializer
+import akka.stream.{ActorMaterializer, SystemMaterializer}
 import com.jejking.rprng.api.{AkkaRngStreaming, Routes}
 import com.typesafe.config.ConfigFactory
 
@@ -17,7 +17,7 @@ object Main {
   val randomRouterPath = "/user/randomRouter"
 
   private implicit val actorSystem = ActorSystem("rprng")
-  private implicit val materializer = ActorMaterializer()
+  private implicit val materializer = SystemMaterializer.get(actorSystem)
 
   def main(args: Array[String]): Unit = {
     val myConfig = processConfig(ConfigFactory.load())
@@ -32,7 +32,7 @@ object Main {
     val streamsHelper = new AkkaRngStreaming(actorSystem.actorSelection(randomRouterPath))
     val route = new Routes(streamsHelper).route
 
-    Http().bindAndHandle(route, "0.0.0.0", myConfig.port)
+    Http().newServerAt("0.0.0.0", myConfig.port).bindFlow(route)
   }
 
   def shutdown(): Unit = {

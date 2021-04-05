@@ -1,7 +1,7 @@
 package com.jejking.rprng.api
 
 import akka.actor._
-import akka.stream.ActorMaterializer
+import akka.stream.{ActorMaterializer, SystemMaterializer}
 import akka.stream.scaladsl.{Keep, Sink, Source}
 import akka.stream.testkit.scaladsl.TestSink
 import com.jejking.rprng.rng.CommonsMathRandomGeneratorFactory
@@ -21,7 +21,7 @@ class ToSizedSetSpec extends AnyFlatSpec with Matchers with Inspectors with Scal
 
   implicit override val patienceConfig = PatienceConfig(timeout = 1 second, interval = 100 milliseconds)
   implicit val system = ActorSystem("test")
-  implicit val materializer = ActorMaterializer()
+  implicit val materializer = SystemMaterializer.get(system)
 
 
   "the stage" should "produce a single set of right size from a sequence of integers when requested" in {
@@ -30,7 +30,7 @@ class ToSizedSetSpec extends AnyFlatSpec with Matchers with Inspectors with Scal
                                 .via(toSizedSet)
                                 .take(1)
                                 .toMat(Sink.head)(Keep.right)
-                                .run
+                                .run()
     whenReady(set) {
       s => s shouldBe Set(1, 2, 3, 4, 5)
     }
@@ -63,7 +63,7 @@ class ToSizedSetSpec extends AnyFlatSpec with Matchers with Inspectors with Scal
                                     .take(100)
                                     .grouped(100)
                                     .toMat(Sink.head)(Keep.right)
-                                    .run
+                                    .run()
     whenReady(futureSeq) {
       seq => {
         seq should have size 100

@@ -3,7 +3,7 @@ package com.jejking.rprng.main
 import akka.NotUsed
 import akka.actor.ActorSystem
 import akka.stream.scaladsl.Source
-import akka.stream.{ActorMaterializer, Graph, SourceShape}
+import akka.stream.{ActorMaterializer, Graph, SourceShape, SystemMaterializer}
 import akka.util.ByteString
 import com.jejking.rprng.rng._
 import com.jejking.rprng.rng.actors.TimeRangeToReseed
@@ -24,7 +24,7 @@ object RandomBytesToStandardOut {
   def main(args: Array[String]): Unit = {
 
     implicit val actorSystem = ActorSystem("RandomByteToStandardOut")
-    implicit val materializer = ActorMaterializer()
+    implicit val materializer = SystemMaterializer.get(actorSystem)
 
     val routerActorRef = createRandomSourceActors(actorSystem, RprngConfig(0, TimeRangeToReseed(1 hour, 8 hours), 8))
 

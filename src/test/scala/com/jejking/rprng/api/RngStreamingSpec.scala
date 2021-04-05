@@ -2,7 +2,7 @@ package com.jejking.rprng.api
 
 import akka.actor.{ActorSystem, Props}
 import akka.http.scaladsl.model.{ContentType, ContentTypes, MediaTypes, StatusCodes}
-import akka.stream.ActorMaterializer
+import akka.stream.{ActorMaterializer, SystemMaterializer}
 import akka.stream.scaladsl.Sink
 import akka.util.{ByteString, ByteStringBuilder}
 import com.jejking.rprng.rng.TestUtils.{FailureActor, InsecureSeeder, ZeroRng}
@@ -30,7 +30,7 @@ class RngStreamingSpec extends AnyFlatSpec with Matchers with ScalaFutures with 
   implicit override val patienceConfig = PatienceConfig(timeout = 2 seconds, interval = 100 milliseconds)
 
   implicit val system: ActorSystem = initActorSystem()
-  implicit val materializer = ActorMaterializer()
+  implicit val materializer = SystemMaterializer.get(system)
   val simpleAkkaStreamsHelper = new AkkaRngStreaming(system.actorSelection("/user/randomRouter"))
 
   createProperlyRandomActor()
@@ -40,14 +40,14 @@ class RngStreamingSpec extends AnyFlatSpec with Matchers with ScalaFutures with 
 
     val actorSystem = ActorSystem("akkaStreamsHelperSpec")
     actorSystem.actorOf(RngActor.props(new ZeroRng, new InsecureSeeder), "randomRouter")
-    actorSystem.actorOf(Props[FailureActor], "failure")
+    actorSystem.actorOf(Props[FailureActor](), "failure")
     actorSystem
   }
 
   def createProperlyRandomActor(): Unit = {
     val secureRandom = new SecureRandom()
     val secureSeeder = new SecureRandomSeeder(secureRandom)
-    val randomGenerator = CommonsMathRandomGeneratorFactory.createNewGeneratorInstance[Well44497a]
+    val randomGenerator = CommonsMathRandomGeneratorFactory.createNewGeneratorInstance[Well44497a]()
     val randomGeneratorByteSource = CommonsMathRng(randomGenerator)
     system.actorOf(RngActor.props(randomGeneratorByteSource, secureSeeder), "randomlyRandom")
   }

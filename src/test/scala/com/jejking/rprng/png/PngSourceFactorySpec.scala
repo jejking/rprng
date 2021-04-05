@@ -1,7 +1,7 @@
 package com.jejking.rprng.png
 
 import akka.actor.ActorSystem
-import akka.stream.ActorMaterializer
+import akka.stream.{ActorMaterializer, SystemMaterializer}
 import akka.stream.scaladsl.Sink
 import akka.util.ByteStringBuilder
 import com.jejking.rprng.main.{RprngConfig, createRandomSourceActors}
@@ -22,7 +22,7 @@ class PngSourceFactorySpec extends AnyFlatSpec with ScalaFutures with Matchers w
   implicit override val patienceConfig = PatienceConfig(timeout = 1 second, interval = 100 milliseconds)
 
   implicit val system = ActorSystem("test")
-  implicit val materializer = ActorMaterializer()
+  implicit val materializer = SystemMaterializer.get(system)
   val routerActorRef = createRandomSourceActors(system, RprngConfig(0, TimeRangeToReseed(1 hour, 8 hours), 8))
 
   "the png source factory" should "generate a stream that can be parsed into a proper PNG by Java ImageIO" in {

@@ -58,7 +58,7 @@ trait RngStreaming {
   def responseForPng(width: Int, height: Int): HttpResponse
 }
 
-class AkkaRngStreaming(path: ActorSelection)(implicit actorSystem: ActorSystem, actorMaterializer: ActorMaterializer) extends RngStreaming {
+class AkkaRngStreaming(path: ActorSelection)(implicit actorSystem: ActorSystem, materializer: Materializer) extends RngStreaming {
 
   private val pngSourceFactory = PngSourceFactory.pngSource(path) _
 
@@ -114,8 +114,8 @@ class AkkaRngStreaming(path: ActorSelection)(implicit actorSystem: ActorSystem, 
     }
 
     req.collectionType match {
-      case RandomList => listsFromStream
-      case RandomSet  => setsFromStream
+      case RandomList => listsFromStream()
+      case RandomSet  => setsFromStream()
     }
 
   }
@@ -137,8 +137,8 @@ class AkkaRngStreaming(path: ActorSelection)(implicit actorSystem: ActorSystem, 
   */
 class ToSizedSet(requestedSize: Int) extends GraphStage[FlowShape[Int, Set[Int]]] {
 
-  val in = Inlet[Int]("ints.in")
-  val out = Outlet[Set[Int]]("int sets.out")
+  val in: Inlet[Int] = Inlet[Int]("ints.in")
+  val out: Outlet[Set[Int]] = Outlet[Set[Int]]("int sets.out")
 
   val shape = FlowShape.of(in, out)
 

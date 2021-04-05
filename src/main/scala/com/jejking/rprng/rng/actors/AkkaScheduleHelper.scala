@@ -12,7 +12,7 @@ import scala.concurrent.duration.FiniteDuration
  */
 class AkkaScheduleHelper(scheduler: Scheduler) extends ScheduleHelper {
 
-  override def scheduleOnce(delay: FiniteDuration)(f: ⇒ Unit)(implicit executor: ExecutionContext): Cancellable =  {
+  override def scheduleOnce(delay: FiniteDuration)(f: => Unit)(implicit executor: ExecutionContext): Cancellable =  {
     scheduler.scheduleOnce(delay)(f)
   }
 }

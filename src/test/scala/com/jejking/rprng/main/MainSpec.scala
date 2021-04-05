@@ -3,7 +3,7 @@ package com.jejking.rprng.main
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.{ContentTypes, HttpRequest, StatusCodes}
-import akka.stream.ActorMaterializer
+import akka.stream.{ActorMaterializer, SystemMaterializer}
 import akka.util.ByteString
 import com.typesafe.config.ConfigFactory
 import org.scalatest.BeforeAndAfterAll
@@ -29,9 +29,9 @@ class MainSpec extends AnyFlatSpec with Matchers with ScalaFutures with BeforeAn
   val baseUri = "http://localhost:8080"
 
   implicit val system = ActorSystem()
-  implicit val materializer = ActorMaterializer()
+  implicit val materializer = SystemMaterializer.get(system)
 
-  override def beforeAll() {
+  override def beforeAll(): Unit = {
     // start and wait for the binding to be ready before trying to use it
     val myConfig = processConfig(ConfigFactory.load())
     Await.ready(Main.createAndStartServer(myConfig), (Duration(5, "seconds")))
@@ -190,8 +190,7 @@ class MainSpec extends AnyFlatSpec with Matchers with ScalaFutures with BeforeAn
   }
 
 
-
-  override def afterAll() {
+  override def afterAll(): Unit = {
     Main.shutdown()
     system.terminate()
   }

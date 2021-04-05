@@ -16,7 +16,7 @@ object CommonsMathRandomGeneratorFactory {
    * @return new instance, as yet unseeded.
    */
   def createNewGeneratorInstance[G <: RandomGenerator]()(implicit tag: ClassTag[G]): G = {
-    tag.runtimeClass.newInstance().asInstanceOf[G]
+    tag.runtimeClass.getDeclaredConstructor().newInstance().asInstanceOf[G]
   }
 
 }

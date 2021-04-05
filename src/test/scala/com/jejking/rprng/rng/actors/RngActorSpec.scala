@@ -70,7 +70,7 @@ class RngActorSpec extends TestKit(ActorSystem("test")) with DefaultTimeout with
 
     (mockByteSource.randomBytes _).expects(where {
       (request: RandomByteRequest) => request.count == 8
-    }).returning(TestUtils.arrayOfEightZeroBytes)
+    }).returning(TestUtils.arrayOfEightZeroBytes())
     
 
     val mockSecureSeeder = mock[SecureSeeder]

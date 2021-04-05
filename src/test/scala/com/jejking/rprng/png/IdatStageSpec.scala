@@ -1,7 +1,7 @@
 package com.jejking.rprng.png
 
 import akka.actor.ActorSystem
-import akka.stream.ActorMaterializer
+import akka.stream.{ActorMaterializer, SystemMaterializer}
 import akka.stream.scaladsl.Source
 import akka.stream.testkit.scaladsl.TestSink
 import akka.util.{ByteString, ByteStringBuilder}
@@ -17,7 +17,7 @@ class IdatStageSpec extends AnyFlatSpec with Matchers with BeforeAndAfterAll {
   import IdatStage._
 
   implicit val system = ActorSystem("test")
-  implicit val materializer = ActorMaterializer()
+  implicit val materializer = SystemMaterializer.get(system)
 
   "numberOfScanlinesPerIdatChunk" should "compute number nearest in size to 32kb" in {
     val width = 150 // pixels, so scanline will (150 * 4) + 1 bytes = 601

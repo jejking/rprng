@@ -3,7 +3,7 @@ package com.jejking.rprng.rng
 import akka.NotUsed
 import akka.actor.{Actor, ActorSystem, Props}
 import akka.stream.scaladsl.{Keep, Sink, Source}
-import akka.stream.{ActorMaterializer, Graph, SourceShape}
+import akka.stream.{ActorMaterializer, Graph, SourceShape, SystemMaterializer}
 import akka.util.ByteString
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.flatspec.AnyFlatSpec
@@ -21,10 +21,10 @@ class ByteStringSourceSpec extends AnyFlatSpec with Matchers with Inspectors wit
   val eightByteString = ByteString(1, 2, 3, 4, 5, 6, 7, 8)
 
   implicit val system = ActorSystem("test")
-  implicit val materializer = ActorMaterializer()
+  implicit val materializer = SystemMaterializer.get(system)
 
   override def beforeAll(): Unit = {
-    system.actorOf(Props[NotVeryRandomRngActor], "notveryrandom")
+    system.actorOf(Props[NotVeryRandomRngActor](), "notveryrandom")
   }
 
   "the source" should "return a single Future[ByteString] of size 8 when asked" in {
@@ -33,7 +33,7 @@ class ByteStringSourceSpec extends AnyFlatSpec with Matchers with Inspectors wit
 
     val mySource: Source[ByteString, NotUsed] = Source.fromGraph(sourceGraph)
 
-    val futureByteString: Future[ByteString] = mySource.take(1).toMat(Sink.head)(Keep.right).run
+    val futureByteString: Future[ByteString] = mySource.take(1).toMat(Sink.head)(Keep.right).run()
     whenReady(futureByteString) {
       ebs => ebs shouldBe eightByteString
     }
@@ -45,7 +45,7 @@ class ByteStringSourceSpec extends AnyFlatSpec with Matchers with Inspectors wit
 
     val mySource: Source[ByteString, NotUsed] = Source.fromGraph(sourceGraph)
 
-    val futureByteString: Future[ByteString] = mySource.take(1).toMat(Sink.head)(Keep.right).run
+    val futureByteString: Future[ByteString] = mySource.take(1).toMat(Sink.head)(Keep.right).run()
     whenReady(futureByteString) {
       ebs => ebs shouldBe singleByteString
     }

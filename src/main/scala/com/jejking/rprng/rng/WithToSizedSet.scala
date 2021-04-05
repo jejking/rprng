@@ -5,7 +5,7 @@ import scala.annotation.tailrec
 /**
  * Enhances a traversable with method to map it to a set of a target size..
  */
-class WithToSizedSet[T](traversable: Traversable[T]) {
+class WithToSizedSet[T](iterable: Iterable[T]) {
 
   /**
    * Creates a set of the target size from the traversable. If a set of the target size can
@@ -19,18 +19,18 @@ class WithToSizedSet[T](traversable: Traversable[T]) {
   def toSizedSet(targetSize: Int): Set[T] = {
     require(targetSize >= 0)
 
-    @tailrec def addToSet(accum: Set[T], traversing: Traversable[T]): Set[T] = {
+    @tailrec def addToSet(accum: Set[T], iterating: Iterable[T]): Set[T] = {
       if (accum.size == targetSize) {
         accum
-      } else if (traversing.headOption.isEmpty) {
+      } else if (iterating.headOption.isEmpty) {
         accum
       } else {
-        addToSet(accum + traversing.head, traversing.tail)
+        addToSet(accum + iterating.head, iterating.tail)
       }
 
     }
 
-    addToSet(Set.empty, traversable)
+    addToSet(Set.empty, iterable)
   }
 
 }

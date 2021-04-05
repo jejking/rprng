@@ -12,7 +12,7 @@ import scala.language.postfixOps
  * Isolates the functionality we need from the Akka Scheduler.
  */
 trait ScheduleHelper {
-  def scheduleOnce(delay: FiniteDuration)(f: ⇒ Unit)(implicit executor: ExecutionContext): Cancellable
+  def scheduleOnce(delay: FiniteDuration)(f: => Unit)(implicit executor: ExecutionContext): Cancellable
 
 }
 
