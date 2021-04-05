@@ -1,7 +1,7 @@
 package com.jejking.rprng.api
 
 import akka.actor._
-import akka.stream.{ActorMaterializer, SystemMaterializer}
+import akka.stream.SystemMaterializer
 import akka.stream.scaladsl.{Keep, Sink, Source}
 import akka.stream.testkit.scaladsl.TestSink
 import com.jejking.rprng.rng.CommonsMathRandomGeneratorFactory

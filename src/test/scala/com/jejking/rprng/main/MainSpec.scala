@@ -3,7 +3,7 @@ package com.jejking.rprng.main
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.{ContentTypes, HttpRequest, StatusCodes}
-import akka.stream.{ActorMaterializer, SystemMaterializer}
+import akka.stream.SystemMaterializer
 import akka.util.ByteString
 import com.typesafe.config.ConfigFactory
 import org.scalatest.BeforeAndAfterAll

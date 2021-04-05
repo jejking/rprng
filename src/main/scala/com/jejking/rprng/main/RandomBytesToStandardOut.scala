@@ -3,7 +3,7 @@ package com.jejking.rprng.main
 import akka.NotUsed
 import akka.actor.ActorSystem
 import akka.stream.scaladsl.Source
-import akka.stream.{ActorMaterializer, Graph, SourceShape, SystemMaterializer}
+import akka.stream.{Graph, SourceShape, SystemMaterializer}
 import akka.util.ByteString
 import com.jejking.rprng.rng._
 import com.jejking.rprng.rng.actors.TimeRangeToReseed

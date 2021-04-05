@@ -2,7 +2,7 @@ package com.jejking.rprng.png
 
 import akka.NotUsed
 import akka.actor.ActorSystem
-import akka.stream.{ActorMaterializer, SystemMaterializer}
+import akka.stream.SystemMaterializer
 import akka.stream.scaladsl.Source
 import akka.stream.testkit.scaladsl.TestSink
 import akka.util.ByteString

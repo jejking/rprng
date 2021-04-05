@@ -2,7 +2,7 @@ package com.jejking.rprng.lotteries.de.lotto
 
 import akka.NotUsed
 import akka.actor.ActorSystem
-import akka.stream.{ActorMaterializer, SystemMaterializer}
+import akka.stream.SystemMaterializer
 import akka.stream.scaladsl.{Sink, Source}
 import akka.util.ByteString
 import com.jejking.rprng.rng.EightByteString

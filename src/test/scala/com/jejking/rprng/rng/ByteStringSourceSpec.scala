@@ -3,7 +3,7 @@ package com.jejking.rprng.rng
 import akka.NotUsed
 import akka.actor.{Actor, ActorSystem, Props}
 import akka.stream.scaladsl.{Keep, Sink, Source}
-import akka.stream.{ActorMaterializer, Graph, SourceShape, SystemMaterializer}
+import akka.stream.{Graph, SourceShape, SystemMaterializer}
 import akka.util.ByteString
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.flatspec.AnyFlatSpec

@@ -2,7 +2,7 @@ package com.jejking.rprng.main
 
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
-import akka.stream.{ActorMaterializer, SystemMaterializer}
+import akka.stream.SystemMaterializer
 import com.jejking.rprng.api.{AkkaRngStreaming, Routes}
 import com.typesafe.config.ConfigFactory
 

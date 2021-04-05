@@ -2,7 +2,7 @@ package com.jejking.rprng.api
 
 import akka.actor.{ActorSystem, Props}
 import akka.http.scaladsl.model.{ContentType, ContentTypes, MediaTypes, StatusCodes}
-import akka.stream.{ActorMaterializer, SystemMaterializer}
+import akka.stream.SystemMaterializer
 import akka.stream.scaladsl.Sink
 import akka.util.{ByteString, ByteStringBuilder}
 import com.jejking.rprng.rng.TestUtils.{FailureActor, InsecureSeeder, ZeroRng}

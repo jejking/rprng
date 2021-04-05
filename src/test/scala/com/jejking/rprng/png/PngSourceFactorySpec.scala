@@ -1,7 +1,7 @@
 package com.jejking.rprng.png
 
 import akka.actor.ActorSystem
-import akka.stream.{ActorMaterializer, SystemMaterializer}
+import akka.stream.SystemMaterializer
 import akka.stream.scaladsl.Sink
 import akka.util.ByteStringBuilder
 import com.jejking.rprng.main.{RprngConfig, createRandomSourceActors}
