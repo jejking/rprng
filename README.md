@@ -1,7 +1,5 @@
 # rprng
 
-[![Build Status](https://travis-ci.org/jejking/rprng.svg?branch=master)](https://travis-ci.org/jejking/rprng)
-
 *A reactive pseudo-RNG web service built on commons math and akka*
 
 ## Run the server
