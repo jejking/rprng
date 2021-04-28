@@ -113,9 +113,9 @@ class PngSpec extends AnyFlatSpec with Matchers {
     val checkSum = javaCrc(toChecksum)
     val expected = Png.toUnsignedFourByteInt(compressedBytes.length) ++ toChecksum ++ checkSum
 
-    val deflateCompressor = new DeflateCompressor()
+    val deflateHelper = new DeflateHelper()
 
-    val idat = Png.idat(deflateCompressor) _
+    val idat = Png.idat(deflateHelper) _
     idat(bytes, true) shouldBe expected
   }
 
@@ -126,9 +126,9 @@ class PngSpec extends AnyFlatSpec with Matchers {
     val checkSum = javaCrc(toChecksum)
     val expected = Png.toUnsignedFourByteInt(compressedBytes.length) ++ toChecksum ++ checkSum
 
-    val deflateCompressor = new DeflateCompressor()
+    val deflateHelper = new DeflateHelper()
 
-    val idat = Png.idat(deflateCompressor) _
+    val idat = Png.idat(deflateHelper) _
     idat(bytes, false) shouldBe expected
   }
 

@@ -49,7 +49,7 @@ class ToSizedSetSpec extends AnyFlatSpec with Matchers with Inspectors with Scal
 
     val randomIterator = new Iterator[Int] {
 
-      val rng = CommonsMathRandomGeneratorFactory.createNewGeneratorInstance[MersenneTwister]
+      val rng = CommonsMathRandomGeneratorFactory.createNewGeneratorInstance[MersenneTwister]()
 
       override def hasNext: Boolean = true
 

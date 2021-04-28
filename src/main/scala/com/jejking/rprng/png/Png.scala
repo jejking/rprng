@@ -51,13 +51,13 @@ object Png {
     ByteString(0.toByte) ++ bs
   }
 
-  def idat(deflateCompressor: DeflateCompressor = new DeflateCompressor())(bytes: ByteString, shouldFinish: Boolean) = {
+  def idat(deflateHelper: DeflateHelper = new DeflateHelper())(bytes: ByteString, shouldFinish: Boolean) = {
 
     def doCompression(): ByteString = {
       if (shouldFinish) {
-        deflateCompressor.compressAndFinish(bytes)
+        deflateHelper.compressAndFinish(bytes)
       } else {
-        deflateCompressor.compressAndFlush(bytes)
+        deflateHelper.compressAndFlush(bytes)
       }
     }
 
