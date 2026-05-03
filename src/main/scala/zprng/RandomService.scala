@@ -62,12 +62,15 @@ final private class LiveRandomService(
     } yield ()
 
   override def split: UIO[RandomService] =
-    for {
-      params <- stateRef.modify { state =>
-        val streamId = s"split-${state.splitCounter}"
-        val newKey   = ChaChaCore.deriveKey(state.key, streamId)
-        ((newKey, state.nonce), state.copy(splitCounter = state.splitCounter + 1))
+    stateRef.modify { state =>
+      val childIndex    = state.splitCounter
+      val newKey        = ChaChaCore.deriveKey(state.key, childIndex.toString)
+      val newState      = RNGState(newKey, state.nonce, 0, 0)
+      val updatedParent = state.copy(splitCounter = childIndex + 1)
+
+      val childRef = Unsafe.unsafe { implicit u =>
+        Ref.unsafe.make(newState)
       }
-      (newKey, nonce) = params
-      newStateRef <- Ref.make(RNGState(newKey, nonce, 0, 0))
-    } yield LiveRandomService(newStateRef, entropySource)
+
+      (new LiveRandomService(childRef, entropySource), updatedParent)
+    }
