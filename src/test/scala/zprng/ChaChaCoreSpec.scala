@@ -32,5 +32,15 @@ object ChaChaCoreSpec extends ZIOSpecDefault:
       val state  = RNGState(Chunk.fill(32)(0.toByte), Chunk.fill(12)(0.toByte), Int.MaxValue)
       val result = scala.util.Try(ChaChaCore.generateBytes(state, 64))
       assertTrue(result.isFailure)
+    },
+    test("deriveKey and mixEntropy should use different domains") {
+      val key      = Chunk.fill(32)(0.toByte)
+      val input    = Chunk.fill(32)(0.toByte)
+      val streamId = new String(input.toArray, "UTF-8")
+
+      val splitKey  = ChaChaCore.deriveKey(key, streamId)
+      val reseedKey = ChaChaCore.mixEntropy(key, input)
+
+      assertTrue(splitKey != reseedKey)
     }
   )

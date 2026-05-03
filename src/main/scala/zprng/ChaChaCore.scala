@@ -58,6 +58,7 @@ object ChaChaCore:
     */
   def deriveKey(parentKey: Chunk[Byte], streamId: String): Chunk[Byte] =
     val digest = java.security.MessageDigest.getInstance("SHA-256")
+    digest.update("zprng:split:".getBytes("UTF-8"))
     digest.update(parentKey.toArray)
     digest.update(streamId.getBytes("UTF-8"))
     Chunk.fromArray(digest.digest())
@@ -66,6 +67,7 @@ object ChaChaCore:
     */
   def mixEntropy(oldKey: Chunk[Byte], entropy: Chunk[Byte]): Chunk[Byte] =
     val digest = java.security.MessageDigest.getInstance("SHA-256")
+    digest.update("zprng:reseed:".getBytes("UTF-8"))
     digest.update(oldKey.toArray)
     digest.update(entropy.toArray)
     Chunk.fromArray(digest.digest())
