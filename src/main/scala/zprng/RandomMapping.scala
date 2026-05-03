@@ -1,6 +1,7 @@
 package zprng
 
 import zio.*
+import scala.annotation.tailrec
 
 /** Pure functions for mapping random bytes to other types.
   */
@@ -31,6 +32,7 @@ object RandomMapping:
     val threshold = (Int.MaxValue.toLong * 2 + 2) % bound
     val limit     = (Int.MaxValue.toLong * 2 + 2) - threshold
 
+    @tailrec
     def loop(): Int =
       val bytes         = nextBytes(4)
       val unsignedValue = bytesToInt(bytes).toLong & 0xffffffffL
@@ -40,6 +42,10 @@ object RandomMapping:
     loop()
 
   /** Effectful version of nextIntBounded.
+    *
+    * Note: The loop here is stack-safe due to ZIO's internal trampolining via flatMap, but it
+    * cannot be marked with @tailrec because the recursive call is not in the tail position from the
+    * compiler's perspective (it's inside a lambda).
     */
   def nextIntBoundedZIO(bound: Int)(nextBytes: Int => UIO[Chunk[Byte]]): UIO[Int] =
     require(bound > 0, "Bound must be positive")
