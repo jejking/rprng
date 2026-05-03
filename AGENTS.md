@@ -323,3 +323,151 @@ The implementation is successful if:
 > This system should feel almost boring.
 
 If it does not, simplify it.
+
+## 13. Build and Execution (sbt)
+
+The project uses **sbt** as the build tool.
+
+### 13.1 Standard commands
+
+All commands must be run from the project root.
+
+* Compile:
+
+  ```bash
+  sbt compile
+  ```
+
+* Run tests:
+
+  ```bash
+  sbt test
+  ```
+
+* Continuous testing (for TDD):
+
+  ```bash
+  sbt ~test
+  ```
+
+* Run a specific demo:
+
+  ```bash
+  sbt "runMain <fully.qualified.MainClass>"
+  ```
+
+---
+
+### 13.2 Definition of done
+
+A task is complete only if:
+
+* `sbt compile` succeeds
+* `sbt test` passes with no failures
+* No warnings indicating incorrect or unsafe behaviour
+
+---
+
+### 13.3 Testing workflow (TDD)
+
+Agents must:
+
+1. Run tests before making changes
+2. Add or update tests first
+3. Run `sbt test` after each change
+4. Ensure all tests pass before proceeding
+
+---
+
+### 13.4 Constraints
+
+* Do NOT introduce alternative build tools
+* Do NOT modify sbt configuration unless explicitly required
+* Do NOT bypass tests
+
+---
+
+### 13.5 Performance guidance
+
+* Prefer `sbt ~test` during development loops
+* Avoid unnecessary full rebuilds
+* Keep test execution fast and deterministic
+
+## 14. Code Formatting (scalafmt)
+
+The project uses **scalafmt** for code formatting.
+
+### 14.1 Requirements
+
+* All Scala code MUST be formatted using scalafmt
+* Formatting is not optional
+* No manual style deviations are allowed
+
+---
+
+### 14.2 Standard commands
+
+* Format all code:
+
+  ```bash
+  sbt scalafmtAll
+  ```
+
+* Check formatting (CI / verification):
+
+  ```bash
+  sbt scalafmtCheckAll
+  ```
+
+---
+
+### 14.3 Workflow
+
+Agents must:
+
+1. Run formatting after any code changes:
+
+   ```bash
+   sbt scalafmtAll
+   ```
+2. Ensure formatting checks pass:
+
+   ```bash
+   sbt scalafmtCheckAll
+   ```
+
+---
+
+### 14.4 Definition of done (formatting)
+
+A task is NOT complete unless:
+
+* `sbt scalafmtCheckAll` passes
+* No formatting diffs remain
+
+---
+
+### 14.5 Configuration
+
+* Formatting rules are defined in `.scalafmt.conf`
+* Agents MUST NOT modify formatting rules unless explicitly instructed
+
+---
+
+### 14.6 Constraints
+
+* Do NOT introduce alternative formatters
+* Do NOT bypass formatting checks
+* Do NOT commit unformatted code
+
+---
+
+### 14.7 Rationale
+
+Consistent formatting:
+
+* reduces noise in diffs
+* improves readability
+* enables automated review
+
+Formatting is treated as part of correctness, not style preference.
