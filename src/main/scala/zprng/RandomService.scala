@@ -8,40 +8,77 @@ trait RandomService:
   def nextBytes(n: Int): UIO[Chunk[Byte]]
   def nextInt: UIO[Int]
   def nextInt(bound: Int): UIO[Int]
-  def nextDouble: UIO[Double] // [-1.0, 1.0]
+  def nextDouble: UIO[Double] // [-1.0, 1.0)
   def reseed: UIO[Unit]
   def split: UIO[RandomService]
 
+/** Configuration for RandomService.
+  *
+  * @param autoReseedThreshold
+  *   Optional threshold in bytes. If set, the service will automatically reseed after this many
+  *   bytes have been generated.
+  */
+final case class RandomConfig(
+  autoReseedThreshold: Option[Long] = None
+)
+
 object RandomService:
-  val live: ZLayer[EntropySource, Throwable, RandomService] =
+  val live: ZLayer[EntropySource & RandomConfig, Throwable, RandomService] =
     ZLayer.fromZIO {
       for {
         entropySource <- ZIO.service[EntropySource]
-        seed          <- entropySource.nextBytes(32 + 12)
-        stateRef      <- Ref.make(RNGState(seed.take(32), seed.drop(32).take(12), 0, 0))
-      } yield LiveRandomService(stateRef, entropySource)
+        config        <- ZIO.service[RandomConfig]
+        seed          <- entropySource.nextBytes(RNGState.KeySize + RNGState.NonceSize)
+        stateRef <- Ref.make(
+          RNGState(
+            seed.take(RNGState.KeySize),
+            seed.drop(RNGState.KeySize).take(RNGState.NonceSize),
+            0,
+            0,
+            0
+          )
+        )
+      } yield LiveRandomService(stateRef, entropySource, config)
     }
 
   def fromSeed(
     key: Chunk[Byte],
-    nonce: Chunk[Byte]
+    nonce: Chunk[Byte],
+    config: RandomConfig = RandomConfig()
   ): ZLayer[EntropySource, Nothing, RandomService] =
     ZLayer.fromZIO {
       for {
         entropySource <- ZIO.service[EntropySource]
-        stateRef      <- Ref.make(RNGState(key, nonce, 0, 0))
-      } yield LiveRandomService(stateRef, entropySource)
+        stateRef      <- Ref.make(RNGState(key, nonce, 0, 0, 0))
+      } yield LiveRandomService(stateRef, entropySource, config)
     }
 
 final private class LiveRandomService(
   stateRef: Ref[RNGState],
-  entropySource: EntropySource
+  entropySource: EntropySource,
+  config: RandomConfig
 ) extends RandomService:
 
   override def nextBytes(n: Int): UIO[Chunk[Byte]] =
-    stateRef.modify { state =>
-      ChaChaCore.generateBytes(state, n)
-    }
+    for {
+      _ <- maybeAutoReseed(n)
+      bytes <- stateRef.modify { state =>
+        val (chunk, nextState) = ChaChaCore.generateBytes(state, n)
+        (
+          chunk,
+          nextState.copy(bytesGeneratedSinceReseed = state.bytesGeneratedSinceReseed + n)
+        )
+      }
+    } yield bytes
+
+  private def maybeAutoReseed(n: Int): UIO[Unit] =
+    config.autoReseedThreshold match
+      case Some(threshold) =>
+        stateRef.get.flatMap { state =>
+          if (state.bytesGeneratedSinceReseed + n > threshold) reseed
+          else ZIO.unit
+        }
+      case None => ZIO.unit
 
   override def nextInt: UIO[Int] =
     nextBytes(4).map(RandomMapping.bytesToInt)
@@ -62,7 +99,7 @@ final private class LiveRandomService(
             state.nonce,
             entropy.drop(RNGState.KeySize).take(RNGState.NonceSize)
           )
-        state.copy(key = newKey, nonce = newNonce, counter = 0)
+        state.copy(key = newKey, nonce = newNonce, counter = 0, bytesGeneratedSinceReseed = 0)
       }
     } yield ()
 
@@ -74,12 +111,12 @@ final private class LiveRandomService(
       )
       val newKey        = ChaChaCore.deriveKey(state.key, streamId)
       val newNonce      = ChaChaCore.deriveNonce(state.nonce, streamId)
-      val newState      = RNGState(newKey, newNonce, 0, 0)
+      val newState      = RNGState(newKey, newNonce, 0, 0, 0)
       val updatedParent = state.copy(splitCounter = childIndex + 1)
 
       val childRef = Unsafe.unsafe { implicit u =>
         Ref.unsafe.make(newState)
       }
 
-      (new LiveRandomService(childRef, entropySource), updatedParent)
+      (new LiveRandomService(childRef, entropySource, config), updatedParent)
     }

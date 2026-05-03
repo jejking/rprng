@@ -19,8 +19,9 @@ trait LottoDemo extends ZIOAppDefault:
       service <- ZIO.service[RandomService]
       numbers <- pickUnique(count, max, service)
       extra <- extraName match
-        case Some(_) => service.nextInt(extraMax.get).map(v => Some(v + 1))
-        case None    => ZIO.none
+        case Some(n) if n == "Superzahl" => service.nextInt(extraMax.get).map(v => Some(v))
+        case Some(_)                     => service.nextInt(extraMax.get).map(v => Some(v + 1))
+        case None                        => ZIO.none
       _ <- Console.printLine(s"--- $name ---").orDie
       _ <- Console.printLine(s"Main numbers: ${numbers.mkString(", ")}").orDie
       _ <- extra match
@@ -40,11 +41,11 @@ trait LottoDemo extends ZIOAppDefault:
 
 object GermanLotto extends LottoDemo:
   def run = draw("German Lotto (6aus49)", 6, 49, Some("Superzahl"), Some(10))
-    .provide(RandomService.live, EntropySource.live)
+    .provide(RandomService.live, EntropySource.live, ZLayer.succeed(RandomConfig()))
 
 object EuroMillions extends LottoDemo:
   def run = draw("EuroMillions", 5, 50, Some("Stars (2 pick)"), Some(12))
-    .provide(RandomService.live, EntropySource.live)
+    .provide(RandomService.live, EntropySource.live, ZLayer.succeed(RandomConfig()))
 
   override def draw(
     name: String,
@@ -66,7 +67,7 @@ object EuroMillions extends LottoDemo:
 
 object Eurojackpot extends LottoDemo:
   def run = draw("Eurojackpot", 5, 50, Some("Euronumbers (2 pick)"), Some(12))
-    .provide(RandomService.live, EntropySource.live)
+    .provide(RandomService.live, EntropySource.live, ZLayer.succeed(RandomConfig()))
 
   override def draw(
     name: String,

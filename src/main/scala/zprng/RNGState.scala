@@ -15,7 +15,8 @@ final case class RNGState(
   key: Chunk[Byte],
   nonce: Chunk[Byte],
   counter: Int,
-  splitCounter: Long
+  splitCounter: Long,
+  bytesGeneratedSinceReseed: Long
 )
 
 object RNGState:
