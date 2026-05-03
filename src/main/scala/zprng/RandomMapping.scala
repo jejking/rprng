@@ -28,9 +28,6 @@ object RandomMapping:
   def nextIntBounded(bound: Int)(nextBytes: Int => Chunk[Byte]): Int =
     require(bound > 0, "Bound must be positive")
 
-    // To avoid modulo bias, we use rejection sampling.
-    // For a bound 'n', we find the largest multiple of 'n' that fits in 2^32.
-    // Any value >= that multiple is rejected.
     val threshold = (Int.MaxValue.toLong * 2 + 2) % bound
     val limit     = (Int.MaxValue.toLong * 2 + 2) - threshold
 
@@ -39,6 +36,23 @@ object RandomMapping:
       val unsignedValue = bytesToInt(bytes).toLong & 0xffffffffL
       if (unsignedValue < limit) (unsignedValue % bound).toInt
       else loop()
+
+    loop()
+
+  /** Effectful version of nextIntBounded.
+    */
+  def nextIntBoundedZIO(bound: Int)(nextBytes: Int => UIO[Chunk[Byte]]): UIO[Int] =
+    require(bound > 0, "Bound must be positive")
+
+    val threshold = (Int.MaxValue.toLong * 2 + 2) % bound
+    val limit     = (Int.MaxValue.toLong * 2 + 2) - threshold
+
+    def loop(): UIO[Int] =
+      nextBytes(4).flatMap { bytes =>
+        val unsignedValue = bytesToInt(bytes).toLong & 0xffffffffL
+        if (unsignedValue < limit) ZIO.succeed((unsignedValue % bound).toInt)
+        else loop()
+      }
 
     loop()
 
