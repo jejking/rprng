@@ -1,0 +1,146 @@
+# =========================
+
+# Scala / sbt
+
+# =========================
+
+target/
+project/target/
+project/project/
+project/metals.sbt
+project/project/target/
+
+# sbt lock / cache
+
+.sbt/
+.sbtboot/
+.sbtopts
+
+# Ivy / Coursier caches (optional; usually outside project but sometimes local)
+
+lib_managed/
+src_managed/
+
+# Bloop (used by Metals)
+
+.bloop/
+
+# Metals
+
+.metals/
+
+# Scala CLI (if used occasionally)
+
+.scala-build/
+
+# =========================
+
+# IntelliJ IDEA
+
+# =========================
+
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# IntelliJ-specific caches
+
+out/
+
+# =========================
+
+# VS Code
+
+# =========================
+
+.vscode/
+!.vscode/settings.json
+!.vscode/extensions.json
+!.vscode/launch.json
+!.vscode/tasks.json
+
+# =========================
+
+# OS-specific
+
+# =========================
+
+# macOS
+
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# macOS thumbnails / metadata
+
+Icon?
+._*
+
+# Linux
+
+*~
+
+# =========================
+
+# Logs / temp
+
+# =========================
+
+*.log
+*.tmp
+*.swp
+*.swo
+
+# =========================
+
+# Build tools / misc
+
+# =========================
+
+# Ammonite
+
+.ammonite/
+
+# BSP (build server protocol)
+
+.bsp/
+
+# Coursier (sometimes appears locally)
+
+.coursier/
+
+# =========================
+
+# Test / runtime outputs
+
+# =========================
+
+# Coverage (scoverage, etc.)
+
+coverage/
+coverage-report/
+scoverage-data/
+
+# =========================
+
+# Environment / secrets
+
+# =========================
+
+.env
+.env.*
+*.env
+
+# =========================
+
+# Misc
+
+# =========================
+
+# Package / release artifacts
+
+*.jar
+*.war
+*.zip
+*.tar.gz
