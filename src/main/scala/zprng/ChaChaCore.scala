@@ -56,11 +56,11 @@ object ChaChaCore:
 
   /** Derives a new key from a parent key and a stream ID using SHA-256.
     */
-  def deriveKey(parentKey: Chunk[Byte], streamId: String): Chunk[Byte] =
+  def deriveKey(parentKey: Chunk[Byte], streamId: Chunk[Byte]): Chunk[Byte] =
     val digest = java.security.MessageDigest.getInstance("SHA-256")
     digest.update("zprng:split:".getBytes("UTF-8"))
     digest.update(parentKey.toArray)
-    digest.update(streamId.getBytes("UTF-8"))
+    digest.update(streamId.toArray)
     Chunk.fromArray(digest.digest())
 
   /** Mixes old key with entropy to produce a new key using SHA-256.

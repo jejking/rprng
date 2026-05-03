@@ -63,8 +63,11 @@ final private class LiveRandomService(
 
   override def split: UIO[RandomService] =
     stateRef.modify { state =>
-      val childIndex    = state.splitCounter
-      val newKey        = ChaChaCore.deriveKey(state.key, childIndex.toString)
+      val childIndex = state.splitCounter
+      val streamId = Chunk.fromArray(
+        java.nio.ByteBuffer.allocate(8).putLong(childIndex).array()
+      )
+      val newKey        = ChaChaCore.deriveKey(state.key, streamId)
       val newState      = RNGState(newKey, state.nonce, 0, 0)
       val updatedParent = state.copy(splitCounter = childIndex + 1)
 

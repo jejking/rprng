@@ -35,11 +35,10 @@ object ChaChaCoreSpec extends ZIOSpecDefault:
       assertTrue(result.isFailure)
     },
     test("deriveKey and mixEntropy should use different domains") {
-      val key      = Chunk.fill(32)(0.toByte)
-      val input    = Chunk.fill(32)(0.toByte)
-      val streamId = new String(input.toArray, "UTF-8")
+      val key   = Chunk.fill(32)(0.toByte)
+      val input = Chunk.fill(32)(0.toByte)
 
-      val splitKey  = ChaChaCore.deriveKey(key, streamId)
+      val splitKey  = ChaChaCore.deriveKey(key, input)
       val reseedKey = ChaChaCore.mixEntropy(key, input)
 
       assertTrue(splitKey != reseedKey)
