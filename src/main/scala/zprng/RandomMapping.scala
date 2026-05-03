@@ -62,7 +62,7 @@ object RandomMapping:
 
     loop()
 
-  /** Maps a 64-bit value (from 8 bytes) to a Double in the range [-1.0, 1.0].
+  /** Maps a 64-bit value (from 8 bytes) to a Double in the range [-1.0, 1.0).
     */
   def bytesToDouble(bytes: Chunk[Byte]): Double =
     require(bytes.size >= 8, "Need at least 8 bytes for a Double")
@@ -77,9 +77,6 @@ object RandomMapping:
         ((b(6).toLong & 0xff) << 8) |
         (b(7).toLong & 0xff)
 
-    // Map Long.MinValue to Long.MaxValue to [-1.0, 1.0]
-    // Double precision is 53 bits.
-    val mask     = (1L << 53) - 1
-    val mantissa = longValue & mask
-    val exponent = 1.0 / (1L << 53)
-    (mantissa * exponent * 2.0) - 1.0
+    val mantissa = longValue >>> 11
+    val d        = mantissa * (1.0 / (1L << 53))
+    (d * 2.0) - 1.0
