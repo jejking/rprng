@@ -7,6 +7,7 @@ import zio.Chunk
 
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
+import java.nio.charset.StandardCharsets
 
 /** Pure cryptographic core using Bouncy Castle's ChaCha7539Engine.
   */
@@ -58,7 +59,7 @@ object ChaChaCore:
     */
   def deriveKey(parentKey: Chunk[Byte], streamId: Chunk[Byte]): Chunk[Byte] =
     val digest = java.security.MessageDigest.getInstance("SHA-256")
-    digest.update("zprng:split:".getBytes("UTF-8"))
+    digest.update("zprng:split:".getBytes(StandardCharsets.UTF_8))
     digest.update(parentKey.toArray)
     digest.update(streamId.toArray)
     Chunk.fromArray(digest.digest())
@@ -67,7 +68,7 @@ object ChaChaCore:
     */
   def deriveNonce(parentNonce: Chunk[Byte], streamId: Chunk[Byte]): Chunk[Byte] =
     val digest = java.security.MessageDigest.getInstance("SHA-256")
-    digest.update("zprng:split-nonce:".getBytes("UTF-8"))
+    digest.update("zprng:split-nonce:".getBytes(StandardCharsets.UTF_8))
     digest.update(parentNonce.toArray)
     digest.update(streamId.toArray)
     Chunk.fromArray(digest.digest()).take(RNGState.NonceSize)
@@ -76,7 +77,7 @@ object ChaChaCore:
     */
   def mixEntropy(oldKey: Chunk[Byte], entropy: Chunk[Byte]): Chunk[Byte] =
     val digest = java.security.MessageDigest.getInstance("SHA-256")
-    digest.update("zprng:reseed:".getBytes("UTF-8"))
+    digest.update("zprng:reseed:".getBytes(StandardCharsets.UTF_8))
     digest.update(oldKey.toArray)
     digest.update(entropy.toArray)
     Chunk.fromArray(digest.digest())
@@ -85,7 +86,7 @@ object ChaChaCore:
     */
   def mixEntropyNonce(oldNonce: Chunk[Byte], entropy: Chunk[Byte]): Chunk[Byte] =
     val digest = java.security.MessageDigest.getInstance("SHA-256")
-    digest.update("zprng:reseed-nonce:".getBytes("UTF-8"))
+    digest.update("zprng:reseed-nonce:".getBytes(StandardCharsets.UTF_8))
     digest.update(oldNonce.toArray)
     digest.update(entropy.toArray)
     Chunk.fromArray(digest.digest()).take(RNGState.NonceSize)
