@@ -54,10 +54,15 @@ final private class LiveRandomService(
 
   override def reseed: UIO[Unit] =
     for {
-      entropy <- entropySource.nextBytes(32).orDie
+      entropy <- entropySource.nextBytes(RNGState.KeySize + RNGState.NonceSize).orDie
       _ <- stateRef.update { state =>
-        val newKey = ChaChaCore.mixEntropy(state.key, entropy)
-        state.copy(key = newKey, counter = 0)
+        val newKey = ChaChaCore.mixEntropy(state.key, entropy.take(RNGState.KeySize))
+        val newNonce =
+          ChaChaCore.mixEntropyNonce(
+            state.nonce,
+            entropy.drop(RNGState.KeySize).take(RNGState.NonceSize)
+          )
+        state.copy(key = newKey, nonce = newNonce, counter = 0)
       }
     } yield ()
 
@@ -68,7 +73,8 @@ final private class LiveRandomService(
         java.nio.ByteBuffer.allocate(8).putLong(childIndex).array()
       )
       val newKey        = ChaChaCore.deriveKey(state.key, streamId)
-      val newState      = RNGState(newKey, state.nonce, 0, 0)
+      val newNonce      = ChaChaCore.deriveNonce(state.nonce, streamId)
+      val newState      = RNGState(newKey, newNonce, 0, 0)
       val updatedParent = state.copy(splitCounter = childIndex + 1)
 
       val childRef = Unsafe.unsafe { implicit u =>

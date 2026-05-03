@@ -63,6 +63,15 @@ object ChaChaCore:
     digest.update(streamId.toArray)
     Chunk.fromArray(digest.digest())
 
+  /** Derives a new nonce from a parent nonce and a stream ID using SHA-256 (truncated to 12 bytes).
+    */
+  def deriveNonce(parentNonce: Chunk[Byte], streamId: Chunk[Byte]): Chunk[Byte] =
+    val digest = java.security.MessageDigest.getInstance("SHA-256")
+    digest.update("zprng:split-nonce:".getBytes("UTF-8"))
+    digest.update(parentNonce.toArray)
+    digest.update(streamId.toArray)
+    Chunk.fromArray(digest.digest()).take(RNGState.NonceSize)
+
   /** Mixes old key with entropy to produce a new key using SHA-256.
     */
   def mixEntropy(oldKey: Chunk[Byte], entropy: Chunk[Byte]): Chunk[Byte] =
@@ -71,3 +80,12 @@ object ChaChaCore:
     digest.update(oldKey.toArray)
     digest.update(entropy.toArray)
     Chunk.fromArray(digest.digest())
+
+  /** Mixes old nonce with entropy to produce a new nonce using SHA-256 (truncated to 12 bytes).
+    */
+  def mixEntropyNonce(oldNonce: Chunk[Byte], entropy: Chunk[Byte]): Chunk[Byte] =
+    val digest = java.security.MessageDigest.getInstance("SHA-256")
+    digest.update("zprng:reseed-nonce:".getBytes("UTF-8"))
+    digest.update(oldNonce.toArray)
+    digest.update(entropy.toArray)
+    Chunk.fromArray(digest.digest()).take(RNGState.NonceSize)
