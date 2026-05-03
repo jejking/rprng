@@ -14,7 +14,8 @@ import zio.Chunk
 final case class RNGState(
   key: Chunk[Byte],
   nonce: Chunk[Byte],
-  counter: Int
+  counter: Int,
+  splitCounter: Long
 )
 
 object RNGState:

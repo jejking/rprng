@@ -18,7 +18,7 @@ object RandomService:
       for {
         entropySource <- ZIO.service[EntropySource]
         seed          <- entropySource.nextBytes(32 + 12)
-        stateRef      <- Ref.make(RNGState(seed.take(32), seed.drop(32).take(12), 0))
+        stateRef      <- Ref.make(RNGState(seed.take(32), seed.drop(32).take(12), 0, 0))
       } yield LiveRandomService(stateRef, entropySource)
     }
 
@@ -29,7 +29,7 @@ object RandomService:
     ZLayer.fromZIO {
       for {
         entropySource <- ZIO.service[EntropySource]
-        stateRef      <- Ref.make(RNGState(key, nonce, 0))
+        stateRef      <- Ref.make(RNGState(key, nonce, 0, 0))
       } yield LiveRandomService(stateRef, entropySource)
     }
 
@@ -63,11 +63,11 @@ final private class LiveRandomService(
 
   override def split: UIO[RandomService] =
     for {
-      // Derive a new key using some of the current RNG's output as a stream ID
-      bytesForId <- nextBytes(16)
-      streamId = bytesForId.map("%02x".format(_)).mkString
-      currentState <- stateRef.get
-      newKey = ChaChaCore.deriveKey(currentState.key, streamId)
-      // New RNG starts with same nonce but counter 0 (or we could vary nonce)
-      newStateRef <- Ref.make(RNGState(newKey, currentState.nonce, 0))
+      params <- stateRef.modify { state =>
+        val streamId = s"split-${state.splitCounter}"
+        val newKey   = ChaChaCore.deriveKey(state.key, streamId)
+        ((newKey, state.nonce), state.copy(splitCounter = state.splitCounter + 1))
+      }
+      (newKey, nonce) = params
+      newStateRef <- Ref.make(RNGState(newKey, nonce, 0, 0))
     } yield LiveRandomService(newStateRef, entropySource)
