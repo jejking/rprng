@@ -17,5 +17,20 @@ object ChaChaCoreSpec extends ZIOSpecDefault:
       assertTrue(bytes1 == bytes2) &&
       assertTrue(bytes1.size == 64) &&
       assertTrue(nextState1.counter == state.counter + 1)
+    },
+    test("generateBytes should fail for invalid key length") {
+      val state  = RNGState(Chunk.fill(16)(0.toByte), Chunk.fill(12)(0.toByte), 0)
+      val result = scala.util.Try(ChaChaCore.generateBytes(state, 64))
+      assertTrue(result.isFailure)
+    },
+    test("generateBytes should fail for invalid nonce length") {
+      val state  = RNGState(Chunk.fill(32)(0.toByte), Chunk.fill(8)(0.toByte), 0)
+      val result = scala.util.Try(ChaChaCore.generateBytes(state, 64))
+      assertTrue(result.isFailure)
+    },
+    test("generateBytes should fail if counter would overflow") {
+      val state  = RNGState(Chunk.fill(32)(0.toByte), Chunk.fill(12)(0.toByte), Int.MaxValue)
+      val result = scala.util.Try(ChaChaCore.generateBytes(state, 64))
+      assertTrue(result.isFailure)
     }
   )
