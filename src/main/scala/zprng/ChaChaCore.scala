@@ -26,11 +26,10 @@ object ChaChaCore:
     require(state.key.size == RNGState.KeySize, s"Key must be ${RNGState.KeySize} bytes")
     require(state.nonce.size == RNGState.NonceSize, s"Nonce must be ${RNGState.NonceSize} bytes")
     require(numBytes > 0, "numBytes must be positive")
-    require(state.counter >= 0, "Counter must be non-negative")
+    require(state.bytesGenerated >= 0, "bytesGenerated must be non-negative")
 
-    val blocksNeeded = (numBytes + 63) / 64
     require(
-      state.counter.toLong + blocksNeeded <= Int.MaxValue,
+      state.bytesGenerated + numBytes <= RNGState.MaxBytesPerReseed,
       "Counter overflow: too many bytes requested or reseed required"
     )
 
@@ -41,18 +40,16 @@ object ChaChaCore:
     )
     engine.init(true, params)
 
-    // Set the counter. ChaCha7539 uses a 32-bit counter.
-    // We need to skip to the correct block.
-    // Each block is 64 bytes.
-    // Bouncy Castle's ChaChaEngine.skip(long) skips bytes.
-    if (state.counter != 0) {
-      engine.skip(state.counter.toLong * 64)
+    // ChaCha7539 uses a 32-bit block counter.
+    // Bouncy Castle's ChaChaEngine.skip(long) skips individual bytes.
+    if (state.bytesGenerated != 0) {
+      engine.skip(state.bytesGenerated)
     }
 
     val out = new Array[Byte](numBytes)
     engine.processBytes(new Array[Byte](numBytes), 0, numBytes, out, 0)
 
-    val nextState = state.copy(counter = state.counter + (numBytes + 63) / 64)
+    val nextState = state.copy(bytesGenerated = state.bytesGenerated + numBytes)
     (Chunk.fromArray(out), nextState)
 
   /** Derives a new key from a parent key and a stream ID using SHA-256.

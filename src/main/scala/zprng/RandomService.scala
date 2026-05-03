@@ -34,11 +34,11 @@ object RandomService:
             seed.take(RNGState.KeySize),
             seed.drop(RNGState.KeySize).take(RNGState.NonceSize),
             0,
-            0,
             0
           )
         )
-      } yield LiveRandomService(stateRef, entropySource, config)
+        semaphore <- Semaphore.make(1)
+      } yield LiveRandomService(stateRef, entropySource, config, semaphore)
     }
 
   def fromSeed(
@@ -49,37 +49,34 @@ object RandomService:
     ZLayer.fromZIO {
       for {
         entropySource <- ZIO.service[EntropySource]
-        stateRef      <- Ref.make(RNGState(key, nonce, 0, 0, 0))
-      } yield LiveRandomService(stateRef, entropySource, config)
+        stateRef      <- Ref.make(RNGState(key, nonce, 0, 0))
+        semaphore     <- Semaphore.make(1)
+      } yield LiveRandomService(stateRef, entropySource, config, semaphore)
     }
 
 final private class LiveRandomService(
   stateRef: Ref[RNGState],
   entropySource: EntropySource,
-  config: RandomConfig
+  config: RandomConfig,
+  reseedSemaphore: Semaphore
 ) extends RandomService:
 
   override def nextBytes(n: Int): UIO[Chunk[Byte]] =
-    for {
-      _ <- maybeAutoReseed(n)
-      bytes <- stateRef.modify { state =>
-        val (chunk, nextState) = ChaChaCore.generateBytes(state, n)
-        (
-          chunk,
-          nextState.copy(bytesGeneratedSinceReseed = state.bytesGeneratedSinceReseed + n)
-        )
-      }
-    } yield bytes
+    reseedSemaphore.withPermit {
+      for {
+        _ <- maybeAutoReseed(n)
+        bytes <- stateRef.modify { state =>
+          ChaChaCore.generateBytes(state, n)
+        }
+      } yield bytes
+    }
 
   private def maybeAutoReseed(n: Int): UIO[Unit] =
     stateRef.get.flatMap { state =>
-      // The ChaCha20 counter is 32-bit. Each increment represents one 64-byte block.
-      // We must reseed before the counter hits Int.MaxValue to avoid overflow and crashes.
-      val maxSafeBytes = Int.MaxValue.toLong * 64
-      val threshold    = config.autoReseedThreshold.getOrElse(maxSafeBytes)
-      val limit        = Math.min(threshold, maxSafeBytes)
+      val threshold = config.autoReseedThreshold.getOrElse(RNGState.MaxBytesPerReseed)
+      val limit     = Math.min(threshold, RNGState.MaxBytesPerReseed)
 
-      if (state.bytesGeneratedSinceReseed + n > limit) reseed
+      if (state.bytesGenerated + n > limit) reseed
       else ZIO.unit
     }
 
@@ -102,7 +99,7 @@ final private class LiveRandomService(
             state.nonce,
             entropy.drop(RNGState.KeySize).take(RNGState.NonceSize)
           )
-        state.copy(key = newKey, nonce = newNonce, counter = 0, bytesGeneratedSinceReseed = 0)
+        state.copy(key = newKey, nonce = newNonce, bytesGenerated = 0)
       }
     } yield ()
 
@@ -112,14 +109,20 @@ final private class LiveRandomService(
       val streamId = Chunk.fromArray(
         java.nio.ByteBuffer.allocate(8).putLong(childIndex).array()
       )
-      val newKey        = ChaChaCore.deriveKey(state.key, streamId)
-      val newNonce      = ChaChaCore.deriveNonce(state.nonce, streamId)
-      val newState      = RNGState(newKey, newNonce, 0, 0, 0)
-      val updatedParent = state.copy(splitCounter = childIndex + 1)
+      val newKey   = ChaChaCore.deriveKey(state.key, streamId)
+      val newNonce = ChaChaCore.deriveNonce(state.nonce, streamId)
+      val newState = RNGState(newKey, newNonce, 0, 0)
 
       val childRef = Unsafe.unsafe { implicit u =>
         Ref.unsafe.make(newState)
       }
 
-      (new LiveRandomService(childRef, entropySource, config), updatedParent)
+      val childSemaphore = Unsafe.unsafe { implicit u =>
+        Semaphore.unsafe.make(1)
+      }
+
+      (
+        new LiveRandomService(childRef, entropySource, config, childSemaphore),
+        state.copy(splitCounter = childIndex + 1)
+      )
     }
