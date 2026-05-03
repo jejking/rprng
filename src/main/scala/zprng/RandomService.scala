@@ -72,13 +72,16 @@ final private class LiveRandomService(
     } yield bytes
 
   private def maybeAutoReseed(n: Int): UIO[Unit] =
-    config.autoReseedThreshold match
-      case Some(threshold) =>
-        stateRef.get.flatMap { state =>
-          if (state.bytesGeneratedSinceReseed + n > threshold) reseed
-          else ZIO.unit
-        }
-      case None => ZIO.unit
+    stateRef.get.flatMap { state =>
+      // The ChaCha20 counter is 32-bit. Each increment represents one 64-byte block.
+      // We must reseed before the counter hits Int.MaxValue to avoid overflow and crashes.
+      val maxSafeBytes = Int.MaxValue.toLong * 64
+      val threshold    = config.autoReseedThreshold.getOrElse(maxSafeBytes)
+      val limit        = Math.min(threshold, maxSafeBytes)
+
+      if (state.bytesGeneratedSinceReseed + n > limit) reseed
+      else ZIO.unit
+    }
 
   override def nextInt: UIO[Int] =
     nextBytes(4).map(RandomMapping.bytesToInt)
