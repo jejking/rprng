@@ -10,12 +10,11 @@ object RandomMapping:
   /** Converts 4 bytes to a signed 32-bit integer.
     */
   def bytesToInt(bytes: Chunk[Byte]): Int =
-    require(bytes.size >= 4, "Need at least 4 bytes for an Int")
-    val b = bytes.toArray
-    ((b(0) & 0xff) << 24) |
-      ((b(1) & 0xff) << 16) |
-      ((b(2) & 0xff) << 8) |
-      (b(3) & 0xff)
+    require(bytes.size >= 4, "Need at least 4 bytes for an Int") 
+    ((bytes(0) & 0xff) << 24) |
+    ((bytes(1) & 0xff) << 16) |
+    ((bytes(2) & 0xff) << 8) |
+    (bytes(3) & 0xff)
 
   /** Generates a random integer in the range [0, bound) using rejection sampling.
     *
@@ -29,8 +28,9 @@ object RandomMapping:
   def nextIntBounded(bound: Int)(nextBytes: Int => Chunk[Byte]): Int =
     require(bound > 0, "Bound must be positive")
 
-    val threshold = (Int.MaxValue.toLong * 2 + 2) % bound
-    val limit     = (Int.MaxValue.toLong * 2 + 2) - threshold
+    val range = 1L << 32
+    val threshold = range % bound
+    val limit = range - threshold
 
     @tailrec
     def loop(): Int =
